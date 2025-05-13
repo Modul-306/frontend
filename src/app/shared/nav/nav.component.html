@@ -1,0 +1,91 @@
+<nav class="bg-white shadow-lg">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between h-16">
+      <!-- Logo and Primary Nav -->
+      <div class="flex">
+        <div class="flex-shrink-0 flex items-center">
+          <a routerLink="/" class="flex items-center">
+            <svg class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            <span class="ml-2 font-semibold text-xl text-gray-800">Shop</span>
+          </a>
+        </div>
+
+        <!-- Primary Nav -->
+        <div class="hidden md:flex items-center space-x-4 ml-10">
+          <a routerLink="/blogs" class="flex items-center px-3 py-2 text-gray-700 hover:text-green-500">
+            <svg class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15"/>
+            </svg>
+            Blogs
+          </a>
+          <a routerLink="/products" class="flex items-center px-3 py-2 text-gray-700 hover:text-green-500">
+            <svg class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+            Products
+          </a>
+        </div>
+      </div>
+
+      <!-- Secondary Nav -->
+      <div class="hidden md:flex items-center space-x-3">
+        <ng-container *ngIf="!isAuthenticated; else userMenu">
+          <a routerLink="/login" class="flex items-center px-4 py-2 text-gray-700 hover:text-green-500">
+            <svg class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+            </svg>
+            Login
+          </a>
+          <a routerLink="/register" class="flex items-center px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600">
+            <svg class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+            Register
+          </a>
+        </ng-container>
+      </div>
+
+      <!-- Mobile menu button -->
+      <div class="md:hidden flex items-center">
+        <button (click)="toggleMobileMenu()" class="mobile-menu-button p-2 rounded-md hover:bg-gray-100 focus:outline-none">
+          <svg class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div [class.hidden]="!isMobileMenuOpen" class="md:hidden">
+    <div class="px-2 pt-2 pb-3 space-y-1">
+      <a routerLink="/blogs" class="block px-3 py-2 text-gray-700 hover:text-green-500">Blogs</a>
+      <a routerLink="/products" class="block px-3 py-2 text-gray-700 hover:text-green-500">Products</a>
+      <ng-container *ngIf="!isAuthenticated">
+        <a routerLink="/login" class="block px-3 py-2 text-gray-700 hover:text-green-500">Login</a>
+        <a routerLink="/register" class="block px-3 py-2 text-gray-700 hover:text-green-500">Register</a>
+      </ng-container>
+    </div>
+  </div>
+</nav>
+
+<ng-template #userMenu>
+    <div class="relative">
+      <button (click)="toggleUserMenu()" class="flex items-center space-x-2 text-gray-700 hover:text-green-500">
+        <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Profile</span>
+      </button>
+      <div [class.hidden]="!isUserMenuOpen" class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+        <div class="py-1">
+          <a routerLink="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+          <button (click)="logout()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+            Sign out
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>

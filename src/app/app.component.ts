@@ -1,12 +1,16 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { NavComponent } from './shared/nav/nav.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  standalone: true,
+  imports: [RouterOutlet, NavComponent],
+  template: `
+    <app-nav></app-nav>
+    <main class="container mx-auto px-4 py-8">
+      <router-outlet></router-outlet>
+    </main>
+  `
 })
-export class AppComponent {
-  title = 'frontend';
-}
+export class AppComponent {}
