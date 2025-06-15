@@ -34,6 +34,9 @@ jobs:
           version: v3.12.0
 
       - name: Package and Push Helm chart
+        env:
+          HELM_STAGING_REPO: ${{ vars.HELM_STAGING_REPO }}
+          HELM_PROD_REPO: ${{ vars.HELM_PROD_REPO }}
         run: |
           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
           
@@ -45,7 +48,9 @@ jobs:
           if [[ $GITHUB_REF == refs/tags/v* ]]; then
             HELM_REPO=${{ vars.HELM_PROD_REPO }}
             TAG=${GITHUB_REF#refs/tags/v}
-            CHART_NAME="frontend-prod"
+            # Update chart name and version for production
+            sed -i "s/name:.*/name: ${HELM_PROD_REPO#*/}/" ./chart/Chart.yaml
+            sed -i "s/version:.*/version: $TAG/" ./chart/Chart.yaml
           else
             HELM_REPO=${{ vars.HELM_STAGING_REPO }}
             if [[ "${{ github.event_name }}" == "pull_request" ]]; then
@@ -54,12 +59,10 @@ jobs:
             else
               TAG="${LATEST_VERSION}-main"
             fi
-            CHART_NAME="frontend-staging"
+            # Update chart name and version for staging
+            sed -i "s/name:.*/name: ${HELM_STAGING_REPO#*/}/" ./chart/Chart.yaml
+            sed -i "s/version:.*/version: $TAG/" ./chart/Chart.yaml
           fi
-          
-          # Update chart name and version
-          sed -i "s/name:.*/name: $CHART_NAME/" ./chart/Chart.yaml
-          sed -i "s/version:.*/version: $TAG/" ./chart/Chart.yaml
           
           # Package chart
           helm package ./chart
@@ -67,16 +70,11 @@ jobs:
           # Get the actual package name
           PACKAGE_NAME=$(ls *.tgz)
           
-          # Create repository if it doesn't exist
-          aws ecr describe-repositories --repository-names ${HELM_REPO} || \
-          aws ecr create-repository --repository-name ${HELM_REPO}
-          
           # Login to ECR
           aws ecr get-login-password --region ${{ vars.AWS_REGION }} | \
           helm registry login -u AWS --password-stdin $ECR_REGISTRY
           
           # Push to appropriate repository
-          helm push $PACKAGE_NAME oci://${ECR_REGISTRY}/${HELM_REPO}
+          helm push $PACKAGE_NAME oci://${ECR_REGISTRY}
           
           echo "Chart $PACKAGE_NAME pushed to ${HELM_REPO}"
-            

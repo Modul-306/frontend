@@ -5,12 +5,13 @@ import { Product } from '../interfaces/product';
 import { Order } from '../interfaces/order';
 import { User } from '../interfaces/user';
 import { getActiveConsumer } from '@angular/core/primitives/signals';
+import { getApiUrl } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:8000/api/v1';
+  private baseUrl = getApiUrl();
   constructor(private http: HttpClient) {}
 
   // Auth endpoints
