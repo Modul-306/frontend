@@ -1,0 +1,44 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Admin Controls -->
+  <div *ngIf="isAdmin" class="mb-8">
+    <button 
+      [routerLink]="['/blogs/new']"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+      Create New Blog
+    </button>
+  </div>
+
+  <!-- Blog List -->
+  <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+    <div *ngFor="let blog of blogs" 
+         class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
+      <div class="p-6">
+        <h2 class="text-xl font-bold mb-2">{{blog.title}}</h2>
+        <div class="prose prose-sm mb-4">
+          <markdown [data]="getPreview(blog.content)"></markdown>
+        </div>
+        
+        <div class="flex justify-between items-center">
+          <a [routerLink]="['/blogs', blog.id]" 
+             class="text-blue-600 hover:text-blue-800 font-medium">
+            Read More
+          </a>
+          
+          <!-- Admin Actions -->
+          <div *ngIf="isAdmin" class="space-x-2">
+            <button 
+              [routerLink]="['/blogs', blog.id, 'edit']"
+              class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm transition-colors duration-200">
+              Edit
+            </button>
+            <button 
+              (click)="onDelete(blog.id)"
+              class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition-colors duration-200">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
