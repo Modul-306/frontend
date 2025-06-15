@@ -11,8 +11,8 @@ on:
       - 'frontend/**'
 
 env:
-  STAGING_REPO: frontend-staging-m306
-  PROD_REPO: frontend-prod-m306
+  STAGING_REPO: ${{ vars.STAGING_REPO }}
+  PROD_REPO: ${{ vars.PRODUCTION_REPO }}
 
 jobs:
   build:

@@ -11,8 +11,8 @@ on:
       - 'frontend/chart/**'
 
 env:
-  STAGING_REPO: ${{ vars.FRONTEND_HELM_STAGING_REPO }}
-  PROD_REPO: ${{ vars.FRONTEND_HELM_PROD_REPO }}
+  STAGING_REPO: ${{ vars.HELM_STAGING_REPO }}
+  PROD_REPO: ${{ vars.HELM_PROD_REPO }}
 
 jobs:
   push-frontend-helm-chart:
@@ -39,8 +39,8 @@ jobs:
 
       - name: Package and Push Helm chart
         env:
-          FRONTEND_HELM_STAGING_REPO: ${{ vars.FRONTEND_HELM_STAGING_REPO }}
-          FRONTEND_HELM_PROD_REPO: ${{ vars.FRONTEND_HELM_PROD_REPO }}
+          FRONTEND_HELM_STAGING_REPO: ${{ vars.HELM_STAGING_REPO }}
+          FRONTEND_HELM_PROD_REPO: ${{ vars.HELM_PROD_REPO }}
         run: |
           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
           
@@ -50,13 +50,13 @@ jobs:
           
           # Determine target repository and tag based on trigger
           if [[ $GITHUB_REF == refs/tags/v* ]]; then
-            HELM_REPO=${{ vars.FRONTEND_HELM_PROD_REPO }}
+            HELM_REPO=${{ vars.HELM_PROD_REPO }}
             TAG=${GITHUB_REF#refs/tags/v}
             # Update chart name and version for production
             sed -i "s/name:.*/name: ${FRONTEND_HELM_PROD_REPO#*/}/" ./chart/Chart.yaml
             sed -i "s/version:.*/version: $TAG/" ./chart/Chart.yaml
           else
-            HELM_REPO=${{ vars.FRONTEND_HELM_STAGING_REPO }}
+            HELM_REPO=${{ vars.HELM_STAGING_REPO }}
             if [[ ${{ github.event_name }} == 'pull_request' ]]; then
               PR_NUMBER=${{ github.event.number }}
               TAG="${LATEST_VERSION}-pr.${PR_NUMBER}"
@@ -86,4 +86,3 @@ jobs:
           helm push $PACKAGE_NAME oci://${ECR_REGISTRY}/${HELM_REPO}
           
           echo "Chart $PACKAGE_NAME pushed to ${HELM_REPO}"
-            
