@@ -5,10 +5,10 @@ on:
     branches: [ main ]
     tags: [ 'v*.*.*' ]
     paths:
-      - 'frontend/**'
+      - '**'
   pull_request:
     paths:
-      - 'frontend/**'
+      - '**'
 
 env:
   STAGING_REPO: ${{ vars.STAGING_REPO }}

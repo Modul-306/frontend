@@ -5,10 +5,10 @@ on:
     branches: [ main ]
     tags: [ 'v*.*.*' ]
     paths:
-      - 'frontend/chart/**'
+      - 'chart/**'
   pull_request:
     paths:
-      - 'frontend/chart/**'
+      - 'chart/**'
 
 env:
   STAGING_REPO: ${{ vars.HELM_STAGING_REPO }}
