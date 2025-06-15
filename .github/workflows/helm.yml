@@ -53,8 +53,8 @@ jobs:
             HELM_REPO=${{ vars.FRONTEND_HELM_PROD_REPO }}
             TAG=${GITHUB_REF#refs/tags/v}
             # Update chart name and version for production
-            sed -i "s/name:.*/name: ${FRONTEND_HELM_PROD_REPO#*/}/" ./frontend/chart/Chart.yaml
-            sed -i "s/version:.*/version: $TAG/" ./frontend/chart/Chart.yaml
+            sed -i "s/name:.*/name: ${FRONTEND_HELM_PROD_REPO#*/}/" ./chart/Chart.yaml
+            sed -i "s/version:.*/version: $TAG/" ./chart/Chart.yaml
           else
             HELM_REPO=${{ vars.FRONTEND_HELM_STAGING_REPO }}
             if [[ ${{ github.event_name }} == 'pull_request' ]]; then
@@ -64,12 +64,12 @@ jobs:
               TAG="${LATEST_VERSION}-main"
             fi
             # Update chart name and version for staging
-            sed -i "s/name:.*/name: ${FRONTEND_HELM_STAGING_REPO#*/}/" ./frontend/chart/Chart.yaml
-            sed -i "s/version:.*/version: $TAG/" ./frontend/chart/Chart.yaml
+            sed -i "s/name:.*/name: ${FRONTEND_HELM_STAGING_REPO#*/}/" ./chart/Chart.yaml
+            sed -i "s/version:.*/version: $TAG/" ./chart/Chart.yaml
           fi
           
           # Package chart
-          helm package ./frontend/chart
+          helm package ./chart
           
           # Get the actual package name
           PACKAGE_NAME=$(ls *.tgz)
@@ -86,3 +86,4 @@ jobs:
           helm push $PACKAGE_NAME oci://${ECR_REGISTRY}/${HELM_REPO}
           
           echo "Chart $PACKAGE_NAME pushed to ${HELM_REPO}"
+            
