@@ -13,13 +13,13 @@
     <div *ngFor="let blog of blogs" 
          class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
       <div class="p-6">
-        <h2 class="text-xl font-bold mb-2">{{blog.title}}</h2>
+        <h2 class="text-xl font-bold mb-2">{{blog.Title}}</h2>
         <div class="prose prose-sm mb-4">
-          <markdown [data]="getPreview(blog.content)"></markdown>
+          <markdown [data]="getPreview(blog.Content)"></markdown>
         </div>
         
         <div class="flex justify-between items-center">
-          <a [routerLink]="['/blogs', blog.id]" 
+          <a [routerLink]="['/blogs', blog.ID]" 
              class="text-blue-600 hover:text-blue-800 font-medium">
             Read More
           </a>
@@ -27,12 +27,12 @@
           <!-- Admin Actions -->
           <div *ngIf="isAdmin" class="space-x-2">
             <button 
-              [routerLink]="['/blogs', blog.id, 'edit']"
+              [routerLink]="['/blogs', blog.ID, 'edit']"
               class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm transition-colors duration-200">
               Edit
             </button>
             <button 
-              (click)="onDelete(blog.id)"
+              (click)="onDelete(blog.ID)"
               class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition-colors duration-200">
               Delete
             </button>

@@ -5,7 +5,7 @@
         <div class="meta text-gray-600 mb-8">
           <time>{{ blog.CreatedAt | date }}</time>
         </div>
-        <markdown [data]="lineBreak(blog.Content)" [ready]="" ngPreserveWhitespaces></markdown>
+        <markdown [data]="lineBreak(blog.Content)" ngPreserveWhitespaces></markdown>
       </article>
     } @else if (error) {
       <div class="text-red-500">{{ error }}</div>

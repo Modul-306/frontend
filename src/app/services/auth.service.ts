@@ -10,11 +10,11 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  private currentUserSubject = new BehaviorSubject<any>(null);
 
   constructor(
     private apiService: ApiService,
     private router: Router,
-    private currentUser: any,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DOCUMENT) private document: Document
   ) {
@@ -44,11 +44,15 @@ export class AuthService {
     return this.isAuthenticatedSubject.asObservable();
   }
 
+  getCurrentUser(): Observable<any> {
+    return this.currentUserSubject.asObservable();
+  }
+
   login(username: string, password: string): Observable<any> {
     return this.apiService.login(username, password).pipe(
       tap(() => {
         this.isAuthenticatedSubject.next(true);
-        this.currentUser = username;
+        this.currentUserSubject.next(username);
       })
     );
   }
@@ -57,7 +61,7 @@ export class AuthService {
     return this.apiService.register(username, password, email).pipe(
       tap(() => {
         this.isAuthenticatedSubject.next(true);
-        this.currentUser = username;
+        this.currentUserSubject.next(username);
       })
     );
   }
@@ -66,7 +70,7 @@ export class AuthService {
     if (isPlatformBrowser(this.platformId)) {
       this.document.cookie = 'auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       this.isAuthenticatedSubject.next(false);
-      this.currentUser = null;
+      this.currentUserSubject.next(null);
       this.router.navigate(['/login']);
     }
   }
@@ -79,7 +83,8 @@ export class AuthService {
 
     return this.apiService.getUsers().pipe(
       map(users => {
-        const user = users.find(u => u.Name === this.currentUser);
+        const currentUser = this.currentUserSubject.value;
+        const user = users.find(u => u.Name === currentUser);
         return user ? user.IsAdmin : false;
       }),
       catchError(err => {
