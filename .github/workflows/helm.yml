@@ -79,3 +79,4 @@ jobs:
           helm push $PACKAGE_NAME oci://${ECR_REGISTRY}/${HELM_REPO}
           
           echo "Chart $PACKAGE_NAME pushed to ${HELM_REPO}"
+            
