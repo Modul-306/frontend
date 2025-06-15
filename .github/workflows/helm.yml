@@ -5,14 +5,10 @@ on:
     branches: [ main ]
     tags: [ 'v*.*.*' ]
     paths:
-      - 'frontend/chart/**'
+      - 'chart/**'
   pull_request:
     paths:
-      - 'frontend/chart/**'
-
-env:
-  STAGING_REPO: ${{ vars.FRONTEND_HELM_STAGING_REPO }}
-  PROD_REPO: ${{ vars.FRONTEND_HELM_PROD_REPO }}
+      - 'chart/**'
 
 jobs:
   push-frontend-helm-chart:
@@ -39,8 +35,8 @@ jobs:
 
       - name: Package and Push Helm chart
         env:
-          FRONTEND_HELM_STAGING_REPO: ${{ vars.FRONTEND_HELM_STAGING_REPO }}
-          FRONTEND_HELM_PROD_REPO: ${{ vars.FRONTEND_HELM_PROD_REPO }}
+          HELM_STAGING_REPO: ${{ vars.HELM_STAGING_REPO }}
+          HELM_PROD_REPO: ${{ vars.HELM_PROD_REPO }}
         run: |
           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
           
@@ -50,21 +46,21 @@ jobs:
           
           # Determine target repository and tag based on trigger
           if [[ $GITHUB_REF == refs/tags/v* ]]; then
-            HELM_REPO=${{ vars.FRONTEND_HELM_PROD_REPO }}
+            HELM_REPO=${{ vars.HELM_PROD_REPO }}
             TAG=${GITHUB_REF#refs/tags/v}
             # Update chart name and version for production
-            sed -i "s/name:.*/name: ${FRONTEND_HELM_PROD_REPO#*/}/" ./chart/Chart.yaml
+            sed -i "s/name:.*/name: ${HELM_PROD_REPO#*/}/" ./chart/Chart.yaml
             sed -i "s/version:.*/version: $TAG/" ./chart/Chart.yaml
           else
-            HELM_REPO=${{ vars.FRONTEND_HELM_STAGING_REPO }}
-            if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            HELM_REPO=${{ vars.HELM_STAGING_REPO }}
+            if [[ "${{ github.event_name }}" == "pull_request" ]]; then
               PR_NUMBER=${{ github.event.number }}
-              TAG="${LATEST_VERSION}-pr.${PR_NUMBER}"
+              TAG="${LATEST_VERSION}-pr${PR_NUMBER}"
             else
               TAG="${LATEST_VERSION}-main"
             fi
             # Update chart name and version for staging
-            sed -i "s/name:.*/name: ${FRONTEND_HELM_STAGING_REPO#*/}/" ./chart/Chart.yaml
+            sed -i "s/name:.*/name: ${HELM_STAGING_REPO#*/}/" ./chart/Chart.yaml
             sed -i "s/version:.*/version: $TAG/" ./chart/Chart.yaml
           fi
           
@@ -74,16 +70,11 @@ jobs:
           # Get the actual package name
           PACKAGE_NAME=$(ls *.tgz)
           
-          # Create repository if it doesn't exist
-          aws ecr describe-repositories --repository-names ${HELM_REPO} || \
-          aws ecr create-repository --repository-name ${HELM_REPO}
-          
           # Login to ECR
           aws ecr get-login-password --region ${{ vars.AWS_REGION }} | \
           helm registry login -u AWS --password-stdin $ECR_REGISTRY
           
           # Push to appropriate repository
-          helm push $PACKAGE_NAME oci://${ECR_REGISTRY}/${HELM_REPO}
+          helm push $PACKAGE_NAME oci://${ECR_REGISTRY}
           
           echo "Chart $PACKAGE_NAME pushed to ${HELM_REPO}"
-            

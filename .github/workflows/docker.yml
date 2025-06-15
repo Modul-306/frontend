@@ -5,14 +5,14 @@ on:
     branches: [ main ]
     tags: [ 'v*.*.*' ]
     paths:
-      - 'frontend/**'
+      - '**'
   pull_request:
     paths:
-      - 'frontend/**'
+      - '**'
 
 env:
-  STAGING_REPO: frontend-staging-m306
-  PROD_REPO: frontend-prod-m306
+  STAGING_REPO: ${{ vars.STAGING_REPO }}
+  PROD_REPO: ${{ vars.PRODUCTION_REPO }}
 
 jobs:
   build:
@@ -61,7 +61,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend
+          context: .
           file: ./Dockerfile
           push: true
           tags: ${{ steps.docker-tags.outputs.tags }}
