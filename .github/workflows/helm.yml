@@ -10,10 +10,6 @@ on:
     paths:
       - 'chart/**'
 
-env:
-  STAGING_REPO: ${{ vars.HELM_STAGING_REPO }}
-  PROD_REPO: ${{ vars.HELM_PROD_REPO }}
-
 jobs:
   push-frontend-helm-chart:
     runs-on: ubuntu-latest
@@ -38,9 +34,6 @@ jobs:
           version: v3.12.0
 
       - name: Package and Push Helm chart
-        env:
-          FRONTEND_HELM_STAGING_REPO: ${{ vars.HELM_STAGING_REPO }}
-          FRONTEND_HELM_PROD_REPO: ${{ vars.HELM_PROD_REPO }}
         run: |
           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
           
@@ -52,21 +45,21 @@ jobs:
           if [[ $GITHUB_REF == refs/tags/v* ]]; then
             HELM_REPO=${{ vars.HELM_PROD_REPO }}
             TAG=${GITHUB_REF#refs/tags/v}
-            # Update chart name and version for production
-            sed -i "s/name:.*/name: ${FRONTEND_HELM_PROD_REPO#*/}/" ./chart/Chart.yaml
-            sed -i "s/version:.*/version: $TAG/" ./chart/Chart.yaml
+            CHART_NAME="frontend-prod"
           else
             HELM_REPO=${{ vars.HELM_STAGING_REPO }}
-            if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            if [[ "${{ github.event_name }}" == "pull_request" ]]; then
               PR_NUMBER=${{ github.event.number }}
-              TAG="${LATEST_VERSION}-pr.${PR_NUMBER}"
+              TAG="${LATEST_VERSION}-pr${PR_NUMBER}"
             else
               TAG="${LATEST_VERSION}-main"
             fi
-            # Update chart name and version for staging
-            sed -i "s/name:.*/name: ${FRONTEND_HELM_STAGING_REPO#*/}/" ./chart/Chart.yaml
-            sed -i "s/version:.*/version: $TAG/" ./chart/Chart.yaml
+            CHART_NAME="frontend-staging"
           fi
+          
+          # Update chart name and version
+          sed -i "s/name:.*/name: $CHART_NAME/" ./chart/Chart.yaml
+          sed -i "s/version:.*/version: $TAG/" ./chart/Chart.yaml
           
           # Package chart
           helm package ./chart
