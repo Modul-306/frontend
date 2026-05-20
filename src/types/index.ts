@@ -1,11 +1,23 @@
+export interface Tenant {
+    id: string;
+    name: string;
+    slug: string;
+    created_at: string;
+}
+
+export interface NullString {
+    String: string;
+    Valid: boolean;
+}
+
 export interface Product {
     id: string;
     tenant_id: string;
     name: string;
-    description: string;
-    price: number;
+    description: NullString;
+    price: string; // Price is returned as string from backend
     stock: number;
-    image_url: string;
+    image_url: NullString;
     created_at: string;
 }
 

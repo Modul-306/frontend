@@ -10,32 +10,32 @@ export default function TenantPage() {
     const [view, setView] = useState<'shop' | 'admin'>('shop');
 
     return (
-        <main className="min-h-screen bg-background">
-            <nav className="glass-nav sticky top-0 z-50 px-6 py-4">
+        <main className="min-h-screen bg-farm-cream">
+            <nav className="nav-humble">
                 <div className="container mx-auto flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">C</div>
-                        <span className="text-2xl font-black text-primary tracking-tight uppercase">{slug}</span>
+                    <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-farm-forest flex items-center justify-center text-farm-cream font-serif text-xl font-bold">H</div>
+                        <span className="text-3xl font-serif font-bold text-farm-forest uppercase tracking-widest">{slug}</span>
                     </div>
                     
-                    <div className="flex bg-gray-100 p-1 rounded-xl shadow-inner border border-gray-200">
+                    <div className="flex bg-farm-bark/20 p-0.5 border border-farm-bark">
                         <button 
-                            className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 ${view === 'shop' ? 'bg-white text-primary shadow-sm scale-100' : 'text-gray-500 hover:text-primary'}`} 
+                            className={`px-8 py-2 font-bold text-xs uppercase tracking-widest transition-all duration-300 ${view === 'shop' ? 'bg-farm-forest text-farm-cream shadow-sm' : 'text-farm-forest/40 hover:text-farm-forest'}`} 
                             onClick={() => setView('shop')}
                         >
-                            Public Shop
+                            The Shop
                         </button>
                         <button 
-                            className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 ${view === 'admin' ? 'bg-white text-primary shadow-sm scale-100' : 'text-gray-500 hover:text-primary'}`} 
+                            className={`px-8 py-2 font-bold text-xs uppercase tracking-widest transition-all duration-300 ${view === 'admin' ? 'bg-farm-forest text-farm-cream shadow-sm' : 'text-farm-forest/40 hover:text-farm-forest'}`} 
                             onClick={() => setView('admin')}
                         >
-                            Farmer Dashboard
+                            Workbench
                         </button>
                     </div>
                 </div>
             </nav>
 
-            <div className="transition-all duration-500">
+            <div className="animate-in fade-in duration-1000">
                 {view === 'shop' ? <Shop /> : <Admin />}
             </div>
         </main>

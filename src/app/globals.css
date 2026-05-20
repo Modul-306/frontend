@@ -1,48 +1,82 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #1e3a8a;
-  --color-primary-dark: #1e3b8a;
-  --color-secondary: #334155;
-  --color-accent: #f59e0b;
-  --color-background: #f8fafc;
+  /* The Humble Farm Palette */
+  --color-farm-forest: #1B3022;
+  --color-farm-cream: #FDFBF7;
+  --color-farm-gold: #B8860B;
+  --color-farm-bark: #EAE4D9;
+  
+  /* Typography */
+  --font-serif: 'Times New Roman', 'Baskerville', 'Georgia', serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Semantic Mappings */
+  --color-primary: var(--color-farm-forest);
+  --color-secondary: var(--color-farm-cream);
+  --color-accent: var(--color-farm-gold);
+  --color-background: var(--color-farm-cream);
   --color-card: #ffffff;
-  --color-text: #0f172a;
+  --color-text: var(--color-farm-forest);
 }
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: var(--color-farm-cream);
+  --foreground: var(--color-farm-forest);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
-.glass-nav {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(45, 90, 39, 0.1);
+/* Typography Enhancements */
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  @apply font-bold tracking-tight text-farm-forest;
 }
 
-.btn-primary {
-  @apply bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md active:scale-95;
+.text-gold {
+  @apply text-farm-gold;
 }
 
-.btn-secondary {
-  @apply bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white px-6 py-2 rounded-lg transition-all duration-200 active:scale-95;
+/* Humble Utility Classes */
+
+.nav-humble {
+  @apply sticky top-0 z-50 px-8 py-4 bg-farm-cream border-b border-farm-bark;
 }
 
-.card {
-  @apply bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+.farm-card {
+  @apply bg-white border border-farm-bark overflow-hidden transition-colors duration-300 hover:border-farm-forest;
 }
 
-.prose h1, .prose h2, .prose h3 {
-  @apply text-primary font-bold mt-6 mb-4;
+.farm-btn {
+  @apply bg-farm-forest hover:bg-farm-forest/90 text-farm-cream px-8 py-2.5 rounded-sm font-bold transition-all duration-200 active:scale-[0.98] disabled:opacity-50;
 }
 
-.prose p {
-  @apply mb-4 leading-relaxed text-gray-700;
+.farm-btn-outline {
+  @apply bg-transparent border border-farm-forest text-farm-forest hover:bg-farm-forest hover:text-farm-cream px-8 py-2.5 rounded-sm font-bold transition-all duration-200;
+}
+
+.farm-input {
+  @apply w-full bg-white border border-farm-bark p-4 rounded-sm focus:border-farm-forest transition-all outline-none text-farm-forest;
+}
+
+.farm-label {
+  @apply text-xs font-bold uppercase tracking-widest text-farm-forest/60 mb-2 block;
+}
+
+.farm-badge {
+  @apply text-[10px] font-bold uppercase tracking-widest border border-farm-bark text-farm-forest/60 px-2 py-1;
+}
+
+/* Section Elements */
+.section-title {
+  @apply text-4xl md:text-5xl mb-6;
+}
+
+.section-divider {
+  @apply h-px w-24 bg-farm-forest/20 my-8;
 }

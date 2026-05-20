@@ -46,35 +46,58 @@ export default function GlobalAdmin() {
     };
 
     return (
-        <div className="container mx-auto px-6 py-12">
-            <h1 className="text-4xl font-black mb-8 text-primary">GLOBAL ADMIN</h1>
+        <div className="animate-in fade-in duration-1000">
+            <div className="flex flex-col items-center mb-24 text-center">
+                <h1 className="text-6xl md:text-7xl mb-6">Market Registry</h1>
+                <div className="h-0.5 w-32 bg-farm-forest mx-auto mb-8" />
+                <p className="text-farm-forest/50 font-serif italic text-xl max-w-2xl mx-auto leading-relaxed">The central ledger for all community farm stalls.</p>
+            </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <section className="bg-white p-8 rounded-[2rem] shadow-xl border border-gray-100">
-                    <h2 className="text-2xl font-bold mb-6">Create New Shop (Tenant)</h2>
-                    <form onSubmit={handleCreateTenant} className="space-y-4">
-                        <input className="w-full bg-gray-50 border-0 p-4 rounded-xl outline-none focus:ring-2 focus:ring-primary" placeholder="Shop Name (e.g. Green Valley Farm)" value={name} onChange={e => setName(e.target.value)} required />
-                        <input className="w-full bg-gray-50 border-0 p-4 rounded-xl outline-none focus:ring-2 focus:ring-primary" placeholder="Slug (e.g. green-valley)" value={slug} onChange={e => setSlug(e.target.value)} required />
-                        <button disabled={loading} className="btn-primary w-full py-4 rounded-xl font-bold uppercase tracking-widest text-sm shadow-lg shadow-primary/20">
-                            {loading ? 'Creating...' : 'Register Shop'}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <section className="bg-white border border-farm-bark p-12 md:p-16">
+                    <div className="flex flex-col items-center text-center mb-16">
+                        <h2 className="text-3xl uppercase tracking-[0.2em] mb-4 text-farm-forest">Onboarding</h2>
+                        <span className="text-farm-gold text-[10px] font-bold uppercase tracking-widest">Register New Community Stall</span>
+                    </div>
+
+                    <form onSubmit={handleCreateTenant} className="space-y-10">
+                        <div className="space-y-2">
+                            <label className="farm-label">Stall Name</label>
+                            <input className="farm-input font-serif italic" placeholder="e.g. Green Valley Farm" value={name} onChange={e => setName(e.target.value)} required />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="farm-label">Market Slug (URL)</label>
+                            <input className="farm-input font-serif italic" placeholder="e.g. green-valley" value={slug} onChange={e => setSlug(e.target.value)} required />
+                        </div>
+                        <button disabled={loading} className="farm-btn w-full py-4 text-xs uppercase tracking-[0.2em] mt-6">
+                            {loading ? 'Registering...' : 'Formalize Stall Registration'}
                         </button>
                     </form>
                 </section>
 
-                <section className="bg-white p-8 rounded-[2rem] shadow-xl border border-gray-100">
-                    <h2 className="text-2xl font-bold mb-6">Existing Shops</h2>
-                    <div className="space-y-3">
+                <section className="bg-white border border-farm-bark p-12 md:p-16">
+                    <div className="flex flex-col items-center text-center mb-16">
+                        <h2 className="text-3xl uppercase tracking-[0.2em] mb-4 text-farm-forest">Registry</h2>
+                        <span className="text-farm-gold text-[10px] font-bold uppercase tracking-widest">Active Community Producers</span>
+                    </div>
+
+                    <div className="space-y-6">
                         {tenants.map(t => (
-                            <div key={t.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div key={t.id} className="flex items-center justify-between p-8 bg-farm-cream border border-farm-bark group hover:border-farm-forest transition-colors">
                                 <div>
-                                    <div className="font-bold text-gray-900">{t.name}</div>
-                                    <div className="text-xs text-primary font-mono uppercase tracking-tighter">{t.slug}.cattlehof.voyagera.ch</div>
+                                    <div className="text-2xl mb-1 text-farm-forest uppercase tracking-tighter">{t.name}</div>
+                                    <div className="text-[10px] text-farm-gold font-bold uppercase tracking-widest">Unique ID: {t.slug}</div>
                                 </div>
-                                <div className="text-xs text-gray-400">
-                                    {new Date(t.created_at).toLocaleDateString()}
+                                <div className="text-[10px] text-farm-forest/30 font-bold uppercase tracking-widest text-right">
+                                    Enrolled <br/> {new Date(t.created_at).toLocaleDateString('en-GB')}
                                 </div>
                             </div>
                         ))}
+                        {tenants.length === 0 && (
+                            <div className="py-24 text-center text-farm-forest/30 italic font-serif text-xl">
+                                No stalls currently registered in the ledger.
+                            </div>
+                        )}
                     </div>
                 </section>
             </div>
