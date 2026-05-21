@@ -1,15 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  /* The Humble Farm Palette */
-  --color-farm-forest: #1B3022;
-  --color-farm-cream: #FDFBF7;
-  --color-farm-gold: #B8860B;
-  --color-farm-bark: #EAE4D9;
+  /* High-End Organic Palette */
+  --color-farm-forest: #0A2E20;
+  --color-farm-pine: #164E35;
+  --color-farm-gold: #D99C2B;
+  --color-farm-honey: #F0B849;
+  --color-farm-cream: #FCFAF6;
+  --color-farm-parchment: #F3EFE6;
+  --color-farm-bark: #E5DFD1;
+  --color-farm-clay: #2C352D;
   
-  /* Typography */
-  --font-serif: 'Times New Roman', 'Baskerville', 'Georgia', serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
+  /* Typography Variables loaded from Next.js */
+  /* --font-sans and --font-serif are defined in layout.tsx */
 
   /* Semantic Mappings */
   --color-primary: var(--color-farm-forest);
@@ -30,53 +33,86 @@ body {
   background: var(--background);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Typography Enhancements */
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif);
-  @apply font-bold tracking-tight text-farm-forest;
+  @apply tracking-tight text-farm-forest;
 }
 
-.text-gold {
-  @apply text-farm-gold;
+/* Base Inputs */
+input, textarea {
+  font-family: var(--font-sans);
 }
 
-/* Humble Utility Classes */
-
-.nav-humble {
-  @apply sticky top-0 z-50 px-8 py-4 bg-farm-cream border-b border-farm-bark;
+/* Modern Glass & UI Utility Classes */
+.glass-panel {
+  @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-sm;
 }
 
-.farm-card {
-  @apply bg-white border border-farm-bark overflow-hidden transition-colors duration-300 hover:border-farm-forest;
+.nav-premium {
+  @apply sticky top-0 z-50 px-8 py-4 bg-farm-cream/80 backdrop-blur-xl border-b border-farm-bark transition-all duration-300;
 }
 
-.farm-btn {
-  @apply bg-farm-forest hover:bg-farm-forest/90 text-farm-cream px-8 py-2.5 rounded-sm font-bold transition-all duration-200 active:scale-[0.98] disabled:opacity-50;
+.premium-card {
+  @apply bg-white rounded-2xl border border-farm-bark/60 overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-farm-pine/5 hover:-translate-y-1 hover:border-farm-pine/20;
 }
 
-.farm-btn-outline {
-  @apply bg-transparent border border-farm-forest text-farm-forest hover:bg-farm-forest hover:text-farm-cream px-8 py-2.5 rounded-sm font-bold transition-all duration-200;
+.premium-btn {
+  @apply relative overflow-hidden bg-farm-forest text-farm-cream px-8 py-3 rounded-full font-bold transition-all duration-300 hover:bg-farm-pine active:scale-[0.98] disabled:opacity-50 text-xs uppercase tracking-[0.2em] shadow-md hover:shadow-lg hover:shadow-farm-pine/20;
 }
 
-.farm-input {
-  @apply w-full bg-white border border-farm-bark p-4 rounded-sm focus:border-farm-forest transition-all outline-none text-farm-forest;
+.premium-btn-outline {
+  @apply bg-transparent border border-farm-forest/20 text-farm-forest hover:bg-farm-forest hover:text-farm-cream px-8 py-3 rounded-full font-bold transition-all duration-300 active:scale-[0.98] text-xs uppercase tracking-[0.2em];
 }
 
-.farm-label {
-  @apply text-xs font-bold uppercase tracking-widest text-farm-forest/60 mb-2 block;
+.premium-input {
+  @apply w-full bg-white border border-farm-bark/80 p-4 rounded-xl focus:border-farm-pine focus:ring-4 focus:ring-farm-pine/10 transition-all outline-none text-farm-forest placeholder:text-farm-forest/30 shadow-sm;
 }
 
-.farm-badge {
-  @apply text-[10px] font-bold uppercase tracking-widest border border-farm-bark text-farm-forest/60 px-2 py-1;
+.premium-label {
+  @apply text-[11px] font-bold uppercase tracking-[0.15em] text-farm-forest/60 mb-2 block;
+}
+
+.premium-badge {
+  @apply text-[10px] font-bold uppercase tracking-widest bg-farm-parchment text-farm-pine px-3 py-1.5 rounded-full border border-farm-bark shadow-sm;
+}
+
+.premium-badge-gold {
+  @apply text-[10px] font-bold uppercase tracking-widest bg-farm-gold/10 text-farm-gold px-3 py-1.5 rounded-full border border-farm-gold/20 shadow-sm;
 }
 
 /* Section Elements */
 .section-title {
-  @apply text-4xl md:text-5xl mb-6;
+  @apply text-5xl md:text-6xl mb-6 font-serif font-medium;
 }
 
 .section-divider {
-  @apply h-px w-24 bg-farm-forest/20 my-8;
+  @apply h-1 w-24 bg-gradient-to-r from-farm-forest to-farm-gold rounded-full my-8;
+}
+
+/* Micro Animations */
+.hover-scale-image {
+  @apply w-full h-full object-cover transition-transform duration-700 hover:scale-105;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
 }

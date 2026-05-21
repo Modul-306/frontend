@@ -1,9 +1,20 @@
+export interface NullTime {
+    Time: string;
+    Valid: boolean;
+}
+
 export interface Tenant {
     id: string;
     name: string;
     slug: string;
-    created_at: string;
+    icon_url?: NullString;
+    cover_url?: NullString;
+    description?: NullString;
+    created_at: string | NullTime;
+    owner_id?: NullUUID;
 }
+
+export type NullUUID = string | null;
 
 export interface NullString {
     String: string;
@@ -18,7 +29,7 @@ export interface Product {
     price: string; // Price is returned as string from backend
     stock: number;
     image_url: NullString;
-    created_at: string;
+    created_at: string | NullTime;
 }
 
 export interface Blog {
@@ -26,7 +37,7 @@ export interface Blog {
     tenant_id: string;
     title: string;
     content_md: string;
-    published_at: string;
+    published_at: string | NullTime;
 }
 
 export interface Order {
@@ -35,5 +46,5 @@ export interface Order {
     user_id: string;
     status: 'pending' | 'completed' | 'cancelled';
     total_amount: number;
-    created_at: string;
+    created_at: string | NullTime;
 }
