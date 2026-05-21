@@ -3,29 +3,26 @@
 import { useState } from 'react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { useNotify } from '@/context/NotificationContext';
 
 export default function Login({ onLogin }: { onLogin: (role: string) => void }) {
     const { login } = useAuth();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+    const { t, locale } = useLanguage();
+    const { notify } = useNotify();
+...
         try {
             const res = await api.post('auth/login', { email, password });
             // Only platform_admin can access this page
             if (res.data.role !== 'platform_admin') {
-                setError('Access denied. This portal is for platform administrators only.');
+                setError(locale === 'de' ? 'Zugriff verweigert. Dieses Portal ist nur für Plattform-Administratoren.' : 'Access denied. This portal is for platform administrators only.');
                 return;
             }
             login(res.data.token, res.data.user_id, email, res.data.role);
+            notify(locale === 'de' ? 'Willkommen zurück!' : 'Welcome back!', 'success');
             onLogin(res.data.role);
         } catch {
-            setError('Invalid email or password.');
+            setError(locale === 'de' ? 'Ungültige E-Mail oder Passwort.' : 'Invalid email or password.');
         } finally {
             setLoading(false);
         }
@@ -43,18 +40,18 @@ export default function Login({ onLogin }: { onLogin: (role: string) => void }) 
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                 </div>
-                <h2 className="text-4xl font-serif text-farm-forest mb-4">Secured Access</h2>
+                <h2 className="text-4xl font-serif text-farm-forest mb-4">{locale === 'de' ? 'Gesicherter Zugang' : 'Secured Access'}</h2>
                 <div className="h-1 w-16 bg-gradient-to-r from-farm-forest to-farm-gold mx-auto mb-6 rounded-full" />
                 <p className="premium-badge-gold inline-block">Platform Administration</p>
             </div>
             
             <form onSubmit={handleLogin} className="space-y-8">
                 <div>
-                    <label className="premium-label">Email Record</label>
+                    <label className="premium-label">{locale === 'de' ? 'E-Mail Adresse' : 'Email Record'}</label>
                     <input id="admin-email" className="premium-input" type="email" placeholder="admin@cattlehof.ch" value={email} onChange={e => setEmail(e.target.value)} required />
                 </div>
                 <div>
-                    <label className="premium-label">Passphrase</label>
+                    <label className="premium-label">{locale === 'de' ? 'Passwort' : 'Passphrase'}</label>
                     <input id="admin-password" className="premium-input" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
                 </div>
                 {error && (
@@ -63,7 +60,7 @@ export default function Login({ onLogin }: { onLogin: (role: string) => void }) 
                     </p>
                 )}
                 <button id="admin-login-submit" disabled={loading} className="premium-btn w-full mt-8 shadow-xl">
-                    {loading ? 'Confirming...' : 'Enter the Ledger'}
+                    {loading ? 'Confirming...' : (locale === 'de' ? 'Eintreten' : 'Enter the Ledger')}
                 </button>
             </form>
         </div>

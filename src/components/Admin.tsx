@@ -5,9 +5,11 @@ import api from '@/lib/api';
 import { Product, Blog, Order, OrderItem } from '@/types';
 import { formatLongDate, formatCurrency } from '@/lib/utils';
 import { useLanguage } from '@/context/LanguageContext';
+import { useNotify } from '@/context/NotificationContext';
 
 export default function Admin() {
     const { t, locale } = useLanguage();
+    const { notify } = useNotify();
     const [activeTab, setActiveTab] = useState<'storefront' | 'inventory' | 'journal' | 'orders'>('storefront');
     const [loading, setLoading] = useState(false);
     
@@ -71,17 +73,20 @@ export default function Admin() {
     const handleUpdateOrderStatus = async (orderId: string, status: string) => {
         try {
             await api.put(`orders/${orderId}/status`, { status });
+            notify(locale === 'de' ? 'Status aktualisiert!' : 'Status updated!', 'success');
             fetchOrders();
-        } catch (err) { console.error(err); }
+        } catch (err) { 
+            notify(locale === 'de' ? 'Fehler beim Aktualisieren des Status.' : 'Error updating status.', 'error');
+        }
     };
 
     const handleSaveAppearance = async () => {
         setLoading(true);
         try {
             await api.put('tenants/appearance', { cover_url: coverUrl, description });
-            alert(t.admin.storefront.save_success);
+            notify(t.admin.storefront.save_success, 'success');
         } catch (err) {
-            alert(locale === 'de' ? 'Fehler beim Speichern.' : 'Error saving appearance.');
+            notify(locale === 'de' ? 'Fehler beim Speichern.' : 'Error saving appearance.', 'error');
         } finally {
             setLoading(false);
         }
@@ -114,10 +119,10 @@ export default function Admin() {
 
             if (editingProductId) {
                 await api.put(`products/${editingProductId}`, payload);
-                alert(locale === 'de' ? 'Produkt aktualisiert!' : 'Product updated!');
+                notify(locale === 'de' ? 'Produkt aktualisiert!' : 'Product updated!', 'success');
             } else {
                 await api.post('products', payload);
-                alert(locale === 'de' ? 'Produkt hinzugefügt!' : 'Product added!');
+                notify(locale === 'de' ? 'Produkt hinzugefügt!' : 'Product added!', 'success');
             }
             
             setProductName('');
@@ -128,7 +133,7 @@ export default function Admin() {
             setEditingProductId(null);
             fetchProducts();
         } catch (err) {
-            alert(locale === 'de' ? 'Fehler beim Verarbeiten des Produkts.' : 'Error processing product.');
+            notify(locale === 'de' ? 'Fehler beim Verarbeiten des Produkts.' : 'Error processing product.', 'error');
         } finally {
             setLoading(false);
         }
@@ -138,8 +143,9 @@ export default function Admin() {
         if (!confirm(locale === 'de' ? 'Sind Sie sicher?' : 'Are you sure?')) return;
         try {
             await api.delete(`products/${id}`);
+            notify(locale === 'de' ? 'Produkt gelöscht.' : 'Product deleted.', 'success');
             fetchProducts();
-        } catch (err) { alert(locale === 'de' ? 'Fehler beim Löschen.' : 'Error deleting product.'); }
+        } catch (err) { notify(locale === 'de' ? 'Fehler beim Löschen.' : 'Error deleting product.', 'error'); }
     };
 
     const handleCreateOrUpdateBlog = async (e: React.FormEvent) => {
@@ -149,17 +155,17 @@ export default function Admin() {
             const payload = { title: blogTitle, content_md: blogContent };
             if (editingBlogId) {
                 await api.put(`blogs/${editingBlogId}`, payload);
-                alert(locale === 'de' ? 'Eintrag aktualisiert!' : 'Blog updated!');
+                notify(locale === 'de' ? 'Eintrag aktualisiert!' : 'Blog updated!', 'success');
             } else {
                 await api.post('blogs', payload);
-                alert(locale === 'de' ? 'Eintrag veröffentlicht!' : 'Blog published!');
+                notify(locale === 'de' ? 'Eintrag veröffentlicht!' : 'Blog published!', 'success');
             }
             setBlogTitle('');
             setBlogContent('');
             setEditingBlogId(null);
             fetchBlogs();
         } catch (err) {
-            alert(locale === 'de' ? 'Fehler beim Verarbeiten des Eintrags.' : 'Error processing blog.');
+            notify(locale === 'de' ? 'Fehler beim Verarbeiten des Eintrags.' : 'Error processing blog.', 'error');
         } finally {
             setLoading(false);
         }
@@ -169,8 +175,9 @@ export default function Admin() {
         if (!confirm(locale === 'de' ? 'Sind Sie sicher?' : 'Are you sure?')) return;
         try {
             await api.delete(`blogs/${id}`);
+            notify(locale === 'de' ? 'Eintrag gelöscht.' : 'Entry deleted.', 'success');
             fetchBlogs();
-        } catch (err) { alert(locale === 'de' ? 'Fehler beim Löschen.' : 'Error deleting blog.'); }
+        } catch (err) { notify(locale === 'de' ? 'Fehler beim Löschen.' : 'Error deleting blog.', 'error'); }
     };
 
     return (
@@ -203,11 +210,24 @@ export default function Admin() {
                                 <input type="file" onChange={async (e) => {
                                     const file = e.target.files?.[0];
                                     if (!file) return;
-                                    const formData = new FormData();
-                                    formData.append('file', file);
-                                    const uploadRes = await api.post('upload', formData);
-                                    await api.put('tenants/icon', { icon_url: uploadRes.data.url });
-                                    alert(locale === 'de' ? 'Logo aktualisiert!' : 'Logo updated!');
+                                    setLoading(true);
+                                    try {
+                                        const formData = new FormData();
+                                        formData.append('file', file);
+                                        const uploadRes = await api.post('upload', formData, {
+                                            headers: { 'Content-Type': 'multipart/form-data' }
+                                        });
+                                        let imageUrl = uploadRes.data.url;
+                                        if (!imageUrl.startsWith('http')) {
+                                            imageUrl = `${window.location.origin}${imageUrl}`;
+                                        }
+                                        await api.put('tenants/icon', { icon_url: imageUrl });
+                                        notify(locale === 'de' ? 'Logo aktualisiert!' : 'Logo updated!', 'success');
+                                    } catch (err) {
+                                        notify(locale === 'de' ? 'Fehler beim Aktualisieren des Logos.' : 'Error updating logo.', 'error');
+                                    } finally {
+                                        setLoading(false);
+                                    }
                                 }} />
                             </div>
                             <div>

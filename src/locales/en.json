@@ -65,6 +65,24 @@
       "select_order": "Select an order to view details."
     }
   },
+  "home": {
+    "hero_badge": "Curated Local Producers",
+    "hero_title_1": "The modern standard",
+    "hero_title_2": "for local harvest.",
+    "hero_desc": "Discover authentic produce and handcrafted goods, delivered directly from the fields to your doorstep. Supporting local agriculture with unparalleled quality.",
+    "browse_btn": "Browse Directory",
+    "register_farm": "Register your Farm",
+    "active_producers": "Active Producers",
+    "locally_sourced": "Locally Sourced",
+    "community_access": "Community Access",
+    "our_producers": "Our Producers",
+    "producers_subtitle": "Explore the finest selection of local stalls.",
+    "search_placeholder": "Search by name or specialty...",
+    "no_producers": "No producers found matching your criteria.",
+    "clear_search": "Clear Search",
+    "visit_store": "Visit Store",
+    "footer_desc": "Elevating local agriculture through design and community connection."
+  },
   "auth": {
     "welcome": "Welcome Back",
     "create_account": "Create Account",

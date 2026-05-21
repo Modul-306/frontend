@@ -50,6 +50,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     refreshUser();
+
+    const handleUnauthorized = () => {
+      logout();
+    };
+
+    window.addEventListener('auth-unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('auth-unauthorized', handleUnauthorized);
   }, []);
 
   const login = (token: string, userId: string, email: string, role: string) => {

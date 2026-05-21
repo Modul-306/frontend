@@ -7,6 +7,7 @@ import { Product, Blog, Tenant, BasketItem } from '@/types';
 import { formatLongDate, formatCurrency } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useNotify } from '@/context/NotificationContext';
 import UserAuthModal from './UserAuthModal';
 
 interface ShopProps {
@@ -16,6 +17,7 @@ interface ShopProps {
 export default function Shop({ tenant }: ShopProps) {
     const { user } = useAuth();
     const { t, locale } = useLanguage();
+    const { notify } = useNotify();
     const [products, setProducts] = useState<Product[]>([]);
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
@@ -70,7 +72,7 @@ export default function Shop({ tenant }: ShopProps) {
             }
             return [...prev, { product, quantity: 1 }];
         });
-        setIsBasketOpen(true);
+        notify(locale === 'de' ? `${product.name} hinzugefügt!` : `${product.name} added!`, 'success');
     };
 
     const removeFromBasket = (productId: string) => {
@@ -110,7 +112,7 @@ export default function Shop({ tenant }: ShopProps) {
             setTimeout(() => setOrderSuccess(false), 5000);
         } catch (err) {
             console.error("Checkout failed", err);
-            alert(locale === 'de' ? "Bestellung fehlgeschlagen. Bitte versuchen Sie es erneut." : "Checkout failed. Please try again.");
+            notify(locale === 'de' ? "Bestellung fehlgeschlagen. Bitte versuchen Sie es erneut." : "Checkout failed. Please try again.", 'error');
         } finally {
             setIsCheckingOut(false);
         }

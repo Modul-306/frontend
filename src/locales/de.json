@@ -65,6 +65,24 @@
       "select_order": "Wählen Sie eine Bestellung aus, um Details anzuzeigen."
     }
   },
+  "home": {
+    "hero_badge": "Kuratierte lokale Produzenten",
+    "hero_title_1": "Der moderne Standard",
+    "hero_title_2": "für lokale Ernte.",
+    "hero_desc": "Entdecken Sie authentische Produkte und handgefertigte Waren, direkt vom Feld vor Ihre Haustür geliefert. Unterstützung der lokalen Landwirtschaft mit unvergleichlicher Qualität.",
+    "browse_btn": "Verzeichnis durchsuchen",
+    "register_farm": "Ihren Hof registrieren",
+    "active_producers": "Aktive Produzenten",
+    "locally_sourced": "Lokal bezogen",
+    "community_access": "Gemeinschaftszugang",
+    "our_producers": "Unsere Produzenten",
+    "producers_subtitle": "Entdecken Sie die feinste Auswahl an lokalen Ständen.",
+    "search_placeholder": "Suche nach Name oder Spezialität...",
+    "no_producers": "Keine Produzenten gefunden, die Ihren Kriterien entsprechen.",
+    "clear_search": "Suche löschen",
+    "visit_store": "Hof besuchen",
+    "footer_desc": "Aufwertung der lokalen Landwirtschaft durch Design und Gemeinschaftsverbindung."
+  },
   "auth": {
     "welcome": "Willkommen zurück",
     "create_account": "Konto erstellen",
