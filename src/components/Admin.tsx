@@ -21,17 +21,17 @@ export default function Admin() {
             if (productImage) {
                 const formData = new FormData();
                 formData.append('file', productImage);
-                const uploadRes = await api.post('/upload', formData, {
+                const uploadRes = await api.post('upload', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 imageUrl = uploadRes.data.url;
-                // Add the host for local display if needed, but the backend returns path
+                // In production, use relative paths for images
                 if (!imageUrl.startsWith('http')) {
-                    imageUrl = `http://localhost:9000${imageUrl}`;
+                    imageUrl = `${window.location.origin}${imageUrl}`;
                 }
             }
 
-            await api.post('/products', {
+            await api.post('products', {
                 name: productName,
                 description: productDesc,
                 price: productPrice,
@@ -56,7 +56,7 @@ export default function Admin() {
         e.preventDefault();
         setLoading(true);
         try {
-            await api.post('/blogs', {
+            await api.post('blogs', {
                 title: blogTitle,
                 content_md: blogContent,
             });
