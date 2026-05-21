@@ -9,7 +9,12 @@
     "edit": "Edit",
     "delete": "Delete",
     "confirm": "Confirm",
-    "back": "Back"
+    "back": "Back",
+    "success": "Success",
+    "error": "Error",
+    "are_you_sure": "Are you sure?",
+    "visit_storefront": "Storefront",
+    "unit": "unit"
   },
   "shop": {
     "basket": "Your Basket",
@@ -18,6 +23,7 @@
     "checkout": "Complete Purchase",
     "secure_payment": "Secure transactions via CattleHof Network",
     "order_success": "Order Placed Successfully!",
+    "checkout_failed": "Checkout failed. Please try again.",
     "market_selection": "Market Selection",
     "producer_badge": "Official Local Producer",
     "harvest_title": "Current Harvest",
@@ -25,9 +31,15 @@
     "sold_out": "Sold Out",
     "in_season": "In Season",
     "add_to_basket": "Add to Basket",
+    "added_to_basket": "item added to basket!",
     "journal_title": "Farm Journal",
     "journal_subtitle": "Chronicles of our daily labor, community events, and seasonal transitions.",
-    "read_more": "Read Full Entry"
+    "read_more": "Read Full Entry",
+    "no_stories": "No stories shared just yet.",
+    "showing": "Showing",
+    "items": "Items",
+    "default_desc": "Freshly harvested and prepared with care for our local community.",
+    "default_product_desc": "Grown locally with care and tradition. A staple for any community pantry."
   },
   "admin": {
     "workbench": "Workbench",
@@ -43,7 +55,10 @@
       "logo": "Farm Icon (Logo)",
       "cover": "Hero Cover Image URL",
       "description": "Farm Description",
-      "save_success": "Appearance saved successfully!"
+      "save_success": "Appearance saved successfully!",
+      "save_error": "Error saving appearance.",
+      "logo_success": "Logo updated!",
+      "logo_error": "Error updating logo."
     },
     "inventory": {
       "add_new": "Add New Item",
@@ -54,16 +69,57 @@
       "stock": "Stock",
       "photo": "Upload record photo",
       "current": "Current Inventory",
-      "units": "units"
+      "units": "units",
+      "add_success": "Product added!",
+      "update_success": "Product updated!",
+      "delete_success": "Product deleted.",
+      "process_error": "Error processing product.",
+      "delete_error": "Error deleting product."
+    },
+    "journal": {
+      "new_entry": "New Journal Entry",
+      "edit_entry": "Edit Entry",
+      "title": "Title",
+      "content": "Content (Markdown)",
+      "past_entries": "Past Entries",
+      "publish_success": "Blog published!",
+      "update_success": "Blog updated!",
+      "delete_success": "Entry deleted.",
+      "process_error": "Error processing blog.",
+      "delete_error": "Error deleting blog."
     },
     "orders": {
       "title": "Customer Orders",
+      "order_id": "Order ID",
       "details": "Order Details",
       "status": "Change Status",
       "mark_completed": "Mark Completed",
       "cancel_order": "Cancel Order",
-      "select_order": "Select an order to view details."
+      "select_order": "Select an order to view details.",
+      "status_success": "Status updated!",
+      "status_error": "Error updating status."
     }
+  },
+  "home": {
+    "hero_badge": "Curated Local Producers",
+    "hero_title_1": "The modern standard",
+    "hero_title_2": "for local harvest.",
+    "hero_desc": "Discover authentic produce and handcrafted goods, delivered directly from the fields to your doorstep. Supporting local agriculture with unparalleled quality.",
+    "browse_btn": "Browse Directory",
+    "register_farm": "Register your Farm",
+    "active_producers": "Active Producers",
+    "locally_sourced": "Locally Sourced",
+    "community_access": "Community Access",
+    "our_producers": "Our Producers",
+    "producers_subtitle": "Explore the finest selection of local stalls.",
+    "search_placeholder": "Search by name or specialty...",
+    "no_producers": "No producers found matching your criteria.",
+    "clear_search": "Clear Search",
+    "visit_store": "Visit Store",
+    "footer_desc": "Elevating local agriculture through design and community connection.",
+    "featured": "Featured",
+    "est": "Est.",
+    "default_farm_desc": "Discover our curated selection of seasonal produce and artisanal goods, harvested with dedication and sustainable practices."
   },
   "auth": {
     "welcome": "Welcome Back",
@@ -72,6 +128,46 @@
     "password": "Password",
     "confirm_password": "Confirm Password",
     "sign_in": "Sign In",
-    "sign_up": "Create Account"
+    "sign_up": "Create Account",
+    "login_success": "Successfully logged in!",
+    "welcome_back": "Welcome back!",
+    "register_success": "Account created successfully!",
+    "invalid_creds": "Invalid email or password.",
+    "passwords_mismatch": "Passwords do not match.",
+    "register_failed": "Registration failed.",
+    "email_in_use": "Email may already be in use.",
+    "access_denied_admin": "Access denied. This portal is for platform administrators only.",
+    "secured_access": "Secured Access",
+    "platform_admin_badge": "Platform Administration",
+    "enter_ledger": "Enter the Ledger"
+  },
+  "errors": {
+    "not_found_title": "Lost in the Fields",
+    "not_found_desc": "The farm \"{slug}\" doesn't exist or may have moved. Let's get you back on track.",
+    "back_to_safety": "Take me back to safety"
+  },
+  "global_admin": {
+    "registry_title": "Market Registry",
+    "registry_subtitle": "Registry of All Registered Stalls",
+    "register_btn": "Register New Stall",
+    "stall_info": "Stall Information",
+    "market_name": "Market Name",
+    "access_slug": "Access Slug (URL)",
+    "commit_btn": "Commit to Registry",
+    "active_stalls": "Active Stalls",
+    "stall_col": "Stall",
+    "status_col": "Status",
+    "ledger_col": "Assigned Ledger",
+    "date_col": "Registry Date",
+    "action_col": "Action",
+    "unassigned": "(Unassigned)",
+    "no_stalls": "No stalls currently registered in the ledger.",
+    "create_success": "Farm created successfully!",
+    "create_error": "Error creating farm.",
+    "delete_confirm": "Delete farm permanently?",
+    "delete_success": "Farm deleted.",
+    "delete_error": "Delete failed.",
+    "assign_success": "Owner assigned!",
+    "assign_error": "Assignment failed."
   }
 }

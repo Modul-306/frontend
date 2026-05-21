@@ -4,6 +4,7 @@ import { useState } from 'react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useNotify } from '@/context/NotificationContext';
 
 interface Props {
     onClose: () => void;
@@ -13,6 +14,7 @@ interface Props {
 export default function UserAuthModal({ onClose, onSuccess }: Props) {
     const { login } = useAuth();
     const { t, locale } = useLanguage();
+    const { notify } = useNotify();
     const [tab, setTab] = useState<'login' | 'register'>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -27,9 +29,10 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
         try {
             const res = await api.post('auth/login', { email, password });
             login(res.data.token, res.data.user_id, email, res.data.role);
+            notify(t.auth.login_success, 'success');
             onSuccess(res.data.user_id, email);
         } catch {
-            setError(locale === 'de' ? 'Ungültige E-Mail oder Passwort.' : 'Invalid email or password.');
+            setError(t.auth.invalid_creds);
         } finally {
             setLoading(false);
         }
@@ -39,7 +42,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
         e.preventDefault();
         setError('');
         if (password !== confirmPassword) {
-            setError(locale === 'de' ? 'Passwörter stimmen nicht überein.' : 'Passwords do not match.');
+            setError(t.auth.passwords_mismatch);
             return;
         }
         setLoading(true);
@@ -47,10 +50,11 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
             await api.post('auth/register', { email, password });
             const res = await api.post('auth/login', { email, password });
             login(res.data.token, res.data.user_id, email, res.data.role);
+            notify(t.auth.register_success, 'success');
             onSuccess(res.data.user_id, email);
         } catch (err: any) {
-            const msg = err?.response?.data?.error || (locale === 'de' ? 'Registrierung fehlgeschlagen.' : 'Registration failed.');
-            setError(typeof msg === 'string' ? msg : (locale === 'de' ? 'E-Mail wird möglicherweise bereits verwendet.' : 'Email may already be in use.'));
+            const msg = err?.response?.data?.error || t.auth.register_failed;
+            setError(typeof msg === 'string' ? msg : t.auth.email_in_use);
         } finally {
             setLoading(false);
         }
