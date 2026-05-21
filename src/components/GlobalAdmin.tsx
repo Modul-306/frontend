@@ -167,18 +167,18 @@ export default function GlobalAdmin() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-farm-bark/5">
-                                        {tenants.map((t) => (
-                                            <tr key={t.id} className="group hover:bg-farm-parchment/50 transition-colors">
+                                        {tenants.map((tenant) => (
+                                            <tr key={tenant.id} className="group hover:bg-farm-parchment/50 transition-colors">
                                                 <td className="px-8 py-6">
                                                     <div className="flex items-center gap-4">
                                                         <div className="w-10 h-10 rounded-full bg-farm-bark/10 flex items-center justify-center font-serif font-bold text-farm-forest overflow-hidden">
-                                                            {t.icon_url?.Valid ? (
-                                                                <img src={t.icon_url.String} className="w-full h-full object-cover" />
-                                                            ) : t.name.charAt(0)}
+                                                            {tenant.icon_url?.Valid ? (
+                                                                <img src={tenant.icon_url.String} className="w-full h-full object-cover" />
+                                                            ) : tenant.name.charAt(0)}
                                                         </div>
                                                         <div>
-                                                            <div className="font-serif font-bold text-farm-forest">{t.name}</div>
-                                                            <div className="text-[10px] text-farm-forest/40 font-mono tracking-tighter">ID: {t.id.slice(0, 8)}...</div>
+                                                            <div className="font-serif font-bold text-farm-forest">{tenant.name}</div>
+                                                            <div className="text-[10px] text-farm-forest/40 font-mono tracking-tighter">ID: {tenant.id.slice(0, 8)}...</div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -188,8 +188,8 @@ export default function GlobalAdmin() {
                                                 <td className="px-8 py-6">
                                                     <select 
                                                         className="bg-transparent border-none text-xs font-bold text-farm-pine focus:ring-0 cursor-pointer p-0 pr-8"
-                                                        value={t.owner_id || ''}
-                                                        onChange={(e) => handleAssignOwner(t.id, e.target.value)}
+                                                        value={tenant.owner_id || ''}
+                                                        onChange={(e) => handleAssignOwner(tenant.id, e.target.value)}
                                                     >
                                                         <option value="">{t.global_admin.unassigned}</option>
                                                         {users.map(u => (
@@ -198,11 +198,11 @@ export default function GlobalAdmin() {
                                                     </select>
                                                 </td>
                                                 <td className="px-8 py-6 text-right text-xs font-medium text-farm-forest/60">
-                                                    {formatDate(t.created_at)}
+                                                    {formatDate(tenant.created_at)}
                                                 </td>
                                                 <td className="px-8 py-6 text-right">
                                                     <button 
-                                                        onClick={() => handleDeleteTenant(t.id)}
+                                                        onClick={() => handleDeleteTenant(tenant.id)}
                                                         className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-all p-2 hover:bg-red-50 rounded-full"
                                                         title="Revoke Registry"
                                                     >
