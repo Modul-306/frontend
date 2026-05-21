@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { Product, Blog, Order, OrderItem } from '@/types';
 import { formatLongDate, formatCurrency } from '@/lib/utils';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Admin() {
+    const { t, locale } = useLanguage();
     const [activeTab, setActiveTab] = useState<'storefront' | 'inventory' | 'journal' | 'orders'>('storefront');
     const [loading, setLoading] = useState(false);
     
@@ -77,9 +79,9 @@ export default function Admin() {
         setLoading(true);
         try {
             await api.put('tenants/appearance', { cover_url: coverUrl, description });
-            alert('Appearance saved successfully!');
+            alert(t.admin.storefront.save_success);
         } catch (err) {
-            alert('Error saving appearance.');
+            alert(locale === 'de' ? 'Fehler beim Speichern.' : 'Error saving appearance.');
         } finally {
             setLoading(false);
         }
@@ -112,10 +114,10 @@ export default function Admin() {
 
             if (editingProductId) {
                 await api.put(`products/${editingProductId}`, payload);
-                alert('Product updated!');
+                alert(locale === 'de' ? 'Produkt aktualisiert!' : 'Product updated!');
             } else {
                 await api.post('products', payload);
-                alert('Product added!');
+                alert(locale === 'de' ? 'Produkt hinzugefügt!' : 'Product added!');
             }
             
             setProductName('');
@@ -126,18 +128,18 @@ export default function Admin() {
             setEditingProductId(null);
             fetchProducts();
         } catch (err) {
-            alert('Error processing product.');
+            alert(locale === 'de' ? 'Fehler beim Verarbeiten des Produkts.' : 'Error processing product.');
         } finally {
             setLoading(false);
         }
     };
 
     const handleDeleteProduct = async (id: string) => {
-        if (!confirm('Are you sure?')) return;
+        if (!confirm(locale === 'de' ? 'Sind Sie sicher?' : 'Are you sure?')) return;
         try {
             await api.delete(`products/${id}`);
             fetchProducts();
-        } catch (err) { alert('Error deleting product.'); }
+        } catch (err) { alert(locale === 'de' ? 'Fehler beim Löschen.' : 'Error deleting product.'); }
     };
 
     const handleCreateOrUpdateBlog = async (e: React.FormEvent) => {
@@ -147,45 +149,45 @@ export default function Admin() {
             const payload = { title: blogTitle, content_md: blogContent };
             if (editingBlogId) {
                 await api.put(`blogs/${editingBlogId}`, payload);
-                alert('Blog updated!');
+                alert(locale === 'de' ? 'Eintrag aktualisiert!' : 'Blog updated!');
             } else {
                 await api.post('blogs', payload);
-                alert('Blog published!');
+                alert(locale === 'de' ? 'Eintrag veröffentlicht!' : 'Blog published!');
             }
             setBlogTitle('');
             setBlogContent('');
             setEditingBlogId(null);
             fetchBlogs();
         } catch (err) {
-            alert('Error processing blog.');
+            alert(locale === 'de' ? 'Fehler beim Verarbeiten des Eintrags.' : 'Error processing blog.');
         } finally {
             setLoading(false);
         }
     };
 
     const handleDeleteBlog = async (id: string) => {
-        if (!confirm('Are you sure?')) return;
+        if (!confirm(locale === 'de' ? 'Sind Sie sicher?' : 'Are you sure?')) return;
         try {
             await api.delete(`blogs/${id}`);
             fetchBlogs();
-        } catch (err) { alert('Error deleting blog.'); }
+        } catch (err) { alert(locale === 'de' ? 'Fehler beim Löschen.' : 'Error deleting blog.'); }
     };
 
     return (
         <div className="container mx-auto px-8 py-12">
             <header className="mb-12 text-center">
-                <span className="premium-badge-gold mb-4 inline-block">Producer Dashboard</span>
-                <h1 className="text-4xl md:text-5xl mb-4 font-serif text-farm-forest">Workbench</h1>
+                <span className="premium-badge-gold mb-4 inline-block">{t.admin.dashboard_badge}</span>
+                <h1 className="text-4xl md:text-5xl mb-4 font-serif text-farm-forest">{t.admin.workbench}</h1>
                 
                 {/* Tabs */}
                 <div className="flex flex-wrap justify-center gap-2 mt-8">
-                    {['storefront', 'inventory', 'journal', 'orders'].map((tab) => (
+                    {(Object.keys(t.admin.tabs) as Array<keyof typeof t.admin.tabs>).map((key) => (
                         <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab as any)}
-                            className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-farm-forest text-farm-cream shadow-lg' : 'bg-farm-bark/10 text-farm-forest/60 hover:bg-farm-bark/20'}`}
+                            key={key}
+                            onClick={() => setActiveTab(key as any)}
+                            className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${activeTab === key ? 'bg-farm-forest text-farm-cream shadow-lg' : 'bg-farm-bark/10 text-farm-forest/60 hover:bg-farm-bark/20'}`}
                         >
-                            {tab}
+                            {t.admin.tabs[key]}
                         </button>
                     ))}
                 </div>
@@ -194,42 +196,29 @@ export default function Admin() {
             <main className="max-w-6xl mx-auto">
                 {activeTab === 'storefront' && (
                     <section className="glass-panel p-10 rounded-3xl animate-in fade-in duration-500">
-                        <h2 className="text-2xl font-serif mb-8 text-farm-forest border-b pb-4">Storefront Appearance</h2>
+                        <h2 className="text-2xl font-serif mb-8 text-farm-forest border-b pb-4">{t.admin.storefront.title}</h2>
                         <div className="grid gap-8">
                             <div>
-                                <label className="premium-label mb-2 block">Farm Icon (Logo)</label>
+                                <label className="premium-label mb-2 block">{t.admin.storefront.logo}</label>
                                 <input type="file" onChange={async (e) => {
                                     const file = e.target.files?.[0];
                                     if (!file) return;
-                                    setLoading(true);
-                                    try {
-                                        const formData = new FormData();
-                                        formData.append('file', file);
-                                        const uploadRes = await api.post('upload', formData, {
-                                            headers: { 'Content-Type': 'multipart/form-data' }
-                                        });
-                                        let imageUrl = uploadRes.data.url;
-                                        if (!imageUrl.startsWith('http')) {
-                                            imageUrl = `${window.location.origin}${imageUrl}`;
-                                        }
-                                        await api.put('tenants/icon', { icon_url: imageUrl });
-                                        alert('Logo updated!');
-                                    } catch (err) {
-                                        alert('Error updating icon.');
-                                    } finally {
-                                        setLoading(false);
-                                    }
+                                    const formData = new FormData();
+                                    formData.append('file', file);
+                                    const uploadRes = await api.post('upload', formData);
+                                    await api.put('tenants/icon', { icon_url: uploadRes.data.url });
+                                    alert(locale === 'de' ? 'Logo aktualisiert!' : 'Logo updated!');
                                 }} />
                             </div>
                             <div>
-                                <label className="premium-label mb-2 block">Hero Cover Image URL</label>
+                                <label className="premium-label mb-2 block">{t.admin.storefront.cover}</label>
                                 <input className="premium-input" value={coverUrl} onChange={e => setCoverUrl(e.target.value)} placeholder="https://..." />
                             </div>
                             <div>
-                                <label className="premium-label mb-2 block">Farm Description</label>
+                                <label className="premium-label mb-2 block">{t.admin.storefront.description}</label>
                                 <textarea className="premium-input h-24" value={description} onChange={e => setDescription(e.target.value)} />
                             </div>
-                            <button onClick={handleSaveAppearance} disabled={loading} className="premium-btn max-w-xs">{loading ? 'Saving...' : 'Save Changes'}</button>
+                            <button onClick={handleSaveAppearance} disabled={loading} className="premium-btn max-w-xs">{loading ? t.common.loading : t.common.save}</button>
                         </div>
                     </section>
                 )}
@@ -237,24 +226,24 @@ export default function Admin() {
                 {activeTab === 'inventory' && (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 animate-in fade-in duration-500">
                         <section className="glass-panel p-8 rounded-3xl h-fit">
-                            <h2 className="text-2xl font-serif mb-6 text-farm-forest">{editingProductId ? 'Edit Item' : 'Add New Item'}</h2>
+                            <h2 className="text-2xl font-serif mb-6 text-farm-forest">{editingProductId ? t.admin.inventory.edit : t.admin.inventory.add_new}</h2>
                             <form onSubmit={handleAddOrUpdateProduct} className="space-y-6">
-                                <input className="premium-input" placeholder="Name" value={productName} onChange={e => setProductName(e.target.value)} required />
-                                <textarea className="premium-input h-24" placeholder="Description" value={productDesc} onChange={e => setProductDesc(e.target.value)} />
+                                <input className="premium-input" placeholder={t.admin.inventory.name} value={productName} onChange={e => setProductName(e.target.value)} required />
+                                <textarea className="premium-input h-24" placeholder={t.admin.inventory.desc} value={productDesc} onChange={e => setProductDesc(e.target.value)} />
                                 <div className="grid grid-cols-2 gap-4">
-                                    <input className="premium-input" type="number" placeholder="Price" value={productPrice} onChange={e => setProductPrice(Number(e.target.value))} required />
-                                    <input className="premium-input" type="number" placeholder="Stock" value={productStock} onChange={e => setProductStock(Number(e.target.value))} required />
+                                    <input className="premium-input" type="number" placeholder={t.admin.inventory.price} value={productPrice} onChange={e => setProductPrice(Number(e.target.value))} required />
+                                    <input className="premium-input" type="number" placeholder={t.admin.inventory.stock} value={productStock} onChange={e => setProductStock(Number(e.target.value))} required />
                                 </div>
                                 <input type="file" onChange={e => setProductImage(e.target.files?.[0] || null)} />
                                 <div className="flex gap-2">
-                                    <button disabled={loading} className="premium-btn flex-1">{editingProductId ? 'Update' : 'Add'}</button>
-                                    {editingProductId && <button type="button" onClick={() => setEditingProductId(null)} className="premium-btn-outline">Cancel</button>}
+                                    <button disabled={loading} className="premium-btn flex-1">{editingProductId ? t.common.save : t.common.confirm}</button>
+                                    {editingProductId && <button type="button" onClick={() => setEditingProductId(null)} className="premium-btn-outline">{t.common.cancel}</button>}
                                 </div>
                             </form>
                         </section>
                         
                         <section className="space-y-4">
-                            <h2 className="text-2xl font-serif mb-6 text-farm-forest">Current Inventory</h2>
+                            <h2 className="text-2xl font-serif mb-6 text-farm-forest">{t.admin.inventory.current}</h2>
                             {products.map(p => (
                                 <div key={p.id} className="bg-white p-4 rounded-2xl shadow-sm border border-farm-bark/20 flex justify-between items-center">
                                     <div className="flex items-center gap-4">
@@ -263,7 +252,7 @@ export default function Admin() {
                                         </div>
                                         <div>
                                             <h4 className="font-bold text-sm">{p.name}</h4>
-                                            <p className="text-xs text-farm-forest/50">{formatCurrency(p.price)} | {p.stock} units</p>
+                                            <p className="text-xs text-farm-forest/50">{formatCurrency(p.price)} | {p.stock} {t.admin.inventory.units}</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
@@ -273,8 +262,8 @@ export default function Admin() {
                                             setProductDesc(p.description?.String || '');
                                             setProductPrice(Number(p.price));
                                             setProductStock(p.stock);
-                                        }} className="text-farm-pine hover:underline text-xs font-bold">Edit</button>
-                                        <button onClick={() => handleDeleteProduct(p.id)} className="text-red-400 hover:underline text-xs font-bold">Delete</button>
+                                        }} className="text-farm-pine hover:underline text-xs font-bold">{t.common.edit}</button>
+                                        <button onClick={() => handleDeleteProduct(p.id)} className="text-red-400 hover:underline text-xs font-bold">{t.common.delete}</button>
                                     </div>
                                 </div>
                             ))}
@@ -285,19 +274,19 @@ export default function Admin() {
                 {activeTab === 'journal' && (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 animate-in fade-in duration-500">
                         <section className="glass-panel p-8 rounded-3xl h-fit">
-                            <h2 className="text-2xl font-serif mb-6 text-farm-forest">{editingBlogId ? 'Edit Entry' : 'New Journal Entry'}</h2>
+                            <h2 className="text-2xl font-serif mb-6 text-farm-forest">{editingBlogId ? t.common.edit : t.shop.journal_title}</h2>
                             <form onSubmit={handleCreateOrUpdateBlog} className="space-y-6">
                                 <input className="premium-input" placeholder="Title" value={blogTitle} onChange={e => setBlogTitle(e.target.value)} required />
                                 <textarea className="premium-input h-64" placeholder="Content (Markdown)" value={blogContent} onChange={e => setBlogContent(e.target.value)} required />
                                 <div className="flex gap-2">
-                                    <button disabled={loading} className="premium-btn flex-1">{editingBlogId ? 'Update' : 'Publish'}</button>
-                                    {editingBlogId && <button type="button" onClick={() => setEditingBlogId(null)} className="premium-btn-outline">Cancel</button>}
+                                    <button disabled={loading} className="premium-btn flex-1">{editingBlogId ? t.common.save : t.common.confirm}</button>
+                                    {editingBlogId && <button type="button" onClick={() => setEditingBlogId(null)} className="premium-btn-outline">{t.common.cancel}</button>}
                                 </div>
                             </form>
                         </section>
                         
                         <section className="space-y-4">
-                            <h2 className="text-2xl font-serif mb-6 text-farm-forest">Past Entries</h2>
+                            <h2 className="text-2xl font-serif mb-6 text-farm-forest">{locale === 'de' ? 'Vergangene Einträge' : 'Past Entries'}</h2>
                             {blogs.map(b => (
                                 <div key={b.id} className="bg-white p-4 rounded-2xl shadow-sm border border-farm-bark/20 flex justify-between items-center">
                                     <div>
@@ -309,8 +298,8 @@ export default function Admin() {
                                             setEditingBlogId(b.id);
                                             setBlogTitle(b.title);
                                             setBlogContent(b.content_md);
-                                        }} className="text-farm-pine hover:underline text-xs font-bold">Edit</button>
-                                        <button onClick={() => handleDeleteBlog(b.id)} className="text-red-400 hover:underline text-xs font-bold">Delete</button>
+                                        }} className="text-farm-pine hover:underline text-xs font-bold">{t.common.edit}</button>
+                                        <button onClick={() => handleDeleteBlog(b.id)} className="text-red-400 hover:underline text-xs font-bold">{t.common.delete}</button>
                                     </div>
                                 </div>
                             ))}
@@ -322,12 +311,12 @@ export default function Admin() {
                     <section className="animate-in fade-in duration-500">
                         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                             <div className="xl:col-span-2 space-y-4">
-                                <h2 className="text-2xl font-serif mb-6 text-farm-forest">Customer Orders</h2>
+                                <h2 className="text-2xl font-serif mb-6 text-farm-forest">{t.admin.orders.title}</h2>
                                 {orders.map(o => (
                                     <div key={o.id} onClick={() => fetchOrderDetails(o.id)} className={`cursor-pointer p-6 rounded-3xl border transition-all ${viewingOrderId === o.id ? 'bg-farm-forest text-farm-cream border-farm-forest shadow-xl scale-[1.02]' : 'bg-white border-farm-bark/20 hover:border-farm-pine'}`}>
                                         <div className="flex justify-between items-center">
                                             <div>
-                                                <p className={`text-[10px] font-bold uppercase tracking-widest ${viewingOrderId === o.id ? 'text-farm-gold' : 'text-farm-forest/40'}`}>Order ID: {o.id.slice(0, 8)}</p>
+                                                <p className={`text-[10px] font-bold uppercase tracking-widest ${viewingOrderId === o.id ? 'text-farm-gold' : 'text-farm-forest/40'}`}>{locale === 'de' ? 'Bestell-ID' : 'Order ID'}: {o.id.slice(0, 8)}</p>
                                                 <p className="font-serif text-lg">{formatLongDate(o.created_at)}</p>
                                             </div>
                                             <div className="text-right">
@@ -344,7 +333,7 @@ export default function Admin() {
                             <div className="xl:col-span-1">
                                 {viewingOrderId ? (
                                     <div className="glass-panel p-8 rounded-3xl sticky top-24">
-                                        <h3 className="font-serif text-xl mb-6 border-b pb-4">Order Details</h3>
+                                        <h3 className="font-serif text-xl mb-6 border-b pb-4">{t.admin.orders.details}</h3>
                                         <div className="space-y-4 mb-8">
                                             {selectedOrderItems.map(item => (
                                                 <div key={item.id} className="flex justify-between text-sm">
@@ -354,16 +343,16 @@ export default function Admin() {
                                             ))}
                                         </div>
                                         <div className="border-t pt-6 space-y-4">
-                                            <p className="text-xs font-bold uppercase text-farm-forest/40">Change Status</p>
+                                            <p className="text-xs font-bold uppercase text-farm-forest/40">{t.admin.orders.status}</p>
                                             <div className="flex flex-col gap-2">
-                                                <button onClick={() => handleUpdateOrderStatus(viewingOrderId, 'completed')} className="premium-btn text-xs py-2 bg-green-600 border-green-600">Mark Completed</button>
-                                                <button onClick={() => handleUpdateOrderStatus(viewingOrderId, 'cancelled')} className="premium-btn-outline text-xs py-2 text-red-500 border-red-200">Cancel Order</button>
+                                                <button onClick={() => handleUpdateOrderStatus(viewingOrderId, 'completed')} className="premium-btn text-xs py-2 bg-green-600 border-green-600">{t.admin.orders.mark_completed}</button>
+                                                <button onClick={() => handleUpdateOrderStatus(viewingOrderId, 'cancelled')} className="premium-btn-outline text-xs py-2 text-red-500 border-red-200">{t.admin.orders.cancel_order}</button>
                                             </div>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="glass-panel p-12 rounded-3xl text-center text-farm-forest/30 italic">
-                                        Select an order to view details.
+                                        {t.admin.orders.select_order}
                                     </div>
                                 )}
                             </div>

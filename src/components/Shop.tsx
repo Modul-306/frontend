@@ -6,6 +6,7 @@ import api from '@/lib/api';
 import { Product, Blog, Tenant, BasketItem } from '@/types';
 import { formatLongDate, formatCurrency } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
 import UserAuthModal from './UserAuthModal';
 
 interface ShopProps {
@@ -14,6 +15,7 @@ interface ShopProps {
 
 export default function Shop({ tenant }: ShopProps) {
     const { user } = useAuth();
+    const { t, locale } = useLanguage();
     const [products, setProducts] = useState<Product[]>([]);
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
@@ -108,7 +110,7 @@ export default function Shop({ tenant }: ShopProps) {
             setTimeout(() => setOrderSuccess(false), 5000);
         } catch (err) {
             console.error("Checkout failed", err);
-            alert("Checkout failed. Please try again.");
+            alert(locale === 'de' ? "Bestellung fehlgeschlagen. Bitte versuchen Sie es erneut." : "Checkout failed. Please try again.");
         } finally {
             setIsCheckingOut(false);
         }
@@ -143,7 +145,7 @@ export default function Shop({ tenant }: ShopProps) {
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsBasketOpen(false)} />
                     <div className="relative w-full max-w-md bg-farm-cream h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
                         <div className="p-8 border-b border-farm-bark/20 flex items-center justify-between">
-                            <h2 className="text-3xl font-serif text-farm-forest">Your Basket</h2>
+                            <h2 className="text-3xl font-serif text-farm-forest">{t.shop.basket}</h2>
                             <button onClick={() => setIsBasketOpen(false)} className="text-farm-forest/40 hover:text-farm-forest">
                                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -154,7 +156,7 @@ export default function Shop({ tenant }: ShopProps) {
                         <div className="flex-1 overflow-y-auto p-8 space-y-6">
                             {basket.length === 0 ? (
                                 <div className="text-center py-20 text-farm-forest/40 italic font-serif text-xl">
-                                    "Your basket is currently empty."
+                                    "{t.shop.empty_basket}"
                                 </div>
                             ) : (
                                 basket.map((item) => (
@@ -177,7 +179,7 @@ export default function Shop({ tenant }: ShopProps) {
                                         </div>
                                         <div className="text-right">
                                             <p className="font-bold text-sm">{formatCurrency(parseFloat(item.product.price) * item.quantity)}</p>
-                                            <button onClick={() => removeFromBasket(item.product.id)} className="text-[10px] text-red-400 hover:text-red-600 uppercase tracking-widest mt-1">Remove</button>
+                                            <button onClick={() => removeFromBasket(item.product.id)} className="text-[10px] text-red-400 hover:text-red-600 uppercase tracking-widest mt-1">{t.common.delete}</button>
                                         </div>
                                     </div>
                                 ))
@@ -186,7 +188,7 @@ export default function Shop({ tenant }: ShopProps) {
 
                         <div className="p-8 border-t border-farm-bark/20 bg-white">
                             <div className="flex justify-between items-center mb-6">
-                                <span className="font-serif text-xl">Total</span>
+                                <span className="font-serif text-xl">{t.shop.total}</span>
                                 <span className="font-bold text-2xl text-farm-pine">{formatCurrency(basketTotal)}</span>
                             </div>
                             <button 
@@ -194,9 +196,9 @@ export default function Shop({ tenant }: ShopProps) {
                                 disabled={basket.length === 0 || isCheckingOut}
                                 className="premium-btn w-full py-4 text-sm"
                             >
-                                {isCheckingOut ? 'Processing...' : 'Complete Purchase'}
+                                {isCheckingOut ? t.common.loading : t.shop.checkout}
                             </button>
-                            <p className="text-[10px] text-center text-farm-forest/40 uppercase tracking-widest mt-6">Secure transactions via CattleHof Network</p>
+                            <p className="text-[10px] text-center text-farm-forest/40 uppercase tracking-widest mt-6">{t.shop.secure_payment}</p>
                         </div>
                     </div>
                 </div>
@@ -208,7 +210,7 @@ export default function Shop({ tenant }: ShopProps) {
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="font-bold uppercase tracking-widest text-xs">Order Placed Successfully!</span>
+                    <span className="font-bold uppercase tracking-widest text-xs">{t.shop.order_success}</span>
                 </div>
             )}
 
@@ -224,36 +226,36 @@ export default function Shop({ tenant }: ShopProps) {
 
             <div className="container mx-auto px-8 relative -mt-32 z-10">
                 <header className="text-center mb-24 glass-panel p-12 md:p-16 rounded-3xl shadow-xl max-w-5xl mx-auto border-farm-bark">
-                    <span className="premium-badge-gold mb-6 inline-block">Official Local Producer</span>
-                    <h1 className="text-6xl md:text-8xl mb-6 font-serif">Market Selection</h1>
+                    <span className="premium-badge-gold mb-6 inline-block">{t.shop.producer_badge}</span>
+                    <h1 className="text-6xl md:text-8xl mb-6 font-serif">{t.shop.market_selection}</h1>
                     <div className="h-1 w-32 bg-gradient-to-r from-farm-forest to-farm-gold mx-auto mb-8 rounded-full" />
                     <p className="text-xl md:text-2xl text-farm-forest/70 max-w-2xl mx-auto font-serif italic">
                         {tenant?.description?.Valid && tenant.description.String
                             ? tenant.description.String
-                            : 'Freshly harvested and prepared with care for our local community.'}
+                            : (locale === 'de' ? 'Frisch geerntet und mit Sorgfalt für unsere lokale Gemeinschaft zubereitet.' : 'Freshly harvested and prepared with care for our local community.')}
                     </p>
                 </header>
 
                 <section className="mb-40">
                     <div className="flex items-center justify-between mb-12">
-                        <h2 className="text-4xl font-serif text-farm-forest">Current Harvest</h2>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">Showing {products.length} Items</span>
+                        <h2 className="text-4xl font-serif text-farm-forest">{t.shop.harvest_title}</h2>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">{locale === 'de' ? 'Zeige' : 'Showing'} {products.length} {locale === 'de' ? 'Artikel' : 'Items'}</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {products.length === 0 ? (
                             <div className="col-span-full py-32 text-center glass-panel rounded-3xl text-farm-forest/40 italic font-serif text-2xl border-dashed">
-                                "The pantry awaits its next harvest."
+                                "{locale === 'de' ? 'Die Vorratskammer wartet auf die nächste Ernte.' : 'The pantry awaits its next harvest.'}"
                             </div>
                         ) : products.map((product) => (
                             <div key={product.id} className="premium-card group flex flex-col h-full bg-white relative">
                                 <div className="absolute top-4 left-4 z-10">
                                     {product.stock < 10 && product.stock > 0 ? (
-                                        <span className="premium-badge bg-farm-gold text-white border-none shadow-md">Low Stock</span>
+                                        <span className="premium-badge bg-farm-gold text-white border-none shadow-md">{t.shop.low_stock}</span>
                                     ) : product.stock === 0 ? (
-                                        <span className="premium-badge bg-farm-clay text-white border-none shadow-md">Sold Out</span>
+                                        <span className="premium-badge bg-farm-clay text-white border-none shadow-md">{t.shop.sold_out}</span>
                                     ) : (
-                                        <span className="premium-badge bg-white/90 backdrop-blur-sm border-none shadow-sm text-farm-forest">In Season</span>
+                                        <span className="premium-badge bg-white/90 backdrop-blur-sm border-none shadow-sm text-farm-forest">{t.shop.in_season}</span>
                                     )}
                                 </div>
                                 <div className="relative aspect-[4/5] overflow-hidden bg-farm-bark/10">
@@ -269,14 +271,14 @@ export default function Shop({ tenant }: ShopProps) {
                                 <div className="p-8 flex-1 flex flex-col">
                                     <h3 className="text-2xl mb-3 font-serif font-medium group-hover:text-farm-pine transition-colors">{product.name}</h3>
                                     <p className="text-farm-forest/60 text-sm leading-relaxed mb-8 line-clamp-3 flex-1 font-sans">
-                                        {product.description?.Valid ? product.description.String : 'Grown locally with care and tradition. A staple for any community pantry.'}
+                                        {product.description?.Valid ? product.description.String : (locale === 'de' ? 'Lokal mit Sorgfalt und Tradition angebaut. Ein Grundnahrungsmittel für jede Vorratskammer.' : 'Grown locally with care and tradition. A staple for any community pantry.')}
                                     </p>
                                     <button 
                                         disabled={product.stock === 0} 
                                         onClick={() => addToBasket(product)}
                                         className="premium-btn w-full"
                                     >
-                                        Add to Basket
+                                        {t.shop.add_to_basket}
                                     </button>
                                 </div>
                             </div>
@@ -289,14 +291,14 @@ export default function Shop({ tenant }: ShopProps) {
                 <section className="max-w-4xl mx-auto mb-32">
                     <div className="text-center mb-24">
                         <span className="premium-badge mb-6 inline-block">Editorial</span>
-                        <h2 className="text-5xl md:text-6xl font-serif mb-6">Farm Journal</h2>
-                        <p className="text-farm-forest/50 font-sans text-lg max-w-xl mx-auto">Chronicles of our daily labor, community events, and seasonal transitions.</p>
+                        <h2 className="text-5xl md:text-6xl font-serif mb-6">{t.shop.journal_title}</h2>
+                        <p className="text-farm-forest/50 font-sans text-lg max-w-xl mx-auto">{t.shop.journal_subtitle}</p>
                     </div>
 
                     <div className="space-y-32">
                         {blogs.length === 0 ? (
                             <div className="text-center text-farm-forest/30 italic font-serif text-xl bg-white p-16 rounded-3xl border border-farm-bark/50">
-                                No stories shared just yet.
+                                {locale === 'de' ? 'Noch keine Geschichten geteilt.' : 'No stories shared just yet.'}
                             </div>
                         ) : blogs.map((blog) => (
                             <article key={blog.id} className="group cursor-pointer">
@@ -310,7 +312,7 @@ export default function Shop({ tenant }: ShopProps) {
                                             <ReactMarkdown>{blog.content_md}</ReactMarkdown>
                                         </div>
                                         <div className="flex justify-center">
-                                            <button className="premium-btn-outline !px-12">Read Full Entry</button>
+                                            <button className="premium-btn-outline !px-12">{t.shop.read_more}</button>
                                         </div>
                                     </div>
                                 </div>

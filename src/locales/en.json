@@ -1,0 +1,77 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back"
+  },
+  "shop": {
+    "basket": "Your Basket",
+    "empty_basket": "Your basket is currently empty.",
+    "total": "Total",
+    "checkout": "Complete Purchase",
+    "secure_payment": "Secure transactions via CattleHof Network",
+    "order_success": "Order Placed Successfully!",
+    "market_selection": "Market Selection",
+    "producer_badge": "Official Local Producer",
+    "harvest_title": "Current Harvest",
+    "low_stock": "Low Stock",
+    "sold_out": "Sold Out",
+    "in_season": "In Season",
+    "add_to_basket": "Add to Basket",
+    "journal_title": "Farm Journal",
+    "journal_subtitle": "Chronicles of our daily labor, community events, and seasonal transitions.",
+    "read_more": "Read Full Entry"
+  },
+  "admin": {
+    "workbench": "Workbench",
+    "dashboard_badge": "Producer Dashboard",
+    "tabs": {
+      "storefront": "Storefront",
+      "inventory": "Inventory",
+      "journal": "Journal",
+      "orders": "Orders"
+    },
+    "storefront": {
+      "title": "Storefront Appearance",
+      "logo": "Farm Icon (Logo)",
+      "cover": "Hero Cover Image URL",
+      "description": "Farm Description",
+      "save_success": "Appearance saved successfully!"
+    },
+    "inventory": {
+      "add_new": "Add New Item",
+      "edit": "Edit Item",
+      "name": "Name",
+      "desc": "Description",
+      "price": "Price",
+      "stock": "Stock",
+      "photo": "Upload record photo",
+      "current": "Current Inventory",
+      "units": "units"
+    },
+    "orders": {
+      "title": "Customer Orders",
+      "details": "Order Details",
+      "status": "Change Status",
+      "mark_completed": "Mark Completed",
+      "cancel_order": "Cancel Order",
+      "select_order": "Select an order to view details."
+    }
+  },
+  "auth": {
+    "welcome": "Welcome Back",
+    "create_account": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "sign_in": "Sign In",
+    "sign_up": "Create Account"
+  }
+}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -31,9 +32,11 @@ export default function RootLayout({
       className={`h-full antialiased ${outfit.variable} ${playfair.variable}`}
     >
       <body className="min-h-full flex flex-col font-sans">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
