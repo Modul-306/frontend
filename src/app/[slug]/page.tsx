@@ -9,6 +9,7 @@ import api from '@/lib/api';
 import { Tenant } from '@/types';
 import UserAuthModal from '@/components/UserAuthModal';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
 
 export default function TenantPage() {
@@ -52,7 +53,7 @@ export default function TenantPage() {
             <main className="min-h-screen bg-farm-cream flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-farm-forest/30 border-t-farm-forest rounded-full animate-spin" />
-                    <p className="text-farm-forest/60 font-serif text-lg">Loading...</p>
+                    <p className="text-farm-forest/60 font-serif text-lg">{t.common.loading}</p>
                 </div>
             </main>
         );
@@ -68,17 +69,17 @@ export default function TenantPage() {
                         </span>
                     </div>
                     <h1 className="text-3xl md:text-4xl font-serif font-bold text-farm-forest mb-3">
-                        {locale === 'de' ? 'In den Feldern verloren' : 'Lost in the Fields'}
+                        {t.errors.not_found_title}
                     </h1>
                     <p className="text-farm-forest/60 text-base md:text-lg mb-8 leading-relaxed">
-                        {locale === 'de' ? `Der Hof „${slug}“ existiert nicht oder ist umgezogen. Lassen Sie uns Sie zurückführen.` : `The farm “${slug}” doesn't exist or may have moved. Let's get you back on track.`}
+                        {t.errors.not_found_desc.replace('{slug}', typeof slug === 'string' ? slug : '')}
                     </p>
                     <Link
                         href="/"
                         className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-farm-forest to-farm-pine text-farm-cream font-bold text-sm uppercase tracking-widest rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
                     >
                         <span>🏠</span>
-                        {locale === 'de' ? 'Zurück zur Sicherheit' : 'Take me back to safety'}
+                        {t.errors.back_to_safety}
                     </Link>
                 </div>
             </main>
@@ -106,7 +107,7 @@ export default function TenantPage() {
                                 className={`px-8 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-300 ${view === 'shop' ? 'bg-white text-farm-forest shadow-sm' : 'text-farm-forest/50 hover:text-farm-forest'}`} 
                                 onClick={() => setView('shop')}
                             >
-                                {locale === 'de' ? 'Ladenfront' : 'Storefront'}
+                                {t.common.visit_storefront}
                             </button>
                             <button 
                                 id="workbench-btn"

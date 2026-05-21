@@ -59,36 +59,36 @@ export default function GlobalAdmin() {
         setLoading(true);
         try {
             await api.post('tenants', { name, slug });
-            notify(locale === 'de' ? 'Hof erfolgreich erstellt!' : 'Farm created successfully!', 'success');
+            notify(t.global_admin.create_success, 'success');
             setName('');
             setSlug('');
             setShowRegisterForm(false);
             fetchTenants();
         } catch {
-            notify(locale === 'de' ? 'Fehler beim Erstellen des Hofs.' : 'Error creating farm.', 'error');
+            notify(t.global_admin.create_error, 'error');
         } finally {
             setLoading(false);
         }
     };
 
     const handleDeleteTenant = async (id: string) => {
-        if (!confirm(locale === 'de' ? 'Hof dauerhaft löschen?' : 'Delete farm permanently?')) return;
+        if (!confirm(t.global_admin.delete_confirm)) return;
         try {
             await api.delete(`tenants/${id}`);
-            notify(locale === 'de' ? 'Hof gelöscht.' : 'Farm deleted.', 'success');
+            notify(t.global_admin.delete_success, 'success');
             fetchTenants();
         } catch {
-            notify(locale === 'de' ? 'Löschen fehlgeschlagen.' : 'Delete failed.', 'error');
+            notify(t.global_admin.delete_error, 'error');
         }
     };
 
     const handleAssignOwner = async (tenantId: string, ownerId: string) => {
         try {
             await api.put(`tenants/${tenantId}/owner`, { owner_id: ownerId });
-            notify(locale === 'de' ? 'Besitzer zugewiesen!' : 'Owner assigned!', 'success');
+            notify(t.global_admin.assign_success, 'success');
             fetchTenants();
         } catch {
-            notify(locale === 'de' ? 'Zuweisung fehlgeschlagen.' : 'Assignment failed.', 'error');
+            notify(t.global_admin.assign_error, 'error');
         }
     };
 
@@ -97,14 +97,14 @@ export default function GlobalAdmin() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-16">
                 <div>
-                    <h1 className="text-5xl font-serif text-farm-forest mb-2">Market Registry</h1>
-                    <p className="text-farm-forest/40 font-sans text-lg uppercase tracking-widest text-xs font-bold">Registry of All Registered Stalls</p>
+                    <h1 className="text-5xl font-serif text-farm-forest mb-2">{t.global_admin.registry_title}</h1>
+                    <p className="text-farm-forest/40 font-sans text-lg uppercase tracking-widest text-xs font-bold">{t.global_admin.registry_subtitle}</p>
                 </div>
                 <button 
                     onClick={() => setShowRegisterForm(!showRegisterForm)}
                     className="premium-btn shadow-xl hover:scale-105 transition-transform"
                 >
-                    {showRegisterForm ? t.common.cancel : (locale === 'de' ? 'Neue Stallung registrieren' : 'Register New Stall')}
+                    {showRegisterForm ? t.common.cancel : t.global_admin.register_btn}
                 </button>
             </div>
 
@@ -114,11 +114,11 @@ export default function GlobalAdmin() {
                     <div className="glass-panel p-10 rounded-3xl sticky top-24 border-farm-gold/20">
                         <h2 className="text-2xl font-serif mb-8 text-farm-forest flex items-center gap-3">
                             <span className="w-8 h-8 rounded-full bg-farm-gold/20 flex items-center justify-center text-farm-gold text-sm italic">i</span>
-                            Stall Information
+                            {t.global_admin.stall_info}
                         </h2>
                         <form onSubmit={handleCreateTenant} className="space-y-6">
                             <div>
-                                <label className="premium-label">Market Name</label>
+                                <label className="premium-label">{t.global_admin.market_name}</label>
                                 <input 
                                     className="premium-input" 
                                     placeholder="e.g. Sunny Meadows Farm" 
@@ -128,7 +128,7 @@ export default function GlobalAdmin() {
                                 />
                             </div>
                             <div>
-                                <label className="premium-label">Access Slug (URL)</label>
+                                <label className="premium-label">{t.global_admin.access_slug}</label>
                                 <div className="relative">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-farm-forest/30 text-sm">/</span>
                                     <input 
@@ -141,7 +141,7 @@ export default function GlobalAdmin() {
                                 </div>
                             </div>
                             <button id="register-stall-submit" disabled={loading} className="premium-btn w-full mt-4">
-                                {loading ? t.common.loading : (locale === 'de' ? 'In das Register eintragen' : 'Commit to Registry')}
+                                {loading ? t.common.loading : t.global_admin.commit_btn}
                             </button>
                         </form>
                     </div>
@@ -151,7 +151,7 @@ export default function GlobalAdmin() {
                 <section className={`${showRegisterForm ? 'lg:col-span-2' : 'lg:col-span-3'} transition-all duration-500`}>
                     <div className="glass-panel rounded-3xl overflow-hidden shadow-xl border-farm-bark/10">
                         <div className="bg-farm-forest/5 p-6 border-b border-farm-bark/10">
-                            <h2 className="font-serif text-xl text-farm-forest">Active Stalls</h2>
+                            <h2 className="font-serif text-xl text-farm-forest">{t.global_admin.active_stalls}</h2>
                         </div>
                         
                         {tenants.length > 0 ? (
@@ -159,11 +159,11 @@ export default function GlobalAdmin() {
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40 border-b border-farm-bark/10">
-                                            <th className="px-8 py-4">Stall</th>
-                                            <th className="px-8 py-4">Status</th>
-                                            <th className="px-8 py-4">Assigned Ledger</th>
-                                            <th className="px-8 py-4 text-right">Registry Date</th>
-                                            <th className="px-8 py-4 text-right">Action</th>
+                                            <th className="px-8 py-4">{t.global_admin.stall_col}</th>
+                                            <th className="px-8 py-4">{t.global_admin.status_col}</th>
+                                            <th className="px-8 py-4">{t.global_admin.ledger_col}</th>
+                                            <th className="px-8 py-4 text-right">{t.global_admin.date_col}</th>
+                                            <th className="px-8 py-4 text-right">{t.global_admin.action_col}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-farm-bark/5">
@@ -191,7 +191,7 @@ export default function GlobalAdmin() {
                                                         value={t.owner_id || ''}
                                                         onChange={(e) => handleAssignOwner(t.id, e.target.value)}
                                                     >
-                                                        <option value="">(Unassigned)</option>
+                                                        <option value="">{t.global_admin.unassigned}</option>
                                                         {users.map(u => (
                                                             <option key={u.id} value={u.id}>{u.email}</option>
                                                         ))}
@@ -218,7 +218,7 @@ export default function GlobalAdmin() {
                             </div>
                         ) : (
                             <div className="p-20 text-center text-farm-forest/20 italic font-serif text-xl">
-                                No stalls currently registered in the ledger.
+                                {t.global_admin.no_stalls}
                             </div>
                         )}
                     </div>

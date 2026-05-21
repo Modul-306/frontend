@@ -40,9 +40,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role: res.data.role,
         tenant_id: res.data.tenant_id,
       });
-    } catch (err) {
-      console.error('Session invalid or expired', err);
-      logout();
+    } catch (err: any) {
+      console.error('Failed to refresh user context', err);
+      if (err.response?.status === 401) {
+        logout();
+      }
     } finally {
       setLoading(false);
     }

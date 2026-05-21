@@ -182,7 +182,7 @@ export default function RootPage() {
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-farm-forest/80 via-farm-forest/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
                                 <div className="absolute top-4 right-4">
-                                    <span className="premium-badge bg-white/90 backdrop-blur-sm border-none text-farm-forest">{t.shop.in_season}</span>
+                                    <span className="premium-badge bg-white/90 backdrop-blur-sm border-none text-farm-forest">{t.home.featured}</span>
                                 </div>
                             </div>
                             
@@ -200,7 +200,7 @@ export default function RootPage() {
                                 <p className="text-farm-forest/60 text-sm leading-relaxed mb-8 flex-1">
                                     {tenant.description?.Valid && tenant.description.String
                                         ? tenant.description.String
-                                        : (t.locale === 'de' ? 'Entdecken Sie unsere kuratierte Auswahl an saisonalen Produkten und handwerklichen Waren.' : 'Discover our curated selection of seasonal produce and artisanal goods.')}
+                                        : t.home.default_farm_desc}
                                 </p>
                                 
                                 <div className="flex items-center justify-between pt-6 border-t border-farm-bark/50">
@@ -209,7 +209,7 @@ export default function RootPage() {
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">
-                                            Est. {getYear(tenant.created_at)}
+                                            {t.home.est} {getYear(tenant.created_at)}
                                         </span>
                                     </div>
                                     <span className="text-farm-pine font-bold uppercase tracking-widest text-xs flex items-center gap-1 group-hover:text-farm-gold transition-colors">
@@ -239,8 +239,8 @@ export default function RootPage() {
                         <div className="flex gap-12">
                             <div className="flex flex-col gap-4">
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-farm-gold">Platform</span>
-                                <Link href="/admin-login" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">Producer Portal</Link>
-                                <a href="#" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">Directory</a>
+                                <Link href="/admin-login" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">{t.admin.workbench}</Link>
+                                <a href="#" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">{t.home.browse_btn}</a>
                             </div>
                             <div className="flex flex-col gap-4">
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-farm-gold">Legal</span>
@@ -252,12 +252,6 @@ export default function RootPage() {
                     
                     <div className="pt-8 border-t border-farm-cream/10 flex flex-col md:flex-row justify-between items-center gap-4">
                         <p className="text-farm-cream/40 text-xs">© {new Date().getFullYear()} TerraHarvest Platform. All rights reserved.</p>
-                        <div className="flex gap-4">
-                            <span className="w-8 h-8 rounded-full bg-farm-cream/5 flex items-center justify-center text-farm-cream/40 hover:bg-farm-cream/10 hover:text-farm-cream transition-colors cursor-pointer">
-                                {/* SVG Icon placeholder */}
-                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
-                            </span>
-                        </div>
                     </div>
                 </div>
             </footer>

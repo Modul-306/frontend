@@ -9,7 +9,12 @@
     "edit": "Bearbeiten",
     "delete": "Löschen",
     "confirm": "Bestätigen",
-    "back": "Zurück"
+    "back": "Zurück",
+    "success": "Erfolg",
+    "error": "Fehler",
+    "are_you_sure": "Sind Sie sicher?",
+    "visit_storefront": "Ladenfront",
+    "unit": "Einheit"
   },
   "shop": {
     "basket": "Ihr Warenkorb",
@@ -18,6 +23,7 @@
     "checkout": "Kauf abschliessen",
     "secure_payment": "Sichere Transaktionen über das CattleHof Network",
     "order_success": "Bestellung erfolgreich aufgegeben!",
+    "checkout_failed": "Bestellung fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "market_selection": "Marktauswahl",
     "producer_badge": "Offizieller lokaler Produzent",
     "harvest_title": "Aktuelle Ernte",
@@ -25,9 +31,15 @@
     "sold_out": "Ausverkauft",
     "in_season": "Saisonal",
     "add_to_basket": "In den Warenkorb",
+    "added_to_basket": "Artikel zum Warenkorb hinzugefügt!",
     "journal_title": "Hof-Journal",
     "journal_subtitle": "Chroniken unserer täglichen Arbeit, Gemeinschaftsanlässe und saisonalen Übergänge.",
-    "read_more": "Vollständigen Eintrag lesen"
+    "read_more": "Vollständigen Eintrag lesen",
+    "no_stories": "Noch keine Geschichten geteilt.",
+    "showing": "Zeige",
+    "items": "Artikel",
+    "default_desc": "Frisch geerntet und mit Sorgfalt für unsere lokale Gemeinschaft zubereitet.",
+    "default_product_desc": "Lokal mit Sorgfalt und Tradition angebaut. Ein Grundnahrungsmittel für jede Vorratskammer."
   },
   "admin": {
     "workbench": "Werkbank",
@@ -43,7 +55,10 @@
       "logo": "Hof-Symbol (Logo)",
       "cover": "Hero-Titelbild URL",
       "description": "Hof-Beschreibung",
-      "save_success": "Erscheinungsbild erfolgreich gespeichert!"
+      "save_success": "Erscheinungsbild erfolgreich gespeichert!",
+      "save_error": "Fehler beim Speichern.",
+      "logo_success": "Logo aktualisiert!",
+      "logo_error": "Fehler beim Aktualisieren des Logos."
     },
     "inventory": {
       "add_new": "Neuen Artikel hinzufügen",
@@ -54,15 +69,35 @@
       "stock": "Vorrat",
       "photo": "Belegfoto hochladen",
       "current": "Aktueller Lagerbestand",
-      "units": "Einheiten"
+      "units": "Einheiten",
+      "add_success": "Produkt hinzugefügt!",
+      "update_success": "Produkt aktualisiert!",
+      "delete_success": "Produkt gelöscht.",
+      "process_error": "Fehler beim Verarbeiten des Produkts.",
+      "delete_error": "Fehler beim Löschen."
+    },
+    "journal": {
+      "new_entry": "Neuer Journal-Eintrag",
+      "edit_entry": "Eintrag bearbeiten",
+      "title": "Titel",
+      "content": "Inhalt (Markdown)",
+      "past_entries": "Vergangene Einträge",
+      "publish_success": "Journal-Eintrag veröffentlicht!",
+      "update_success": "Eintrag aktualisiert!",
+      "delete_success": "Eintrag gelöscht.",
+      "process_error": "Fehler beim Verarbeiten des Eintrags.",
+      "delete_error": "Fehler beim Löschen."
     },
     "orders": {
       "title": "Kundenbestellungen",
+      "order_id": "Bestell-ID",
       "details": "Bestelldetails",
       "status": "Status ändern",
       "mark_completed": "Als abgeschlossen markieren",
       "cancel_order": "Bestellung stornieren",
-      "select_order": "Wählen Sie eine Bestellung aus, um Details anzuzeigen."
+      "select_order": "Wählen Sie eine Bestellung aus, um Details anzuzeigen.",
+      "status_success": "Status aktualisiert!",
+      "status_error": "Fehler beim Aktualisieren des Status."
     }
   },
   "home": {
@@ -81,7 +116,10 @@
     "no_producers": "Keine Produzenten gefunden, die Ihren Kriterien entsprechen.",
     "clear_search": "Suche löschen",
     "visit_store": "Hof besuchen",
-    "footer_desc": "Aufwertung der lokalen Landwirtschaft durch Design und Gemeinschaftsverbindung."
+    "footer_desc": "Aufwertung der lokalen Landwirtschaft durch Design und Gemeinschaftsverbindung.",
+    "featured": "Hervorgehoben",
+    "est": "Gegr.",
+    "default_farm_desc": "Entdecken Sie unsere kuratierte Auswahl an saisonalen Produkten und handwerklichen Waren, die mit Hingabe und nachhaltigen Praktiken geerntet wurden."
   },
   "auth": {
     "welcome": "Willkommen zurück",
@@ -90,6 +128,46 @@
     "password": "Passwort",
     "confirm_password": "Passwort bestätigen",
     "sign_in": "Anmelden",
-    "sign_up": "Konto erstellen"
+    "sign_up": "Konto erstellen",
+    "login_success": "Erfolgreich angemeldet!",
+    "welcome_back": "Willkommen zurück!",
+    "register_success": "Konto erfolgreich erstellt!",
+    "invalid_creds": "Ungültige E-Mail oder Passwort.",
+    "passwords_mismatch": "Passwörter stimmen nicht überein.",
+    "register_failed": "Registrierung fehlgeschlagen.",
+    "email_in_use": "E-Mail wird möglicherweise bereits verwendet.",
+    "access_denied_admin": "Zugriff verweigert. Dieses Portal ist nur für Plattform-Administratoren.",
+    "secured_access": "Gesicherter Zugang",
+    "platform_admin_badge": "Plattform-Administration",
+    "enter_ledger": "Eintreten"
+  },
+  "errors": {
+    "not_found_title": "In den Feldern verloren",
+    "not_found_desc": "Der Hof „{slug}“ existiert nicht oder ist umgezogen. Lassen Sie uns Sie zurückführen.",
+    "back_to_safety": "Zurück zur Sicherheit"
+  },
+  "global_admin": {
+    "registry_title": "Markt-Register",
+    "registry_subtitle": "Register aller registrierten Stände",
+    "register_btn": "Neuen Stand registrieren",
+    "stall_info": "Stand-Informationen",
+    "market_name": "Markt-Name",
+    "access_slug": "Zugriffs-Slug (URL)",
+    "commit_btn": "In das Register eintragen",
+    "active_stalls": "Aktive Stände",
+    "stall_col": "Stand",
+    "status_col": "Status",
+    "ledger_col": "Zugewiesenes Ledger",
+    "date_col": "Eintragsdatum",
+    "action_col": "Aktion",
+    "unassigned": "(Nicht zugewiesen)",
+    "no_stalls": "Derzeit sind keine Stände im Ledger registriert.",
+    "create_success": "Hof erfolgreich erstellt!",
+    "create_error": "Fehler beim Erstellen des Hofs.",
+    "delete_confirm": "Hof dauerhaft löschen?",
+    "delete_success": "Hof gelöscht.",
+    "delete_error": "Löschen fehlgeschlagen.",
+    "assign_success": "Besitzer zugewiesen!",
+    "assign_error": "Zuweisung fehlgeschlagen."
   }
 }

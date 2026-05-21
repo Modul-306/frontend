@@ -73,10 +73,10 @@ export default function Admin() {
     const handleUpdateOrderStatus = async (orderId: string, status: string) => {
         try {
             await api.put(`orders/${orderId}/status`, { status });
-            notify(locale === 'de' ? 'Status aktualisiert!' : 'Status updated!', 'success');
+            notify(t.admin.orders.status_success, 'success');
             fetchOrders();
         } catch (err) { 
-            notify(locale === 'de' ? 'Fehler beim Aktualisieren des Status.' : 'Error updating status.', 'error');
+            notify(t.admin.orders.status_error, 'error');
         }
     };
 
@@ -86,7 +86,7 @@ export default function Admin() {
             await api.put('tenants/appearance', { cover_url: coverUrl, description });
             notify(t.admin.storefront.save_success, 'success');
         } catch (err) {
-            notify(locale === 'de' ? 'Fehler beim Speichern.' : 'Error saving appearance.', 'error');
+            notify(t.admin.storefront.save_error, 'error');
         } finally {
             setLoading(false);
         }
@@ -119,10 +119,10 @@ export default function Admin() {
 
             if (editingProductId) {
                 await api.put(`products/${editingProductId}`, payload);
-                notify(locale === 'de' ? 'Produkt aktualisiert!' : 'Product updated!', 'success');
+                notify(t.admin.inventory.update_success, 'success');
             } else {
                 await api.post('products', payload);
-                notify(locale === 'de' ? 'Produkt hinzugefügt!' : 'Product added!', 'success');
+                notify(t.admin.inventory.add_success, 'success');
             }
             
             setProductName('');
@@ -133,19 +133,19 @@ export default function Admin() {
             setEditingProductId(null);
             fetchProducts();
         } catch (err) {
-            notify(locale === 'de' ? 'Fehler beim Verarbeiten des Produkts.' : 'Error processing product.', 'error');
+            notify(t.admin.inventory.process_error, 'error');
         } finally {
             setLoading(false);
         }
     };
 
     const handleDeleteProduct = async (id: string) => {
-        if (!confirm(locale === 'de' ? 'Sind Sie sicher?' : 'Are you sure?')) return;
+        if (!confirm(t.common.are_you_sure)) return;
         try {
             await api.delete(`products/${id}`);
-            notify(locale === 'de' ? 'Produkt gelöscht.' : 'Product deleted.', 'success');
+            notify(t.admin.inventory.delete_success, 'success');
             fetchProducts();
-        } catch (err) { notify(locale === 'de' ? 'Fehler beim Löschen.' : 'Error deleting product.', 'error'); }
+        } catch (err) { notify(t.admin.inventory.delete_error, 'error'); }
     };
 
     const handleCreateOrUpdateBlog = async (e: React.FormEvent) => {
@@ -155,29 +155,29 @@ export default function Admin() {
             const payload = { title: blogTitle, content_md: blogContent };
             if (editingBlogId) {
                 await api.put(`blogs/${editingBlogId}`, payload);
-                notify(locale === 'de' ? 'Eintrag aktualisiert!' : 'Blog updated!', 'success');
+                notify(t.admin.journal.update_success, 'success');
             } else {
                 await api.post('blogs', payload);
-                notify(locale === 'de' ? 'Eintrag veröffentlicht!' : 'Blog published!', 'success');
+                notify(t.admin.journal.publish_success, 'success');
             }
             setBlogTitle('');
             setBlogContent('');
             setEditingBlogId(null);
             fetchBlogs();
         } catch (err) {
-            notify(locale === 'de' ? 'Fehler beim Verarbeiten des Eintrags.' : 'Error processing blog.', 'error');
+            notify(t.admin.journal.process_error, 'error');
         } finally {
             setLoading(false);
         }
     };
 
     const handleDeleteBlog = async (id: string) => {
-        if (!confirm(locale === 'de' ? 'Sind Sie sicher?' : 'Are you sure?')) return;
+        if (!confirm(t.common.are_you_sure)) return;
         try {
             await api.delete(`blogs/${id}`);
-            notify(locale === 'de' ? 'Eintrag gelöscht.' : 'Entry deleted.', 'success');
+            notify(t.admin.journal.delete_success, 'success');
             fetchBlogs();
-        } catch (err) { notify(locale === 'de' ? 'Fehler beim Löschen.' : 'Error deleting blog.', 'error'); }
+        } catch (err) { notify(t.admin.journal.delete_error, 'error'); }
     };
 
     return (
@@ -222,9 +222,9 @@ export default function Admin() {
                                             imageUrl = `${window.location.origin}${imageUrl}`;
                                         }
                                         await api.put('tenants/icon', { icon_url: imageUrl });
-                                        notify(locale === 'de' ? 'Logo aktualisiert!' : 'Logo updated!', 'success');
+                                        notify(t.admin.storefront.logo_success, 'success');
                                     } catch (err) {
-                                        notify(locale === 'de' ? 'Fehler beim Aktualisieren des Logos.' : 'Error updating logo.', 'error');
+                                        notify(t.admin.storefront.logo_error, 'error');
                                     } finally {
                                         setLoading(false);
                                     }
@@ -294,10 +294,10 @@ export default function Admin() {
                 {activeTab === 'journal' && (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 animate-in fade-in duration-500">
                         <section className="glass-panel p-8 rounded-3xl h-fit">
-                            <h2 className="text-2xl font-serif mb-6 text-farm-forest">{editingBlogId ? t.common.edit : t.shop.journal_title}</h2>
+                            <h2 className="text-2xl font-serif mb-6 text-farm-forest">{editingBlogId ? t.admin.journal.edit_entry : t.admin.journal.new_entry}</h2>
                             <form onSubmit={handleCreateOrUpdateBlog} className="space-y-6">
-                                <input className="premium-input" placeholder="Title" value={blogTitle} onChange={e => setBlogTitle(e.target.value)} required />
-                                <textarea className="premium-input h-64" placeholder="Content (Markdown)" value={blogContent} onChange={e => setBlogContent(e.target.value)} required />
+                                <input className="premium-input" placeholder={t.admin.journal.title} value={blogTitle} onChange={e => setBlogTitle(e.target.value)} required />
+                                <textarea className="premium-input h-64" placeholder={t.admin.journal.content} value={blogContent} onChange={e => setBlogContent(e.target.value)} required />
                                 <div className="flex gap-2">
                                     <button disabled={loading} className="premium-btn flex-1">{editingBlogId ? t.common.save : t.common.confirm}</button>
                                     {editingBlogId && <button type="button" onClick={() => setEditingBlogId(null)} className="premium-btn-outline">{t.common.cancel}</button>}
@@ -306,7 +306,7 @@ export default function Admin() {
                         </section>
                         
                         <section className="space-y-4">
-                            <h2 className="text-2xl font-serif mb-6 text-farm-forest">{locale === 'de' ? 'Vergangene Einträge' : 'Past Entries'}</h2>
+                            <h2 className="text-2xl font-serif mb-6 text-farm-forest">{t.admin.journal.past_entries}</h2>
                             {blogs.map(b => (
                                 <div key={b.id} className="bg-white p-4 rounded-2xl shadow-sm border border-farm-bark/20 flex justify-between items-center">
                                     <div>
@@ -336,7 +336,7 @@ export default function Admin() {
                                     <div key={o.id} onClick={() => fetchOrderDetails(o.id)} className={`cursor-pointer p-6 rounded-3xl border transition-all ${viewingOrderId === o.id ? 'bg-farm-forest text-farm-cream border-farm-forest shadow-xl scale-[1.02]' : 'bg-white border-farm-bark/20 hover:border-farm-pine'}`}>
                                         <div className="flex justify-between items-center">
                                             <div>
-                                                <p className={`text-[10px] font-bold uppercase tracking-widest ${viewingOrderId === o.id ? 'text-farm-gold' : 'text-farm-forest/40'}`}>{locale === 'de' ? 'Bestell-ID' : 'Order ID'}: {o.id.slice(0, 8)}</p>
+                                                <p className={`text-[10px] font-bold uppercase tracking-widest ${viewingOrderId === o.id ? 'text-farm-gold' : 'text-farm-forest/40'}`}>{t.admin.orders.order_id}: {o.id.slice(0, 8)}</p>
                                                 <p className="font-serif text-lg">{formatLongDate(o.created_at)}</p>
                                             </div>
                                             <div className="text-right">
