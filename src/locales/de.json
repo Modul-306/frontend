@@ -1,0 +1,77 @@
+{
+  "common": {
+    "loading": "Wird geladen...",
+    "logout": "Abmelden",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "confirm": "Bestätigen",
+    "back": "Zurück"
+  },
+  "shop": {
+    "basket": "Ihr Warenkorb",
+    "empty_basket": "Ihr Warenkorb ist derzeit leer.",
+    "total": "Gesamt",
+    "checkout": "Kauf abschliessen",
+    "secure_payment": "Sichere Transaktionen über das CattleHof Network",
+    "order_success": "Bestellung erfolgreich aufgegeben!",
+    "market_selection": "Marktauswahl",
+    "producer_badge": "Offizieller lokaler Produzent",
+    "harvest_title": "Aktuelle Ernte",
+    "low_stock": "Wenig Vorrat",
+    "sold_out": "Ausverkauft",
+    "in_season": "Saisonal",
+    "add_to_basket": "In den Warenkorb",
+    "journal_title": "Hof-Journal",
+    "journal_subtitle": "Chroniken unserer täglichen Arbeit, Gemeinschaftsanlässe und saisonalen Übergänge.",
+    "read_more": "Vollständigen Eintrag lesen"
+  },
+  "admin": {
+    "workbench": "Werkbank",
+    "dashboard_badge": "Produzenten-Dashboard",
+    "tabs": {
+      "storefront": "Ladenfront",
+      "inventory": "Inventar",
+      "journal": "Journal",
+      "orders": "Bestellungen"
+    },
+    "storefront": {
+      "title": "Erscheinungsbild der Ladenfront",
+      "logo": "Hof-Symbol (Logo)",
+      "cover": "Hero-Titelbild URL",
+      "description": "Hof-Beschreibung",
+      "save_success": "Erscheinungsbild erfolgreich gespeichert!"
+    },
+    "inventory": {
+      "add_new": "Neuen Artikel hinzufügen",
+      "edit": "Artikel bearbeiten",
+      "name": "Name",
+      "desc": "Beschreibung",
+      "price": "Preis",
+      "stock": "Vorrat",
+      "photo": "Belegfoto hochladen",
+      "current": "Aktueller Lagerbestand",
+      "units": "Einheiten"
+    },
+    "orders": {
+      "title": "Kundenbestellungen",
+      "details": "Bestelldetails",
+      "status": "Status ändern",
+      "mark_completed": "Als abgeschlossen markieren",
+      "cancel_order": "Bestellung stornieren",
+      "select_order": "Wählen Sie eine Bestellung aus, um Details anzuzeigen."
+    }
+  },
+  "auth": {
+    "welcome": "Willkommen zurück",
+    "create_account": "Konto erstellen",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirm_password": "Passwort bestätigen",
+    "sign_in": "Anmelden",
+    "sign_up": "Konto erstellen"
+  }
+}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Props {
     onClose: () => void;
@@ -11,6 +12,7 @@ interface Props {
 
 export default function UserAuthModal({ onClose, onSuccess }: Props) {
     const { login } = useAuth();
+    const { t, locale } = useLanguage();
     const [tab, setTab] = useState<'login' | 'register'>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -27,7 +29,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
             login(res.data.token, res.data.user_id, email, res.data.role);
             onSuccess(res.data.user_id, email);
         } catch {
-            setError('Invalid email or password.');
+            setError(locale === 'de' ? 'Ungültige E-Mail oder Passwort.' : 'Invalid email or password.');
         } finally {
             setLoading(false);
         }
@@ -37,26 +39,24 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
         e.preventDefault();
         setError('');
         if (password !== confirmPassword) {
-            setError('Passwords do not match.');
+            setError(locale === 'de' ? 'Passwörter stimmen nicht überein.' : 'Passwords do not match.');
             return;
         }
         setLoading(true);
         try {
             await api.post('auth/register', { email, password });
-            // Auto-login after registration
             const res = await api.post('auth/login', { email, password });
             login(res.data.token, res.data.user_id, email, res.data.role);
             onSuccess(res.data.user_id, email);
         } catch (err: any) {
-            const msg = err?.response?.data || 'Registration failed.';
-            setError(typeof msg === 'string' ? msg : 'Email may already be in use.');
+            const msg = err?.response?.data?.error || (locale === 'de' ? 'Registrierung fehlgeschlagen.' : 'Registration failed.');
+            setError(typeof msg === 'string' ? msg : (locale === 'de' ? 'E-Mail wird möglicherweise bereits verwendet.' : 'Email may already be in use.'));
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        /* Backdrop */
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
             onClick={onClose}
@@ -65,11 +65,9 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
                 className="relative w-full max-w-md mx-4 bg-white border border-farm-bark/30 rounded-3xl p-10 shadow-2xl animate-in zoom-in-95 duration-300"
                 onClick={e => e.stopPropagation()}
             >
-                {/* Decorative blobs */}
                 <div className="absolute top-0 right-0 w-48 h-48 bg-farm-gold/10 rounded-full blur-3xl -z-10" />
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-farm-pine/5 rounded-full blur-3xl -z-10" />
 
-                {/* Close */}
                 <button
                     onClick={onClose}
                     className="absolute top-5 right-5 text-farm-forest/40 hover:text-farm-forest transition-colors"
@@ -80,7 +78,6 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
                     </svg>
                 </button>
 
-                {/* Header */}
                 <div className="text-center mb-8">
                     <div className="w-16 h-16 bg-gradient-to-tr from-farm-forest to-farm-pine rounded-full flex items-center justify-center text-farm-cream mx-auto mb-5 shadow-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -88,31 +85,29 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
                         </svg>
                     </div>
                     <h2 className="text-3xl font-serif text-farm-forest">
-                        {tab === 'login' ? 'Welcome Back' : 'Create Account'}
+                        {tab === 'login' ? t.auth.welcome : t.auth.create_account}
                     </h2>
                     <div className="h-0.5 w-12 bg-gradient-to-r from-farm-forest to-farm-gold mx-auto mt-3 rounded-full" />
                 </div>
 
-                {/* Tab switcher */}
                 <div className="flex bg-farm-bark/20 rounded-full p-1 mb-8">
                     <button
                         onClick={() => { setTab('login'); setError(''); }}
                         className={`flex-1 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-200 ${tab === 'login' ? 'bg-white text-farm-forest shadow-sm' : 'text-farm-forest/50 hover:text-farm-forest'}`}
                     >
-                        Login
+                        {t.common.login}
                     </button>
                     <button
                         onClick={() => { setTab('register'); setError(''); }}
                         className={`flex-1 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-200 ${tab === 'register' ? 'bg-white text-farm-forest shadow-sm' : 'text-farm-forest/50 hover:text-farm-forest'}`}
                     >
-                        Register
+                        {t.common.register}
                     </button>
                 </div>
 
-                {/* Form */}
                 <form onSubmit={tab === 'login' ? handleLogin : handleRegister} className="space-y-5">
                     <div>
-                        <label className="premium-label">Email</label>
+                        <label className="premium-label">{t.auth.email}</label>
                         <input
                             id="auth-email"
                             className="premium-input"
@@ -124,7 +119,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
                         />
                     </div>
                     <div>
-                        <label className="premium-label">Password</label>
+                        <label className="premium-label">{t.auth.password}</label>
                         <input
                             id="auth-password"
                             className="premium-input"
@@ -137,7 +132,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
                     </div>
                     {tab === 'register' && (
                         <div>
-                            <label className="premium-label">Confirm Password</label>
+                            <label className="premium-label">{t.auth.confirm_password}</label>
                             <input
                                 id="auth-confirm-password"
                                 className="premium-input"
@@ -161,7 +156,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
                         disabled={loading}
                         className="premium-btn w-full mt-2"
                     >
-                        {loading ? '...' : tab === 'login' ? 'Sign In' : 'Create Account'}
+                        {loading ? '...' : tab === 'login' ? t.auth.sign_in : t.auth.sign_up}
                     </button>
                 </form>
             </div>

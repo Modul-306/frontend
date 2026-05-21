@@ -117,6 +117,7 @@ export default function TenantPage() {
                     )}
 
                     <div className="flex items-center gap-4">
+                        <LanguageToggle />
                         {user ? (
                             <div className="flex items-center gap-3">
                                 <span className="text-xs text-farm-forest/70 font-semibold hidden sm:block">{user.email}</span>
@@ -160,5 +161,8 @@ export default function TenantPage() {
                 />
             )}
         </main>
+    );
+}
+main>
     );
 }
