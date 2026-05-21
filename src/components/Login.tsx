@@ -21,6 +21,9 @@ export default function Login({ onLogin }: { onLogin: (role: string) => void }) 
                 return;
             }
             localStorage.setItem('token', res.data.token);
+            localStorage.setItem('user_id', res.data.user_id);
+            localStorage.setItem('user_email', email);
+            localStorage.setItem('user_role', res.data.role);
             onLogin(res.data.role);
         } catch {
             setError('Invalid email or password.');
