@@ -18,7 +18,7 @@ export default function Admin() {
     const handleSaveAppearance = async () => {
         setLoading(true);
         try {
-            await api.put('/tenants/appearance', { cover_url: coverUrl, description });
+            await api.put('tenants/appearance', { cover_url: coverUrl, description });
             alert('Appearance saved successfully!');
         } catch (err) {
             console.error('Failed to save appearance', err);
@@ -36,16 +36,16 @@ export default function Admin() {
             if (productImage) {
                 const formData = new FormData();
                 formData.append('file', productImage);
-                const uploadRes = await api.post('/upload', formData, {
+                const uploadRes = await api.post('upload', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 imageUrl = uploadRes.data.url;
                 if (!imageUrl.startsWith('http')) {
-                    imageUrl = `http://localhost:9000${imageUrl}`;
+                    imageUrl = `${window.location.origin}${imageUrl}`;
                 }
             }
 
-            await api.post('/products', {
+            await api.post('products', {
                 name: productName,
                 description: productDesc,
                 price: Number(productPrice),
@@ -70,7 +70,7 @@ export default function Admin() {
         e.preventDefault();
         setLoading(true);
         try {
-            await api.post('/blogs', {
+            await api.post('blogs', {
                 title: blogTitle,
                 content_md: blogContent,
             });
@@ -114,14 +114,14 @@ export default function Admin() {
                                 try {
                                     const formData = new FormData();
                                     formData.append('file', file);
-                                    const uploadRes = await api.post('/upload', formData, {
+                                    const uploadRes = await api.post('upload', formData, {
                                         headers: { 'Content-Type': 'multipart/form-data' }
                                     });
                                     let imageUrl = uploadRes.data.url;
                                     if (!imageUrl.startsWith('http')) {
-                                        imageUrl = `http://localhost:9000${imageUrl}`;
+                                        imageUrl = `${window.location.origin}${imageUrl}`;
                                     }
-                                    await api.put('/tenants/icon', { icon_url: imageUrl });
+                                    await api.put('tenants/icon', { icon_url: imageUrl });
                                     alert('Farm icon updated successfully!');
                                 } catch (err) {
                                     console.error('Failed to update farm icon', err);
