@@ -1,38 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import GlobalAdmin from '@/components/GlobalAdmin';
 import Login from '@/components/Login';
+import { useAuth } from '@/context/AuthContext';
 
 export default function AdminLoginPage() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [userEmail, setUserEmail] = useState<string | null>(null);
+    const { user, loading, logout, login } = useAuth();
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            setIsAuthenticated(true);
-            setUserEmail(localStorage.getItem('user_email'));
-        }
-    }, []);
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-farm-cream">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-farm-forest"></div>
+            </div>
+        );
+    }
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user_id');
-        localStorage.removeItem('user_email');
-        localStorage.removeItem('user_role');
-        setUserEmail(null);
-        setIsAuthenticated(false);
-    };
-
-    if (!isAuthenticated) {
+    if (!user || user.role !== 'platform_admin') {
         return (
             <main className="min-h-screen bg-farm-cream relative overflow-hidden flex flex-col justify-center py-12">
                 <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-farm-parchment to-transparent -z-10" />
                 <Login onLogin={() => {
-                    setIsAuthenticated(true);
-                    setUserEmail(localStorage.getItem('user_email'));
+                    // refreshUser is called within login in AuthContext
                 }} />
                 <div className="mt-8 text-center animate-in fade-in duration-1000 delay-500">
                     <Link href="/" className="text-farm-forest/40 hover:text-farm-forest font-bold text-xs uppercase tracking-widest transition-colors">
@@ -54,12 +43,10 @@ export default function AdminLoginPage() {
                         <span className="text-2xl font-serif font-bold text-farm-forest uppercase tracking-widest">Platform Admin</span>
                     </Link>
                     <div className="flex items-center gap-4">
-                        {userEmail && (
-                            <span className="text-xs text-farm-forest/70 font-semibold hidden sm:block">{userEmail}</span>
-                        )}
+                        <span className="text-xs text-farm-forest/70 font-semibold hidden sm:block">{user.email}</span>
                         <button
                             id="logout-btn"
-                            onClick={handleLogout}
+                            onClick={logout}
                             className="text-farm-forest/60 hover:text-red-500 p-1.5 rounded-full hover:bg-red-50 transition-all duration-300"
                             title="Logout"
                         >

@@ -45,6 +45,20 @@ export interface Order {
     tenant_id: string;
     user_id: string;
     status: 'pending' | 'completed' | 'cancelled';
-    total_amount: number;
+    total_amount: string; // From backend it's a string decimal
     created_at: string | NullTime;
+}
+
+export interface OrderItem {
+    id: string;
+    order_id: string;
+    product_id: string;
+    product_name: string;
+    quantity: number;
+    price_at_time: string;
+}
+
+export interface BasketItem {
+    product: Product;
+    quantity: number;
 }
