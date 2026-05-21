@@ -21,7 +21,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
         setError('');
         setLoading(true);
         try {
-            const res = await api.post('/auth/login', { email, password });
+            const res = await api.post('auth/login', { email, password });
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('user_id', res.data.user_id);
             localStorage.setItem('user_email', email);
@@ -43,9 +43,9 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
         }
         setLoading(true);
         try {
-            await api.post('/auth/register', { email, password });
+            await api.post('auth/register', { email, password });
             // Auto-login after registration
-            const res = await api.post('/auth/login', { email, password });
+            const res = await api.post('auth/login', { email, password });
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('user_id', res.data.user_id);
             localStorage.setItem('user_email', email);
