@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import api from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Login({ onLogin }: { onLogin: (role: string) => void }) {
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -20,10 +22,7 @@ export default function Login({ onLogin }: { onLogin: (role: string) => void }) 
                 setError('Access denied. This portal is for platform administrators only.');
                 return;
             }
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('user_id', res.data.user_id);
-            localStorage.setItem('user_email', email);
-            localStorage.setItem('user_role', res.data.role);
+            login(res.data.token, res.data.user_id, email, res.data.role);
             onLogin(res.data.role);
         } catch {
             setError('Invalid email or password.');

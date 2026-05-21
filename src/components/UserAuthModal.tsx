@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import api from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 interface Props {
     onClose: () => void;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function UserAuthModal({ onClose, onSuccess }: Props) {
+    const { login } = useAuth();
     const [tab, setTab] = useState<'login' | 'register'>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -22,10 +24,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
         setLoading(true);
         try {
             const res = await api.post('auth/login', { email, password });
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('user_id', res.data.user_id);
-            localStorage.setItem('user_email', email);
-            localStorage.setItem('user_role', res.data.role);
+            login(res.data.token, res.data.user_id, email, res.data.role);
             onSuccess(res.data.user_id, email);
         } catch {
             setError('Invalid email or password.');
@@ -46,10 +45,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
             await api.post('auth/register', { email, password });
             // Auto-login after registration
             const res = await api.post('auth/login', { email, password });
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('user_id', res.data.user_id);
-            localStorage.setItem('user_email', email);
-            localStorage.setItem('user_role', res.data.role);
+            login(res.data.token, res.data.user_id, email, res.data.role);
             onSuccess(res.data.user_id, email);
         } catch (err: any) {
             const msg = err?.response?.data || 'Registration failed.';

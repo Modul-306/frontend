@@ -34,3 +34,11 @@ export function getYear(dateStr: any): string {
     if (isNaN(date.getTime())) return '';
     return date.getFullYear().toString();
 }
+
+export function formatCurrency(amount: number | string): string {
+    const val = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return new Intl.NumberFormat('de-CH', {
+        style: 'currency',
+        currency: 'CHF',
+    }).format(val);
+}

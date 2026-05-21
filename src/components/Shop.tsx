@@ -1,19 +1,27 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import api from '@/lib/api';
-import { Product, Blog, Tenant } from '@/types';
-import { formatLongDate } from '@/lib/utils';
+import { Product, Blog, Tenant, BasketItem } from '@/types';
+import { formatLongDate, formatCurrency } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
+import UserAuthModal from './UserAuthModal';
 
 interface ShopProps {
     tenant: Tenant | null;
 }
 
 export default function Shop({ tenant }: ShopProps) {
+    const { user } = useAuth();
     const [products, setProducts] = useState<Product[]>([]);
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
+    const [basket, setBasket] = useState<BasketItem[]>([]);
+    const [isBasketOpen, setIsBasketOpen] = useState(false);
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [isCheckingOut, setIsCheckingOut] = useState(false);
+    const [orderSuccess, setOrderSuccess] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,7 +39,80 @@ export default function Shop({ tenant }: ShopProps) {
             }
         };
         fetchData();
-    }, []);
+
+        const savedBasket = localStorage.getItem(`basket_${tenant?.slug}`);
+        if (savedBasket) {
+            try {
+                setBasket(JSON.parse(savedBasket));
+            } catch (e) {
+                console.error("Failed to parse basket", e);
+            }
+        }
+    }, [tenant?.slug]);
+
+    useEffect(() => {
+        if (tenant?.slug) {
+            localStorage.setItem(`basket_${tenant.slug}`, JSON.stringify(basket));
+        }
+    }, [basket, tenant?.slug]);
+
+    const addToBasket = (product: Product) => {
+        setBasket(prev => {
+            const existing = prev.find(item => item.product.id === product.id);
+            if (existing) {
+                return prev.map(item => 
+                    item.product.id === product.id 
+                    ? { ...item, quantity: item.quantity + 1 } 
+                    : item
+                );
+            }
+            return [...prev, { product, quantity: 1 }];
+        });
+        setIsBasketOpen(true);
+    };
+
+    const removeFromBasket = (productId: string) => {
+        setBasket(prev => prev.filter(item => item.product.id !== productId));
+    };
+
+    const updateQuantity = (productId: string, delta: number) => {
+        setBasket(prev => prev.map(item => {
+            if (item.product.id === productId) {
+                const newQty = Math.max(1, item.quantity + delta);
+                return { ...item, quantity: newQty };
+            }
+            return item;
+        }));
+    };
+
+    const basketTotal = useMemo(() => {
+        return basket.reduce((acc, item) => acc + (parseFloat(item.product.price) * item.quantity), 0).toFixed(2);
+    }, [basket]);
+
+    const handleCheckout = async () => {
+        if (!user) {
+            setShowAuthModal(true);
+            return;
+        }
+
+        setIsCheckingOut(true);
+        try {
+            const items = basket.map(item => ({
+                product_id: item.product.id,
+                quantity: item.quantity
+            }));
+            await api.post('orders', { items });
+            setBasket([]);
+            setOrderSuccess(true);
+            setIsBasketOpen(false);
+            setTimeout(() => setOrderSuccess(false), 5000);
+        } catch (err) {
+            console.error("Checkout failed", err);
+            alert("Checkout failed. Please try again.");
+        } finally {
+            setIsCheckingOut(false);
+        }
+    };
 
     if (loading) return (
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -40,8 +121,98 @@ export default function Shop({ tenant }: ShopProps) {
     );
 
     return (
-        <div className="pb-32">
-                    {/* Storefront Hero Cover */}
+        <div className="pb-32 relative">
+            {/* Basket Floating Toggle */}
+            <button 
+                onClick={() => setIsBasketOpen(true)}
+                className="fixed bottom-8 right-8 z-40 bg-farm-forest text-farm-cream p-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-3"
+            >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                {basket.length > 0 && (
+                    <span className="bg-farm-gold text-farm-forest px-2 py-0.5 rounded-full text-[10px] font-bold">
+                        {basket.reduce((a, b) => a + b.quantity, 0)}
+                    </span>
+                )}
+            </button>
+
+            {/* Basket Drawer */}
+            {isBasketOpen && (
+                <div className="fixed inset-0 z-50 flex justify-end">
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsBasketOpen(false)} />
+                    <div className="relative w-full max-w-md bg-farm-cream h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+                        <div className="p-8 border-b border-farm-bark/20 flex items-center justify-between">
+                            <h2 className="text-3xl font-serif text-farm-forest">Your Basket</h2>
+                            <button onClick={() => setIsBasketOpen(false)} className="text-farm-forest/40 hover:text-farm-forest">
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div className="flex-1 overflow-y-auto p-8 space-y-6">
+                            {basket.length === 0 ? (
+                                <div className="text-center py-20 text-farm-forest/40 italic font-serif text-xl">
+                                    "Your basket is currently empty."
+                                </div>
+                            ) : (
+                                basket.map((item) => (
+                                    <div key={item.product.id} className="flex gap-4 items-center">
+                                        <div className="w-20 h-20 bg-farm-bark/10 rounded-xl overflow-hidden shrink-0">
+                                            <img 
+                                                src={item.product.image_url?.Valid ? item.product.image_url.String : `https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=200`} 
+                                                alt={item.product.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h4 className="font-serif text-lg text-farm-forest">{item.product.name}</h4>
+                                            <p className="text-xs text-farm-forest/60">{formatCurrency(item.product.price)} / unit</p>
+                                            <div className="flex items-center gap-3 mt-2">
+                                                <button onClick={() => updateQuantity(item.product.id, -1)} className="w-6 h-6 rounded-full border border-farm-bark/30 flex items-center justify-center hover:bg-farm-bark/10 text-xs">-</button>
+                                                <span className="text-xs font-bold">{item.quantity}</span>
+                                                <button onClick={() => updateQuantity(item.product.id, 1)} className="w-6 h-6 rounded-full border border-farm-bark/30 flex items-center justify-center hover:bg-farm-bark/10 text-xs">+</button>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-bold text-sm">{formatCurrency(parseFloat(item.product.price) * item.quantity)}</p>
+                                            <button onClick={() => removeFromBasket(item.product.id)} className="text-[10px] text-red-400 hover:text-red-600 uppercase tracking-widest mt-1">Remove</button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        <div className="p-8 border-t border-farm-bark/20 bg-white">
+                            <div className="flex justify-between items-center mb-6">
+                                <span className="font-serif text-xl">Total</span>
+                                <span className="font-bold text-2xl text-farm-pine">{formatCurrency(basketTotal)}</span>
+                            </div>
+                            <button 
+                                onClick={handleCheckout}
+                                disabled={basket.length === 0 || isCheckingOut}
+                                className="premium-btn w-full py-4 text-sm"
+                            >
+                                {isCheckingOut ? 'Processing...' : 'Complete Purchase'}
+                            </button>
+                            <p className="text-[10px] text-center text-farm-forest/40 uppercase tracking-widest mt-6">Secure transactions via CattleHof Network</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Success Notification */}
+            {orderSuccess && (
+                <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[60] bg-farm-pine text-farm-cream px-8 py-4 rounded-full shadow-2xl animate-in fade-in slide-in-from-top duration-500 flex items-center gap-3">
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="font-bold uppercase tracking-widest text-xs">Order Placed Successfully!</span>
+                </div>
+            )}
+
+            {/* Storefront Hero Cover */}
             <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
                 <img 
                     src={tenant?.cover_url?.Valid && tenant.cover_url.String ? tenant.cover_url.String : "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1600"}
@@ -92,7 +263,7 @@ export default function Shop({ tenant }: ShopProps) {
                                         className="hover-scale-image" 
                                     />
                                     <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-farm-forest/80 to-transparent flex justify-between items-end">
-                                        <span className="text-farm-cream font-medium text-2xl font-serif tracking-wide drop-shadow-md">CHF {product.price}</span>
+                                        <span className="text-farm-cream font-medium text-2xl font-serif tracking-wide drop-shadow-md">{formatCurrency(product.price)}</span>
                                     </div>
                                 </div>
                                 <div className="p-8 flex-1 flex flex-col">
@@ -100,7 +271,13 @@ export default function Shop({ tenant }: ShopProps) {
                                     <p className="text-farm-forest/60 text-sm leading-relaxed mb-8 line-clamp-3 flex-1 font-sans">
                                         {product.description?.Valid ? product.description.String : 'Grown locally with care and tradition. A staple for any community pantry.'}
                                     </p>
-                                    <button disabled={product.stock === 0} className="premium-btn w-full">Add to Basket</button>
+                                    <button 
+                                        disabled={product.stock === 0} 
+                                        onClick={() => addToBasket(product)}
+                                        className="premium-btn w-full"
+                                    >
+                                        Add to Basket
+                                    </button>
                                 </div>
                             </div>
                         ))}
@@ -142,6 +319,9 @@ export default function Shop({ tenant }: ShopProps) {
                     </div>
                 </section>
             </div>
+            {showAuthModal && (
+                <UserAuthModal onClose={() => setShowAuthModal(false)} onSuccess={() => setShowAuthModal(false)} />
+            )}
         </div>
     );
 }

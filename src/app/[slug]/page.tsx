@@ -8,21 +8,22 @@ import Admin from '@/components/Admin';
 import api from '@/lib/api';
 import { Tenant } from '@/types';
 import UserAuthModal from '@/components/UserAuthModal';
+import { useAuth } from '@/context/AuthContext';
 
 export default function TenantPage() {
     const { slug } = useParams();
+    const { user, logout } = useAuth();
     const [view, setView] = useState<'shop' | 'admin'>('shop');
     const [tenant, setTenant] = useState<Tenant | null>(null);
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
-    const [isOwner, setIsOwner] = useState(false);
-    const [userEmail, setUserEmail] = useState<string | null>(null);
     const [showAuthModal, setShowAuthModal] = useState(false);
 
     useEffect(() => {
         if (typeof slug === 'string') {
             setLoading(true);
             setNotFound(false);
+            localStorage.setItem('tenant_slug', slug); // Store for API interceptor
             api.get(`/tenants/${slug}`)
                .then(res => {
                    setTenant(res.data);
@@ -34,23 +35,15 @@ export default function TenantPage() {
                    setLoading(false);
                });
         }
+        return () => {
+            localStorage.removeItem('tenant_slug');
+        };
     }, [slug]);
 
-    useEffect(() => {
-        const savedEmail = localStorage.getItem('user_email');
-        if (savedEmail && localStorage.getItem('token')) {
-            setUserEmail(savedEmail);
-        }
-    }, []);
-
-    useEffect(() => {
-        const storedUserId = localStorage.getItem('user_id');
-        if (storedUserId && tenant && tenant.owner_id === storedUserId) {
-            setIsOwner(true);
-        } else {
-            setIsOwner(false);
-        }
-    }, [tenant, userEmail]);
+    const isOwner = user && tenant && (
+        user.role === 'platform_admin' || 
+        (user.role === 'farmer_admin' && user.tenant_id === tenant.id)
+    );
 
     if (loading) {
         return (
@@ -67,22 +60,17 @@ export default function TenantPage() {
         return (
             <main className="min-h-screen bg-farm-cream flex items-center justify-center px-6">
                 <div className="text-center max-w-lg animate-in fade-in zoom-in-95 duration-700">
-                    {/* Big 404 */}
                     <div className="mb-6 select-none">
                         <span className="text-[10rem] md:text-[14rem] font-serif font-black text-farm-forest/10 leading-none">
                             404
                         </span>
                     </div>
-
-                    {/* Message */}
                     <h1 className="text-3xl md:text-4xl font-serif font-bold text-farm-forest mb-3">
                         Lost in the Fields
                     </h1>
                     <p className="text-farm-forest/60 text-base md:text-lg mb-8 leading-relaxed">
                         The farm <span className="font-semibold text-farm-forest/80">&ldquo;{slug}&rdquo;</span> doesn&apos;t exist or may have moved. Let&apos;s get you back on track.
                     </p>
-
-                    {/* CTA Button */}
                     <Link
                         href="/"
                         className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-farm-forest to-farm-pine text-farm-cream font-bold text-sm uppercase tracking-widest rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
@@ -129,17 +117,13 @@ export default function TenantPage() {
                     )}
 
                     <div className="flex items-center gap-4">
-                        {userEmail ? (
+                        {user ? (
                             <div className="flex items-center gap-3">
-                                <span className="text-xs text-farm-forest/70 font-semibold hidden sm:block">{userEmail}</span>
+                                <span className="text-xs text-farm-forest/70 font-semibold hidden sm:block">{user.email}</span>
                                 <button
                                     id="logout-btn"
                                     onClick={() => {
-                                        localStorage.removeItem('token');
-                                        localStorage.removeItem('user_id');
-                                        localStorage.removeItem('user_email');
-                                        localStorage.removeItem('user_role');
-                                        setUserEmail(null);
+                                        logout();
                                         setView('shop');
                                     }}
                                     className="text-farm-forest/60 hover:text-red-500 p-1.5 rounded-full hover:bg-red-50 transition-all duration-300"
@@ -170,8 +154,7 @@ export default function TenantPage() {
             {showAuthModal && (
                 <UserAuthModal
                     onClose={() => setShowAuthModal(false)}
-                    onSuccess={(userId, email) => {
-                        setUserEmail(email);
+                    onSuccess={() => {
                         setShowAuthModal(false);
                     }}
                 />
