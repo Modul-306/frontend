@@ -181,7 +181,9 @@ export default function RootPage() {
                         <Link href={`/${tenant.slug}`} key={tenant.id} className="premium-card group block flex flex-col h-full">
                             <div className="relative h-72 overflow-hidden bg-farm-bark/20">
                                 <img 
-                                    src={`https://images.unsplash.com/${farmImages[index % farmImages.length]}?auto=format&fit=crop&q=80&w=800`}
+                                    src={tenant.cover_url?.Valid && tenant.cover_url.String 
+                                        ? tenant.cover_url.String 
+                                        : `https://images.unsplash.com/${farmImages[index % farmImages.length]}?auto=format&fit=crop&q=80&w=800`}
                                     className="hover-scale-image"
                                     alt="Farm market stall"
                                 />

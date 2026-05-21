@@ -110,14 +110,14 @@ export default function TenantPage() {
                         <span className="text-2xl font-serif font-bold text-farm-forest uppercase tracking-widest">{tenant?.name || slug}</span>
                     </Link>
                     
-                    <div className="flex bg-farm-bark/30 p-1 rounded-full border border-farm-bark backdrop-blur-sm shadow-inner">
-                        <button 
-                            className={`px-8 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-300 ${view === 'shop' ? 'bg-white text-farm-forest shadow-sm' : 'text-farm-forest/50 hover:text-farm-forest'}`} 
-                            onClick={() => setView('shop')}
-                        >
-                            Storefront
-                        </button>
-                        {isOwner && (
+                    {isOwner && (
+                        <div className="flex bg-farm-bark/30 p-1 rounded-full border border-farm-bark backdrop-blur-sm shadow-inner">
+                            <button 
+                                className={`px-8 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-300 ${view === 'shop' ? 'bg-white text-farm-forest shadow-sm' : 'text-farm-forest/50 hover:text-farm-forest'}`} 
+                                onClick={() => setView('shop')}
+                            >
+                                Storefront
+                            </button>
                             <button 
                                 id="workbench-btn"
                                 className={`px-8 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-300 ${view === 'admin' ? 'bg-white text-farm-forest shadow-sm' : 'text-farm-forest/50 hover:text-farm-forest'}`} 
@@ -125,8 +125,8 @@ export default function TenantPage() {
                             >
                                 Workbench
                             </button>
-                        )}
-                    </div>
+                        </div>
+                    )}
 
                     <div className="flex items-center gap-4">
                         {userEmail ? (
