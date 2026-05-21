@@ -97,6 +97,9 @@ export default function Admin() {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 imageUrl = uploadRes.data.url;
+                if (!imageUrl.startsWith('http')) {
+                    imageUrl = `${window.location.origin}${imageUrl}`;
+                }
             }
 
             const payload = {
@@ -198,11 +201,24 @@ export default function Admin() {
                                 <input type="file" onChange={async (e) => {
                                     const file = e.target.files?.[0];
                                     if (!file) return;
-                                    const formData = new FormData();
-                                    formData.append('file', file);
-                                    const uploadRes = await api.post('upload', formData);
-                                    await api.put('tenants/icon', { icon_url: uploadRes.data.url });
-                                    alert('Logo updated!');
+                                    setLoading(true);
+                                    try {
+                                        const formData = new FormData();
+                                        formData.append('file', file);
+                                        const uploadRes = await api.post('upload', formData, {
+                                            headers: { 'Content-Type': 'multipart/form-data' }
+                                        });
+                                        let imageUrl = uploadRes.data.url;
+                                        if (!imageUrl.startsWith('http')) {
+                                            imageUrl = `${window.location.origin}${imageUrl}`;
+                                        }
+                                        await api.put('tenants/icon', { icon_url: imageUrl });
+                                        alert('Logo updated!');
+                                    } catch (err) {
+                                        alert('Error updating icon.');
+                                    } finally {
+                                        setLoading(false);
+                                    }
                                 }} />
                             </div>
                             <div>
