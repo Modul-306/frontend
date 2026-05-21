@@ -156,12 +156,12 @@ export default function Admin() {
                                     try {
                                         const formData = new FormData();
                                         formData.append('file', file);
-                                        const uploadRes = await api.post('/upload', formData, {
+                                        const uploadRes = await api.post('upload', formData, {
                                             headers: { 'Content-Type': 'multipart/form-data' }
                                         });
                                         let imageUrl = uploadRes.data.url;
                                         if (!imageUrl.startsWith('http')) {
-                                            imageUrl = `http://localhost:9000${imageUrl}`;
+                                            imageUrl = `${window.location.origin}${imageUrl}`;
                                         }
                                         setCoverUrl(imageUrl);
                                     } catch (err) {

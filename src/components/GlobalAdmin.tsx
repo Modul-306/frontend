@@ -59,7 +59,7 @@ export default function GlobalAdmin() {
 
     const fetchTenants = async () => {
         try {
-            const res = await api.get('/tenants');
+            const res = await api.get('tenants');
             console.log('fetchTenants returned:', res.data);
             setTenants(res.data || []);
         } catch (err) {
@@ -69,7 +69,7 @@ export default function GlobalAdmin() {
 
     const fetchUsers = async () => {
         try {
-            const res = await api.get('/users');
+            const res = await api.get('users');
             setUsers(res.data || []);
         } catch (err) {
             console.error('Failed to fetch users', err);
@@ -106,7 +106,7 @@ export default function GlobalAdmin() {
                     finalOwner = exactMatch;
                 }
             }
-            await api.post('/tenants', {
+            await api.post('tenants', {
                 name,
                 slug,
                 owner_id: finalOwner?.id || '',
@@ -127,7 +127,7 @@ export default function GlobalAdmin() {
     const handleDelete = async (id: string) => {
         if (!window.confirm("Are you sure? This will delete all products, blogs, and users for this tenant!")) return;
         try {
-            await api.delete(`/tenants/${id}`);
+            await api.delete(`tenants/${id}`);
             fetchTenants();
         } catch (err) {
             console.error('Failed to delete tenant', err);
@@ -163,12 +163,12 @@ export default function GlobalAdmin() {
         
         try {
             console.log('Updating tenant name and slug...');
-            const res1 = await api.put(`/tenants/${id}`, { name: editName, slug: editSlug });
+            const res1 = await api.put(`tenants/${id}`, { name: editName, slug: editSlug });
             console.log('Updated tenant response:', res1.data);
             
             const ownerId = finalOwner?.id || '';
             console.log('Updating tenant owner to:', ownerId);
-            const res2 = await api.put(`/tenants/${id}/owner`, {
+            const res2 = await api.put(`tenants/${id}/owner`, {
                 owner_id: ownerId,
             });
             console.log('Updated owner response:', res2.data);
@@ -204,7 +204,7 @@ export default function GlobalAdmin() {
         }
         try {
             console.log('handleSaveOwner - saving owner for tenant:', tenantId, 'owner:', finalOwner);
-            await api.put(`/tenants/${tenantId}/owner`, {
+            await api.put(`tenants/${tenantId}/owner`, {
                 owner_id: finalOwner?.id || '',
             });
             setOwnerEditId(null);

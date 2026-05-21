@@ -19,8 +19,8 @@ export default function Shop({ tenant }: ShopProps) {
         const fetchData = async () => {
             try {
                 const [productsRes, blogsRes] = await Promise.all([
-                    api.get('/products'),
-                    api.get('/blogs'),
+                    api.get('products'),
+                    api.get('blogs'),
                 ]);
                 setProducts(productsRes.data || []);
                 setBlogs(blogsRes.data || []);

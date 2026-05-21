@@ -14,7 +14,7 @@ export default function Login({ onLogin }: { onLogin: (role: string) => void }) 
         setError('');
         setLoading(true);
         try {
-            const res = await api.post('/auth/login', { email, password });
+            const res = await api.post('auth/login', { email, password });
             // Only platform_admin can access this page
             if (res.data.role !== 'platform_admin') {
                 setError('Access denied. This portal is for platform administrators only.');

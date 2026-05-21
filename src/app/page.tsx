@@ -25,7 +25,7 @@ export default function RootPage() {
     useEffect(() => {
         const fetchTenants = async () => {
             try {
-                const res = await api.get('/tenants');
+                const res = await api.get('tenants');
                 setTenants(res.data || []);
             } catch (err) {
                 console.error('Failed to fetch tenants', err);
