@@ -66,7 +66,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
             onClick={onClose}
         >
             <div
-                className="relative w-full max-w-md mx-4 glass-panel rounded-3xl p-10 shadow-2xl animate-in zoom-in-95 duration-300"
+                className="relative w-full max-w-md mx-4 bg-white border border-farm-bark/30 rounded-3xl p-10 shadow-2xl animate-in zoom-in-95 duration-300"
                 onClick={e => e.stopPropagation()}
             >
                 {/* Decorative blobs */}

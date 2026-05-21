@@ -60,6 +60,7 @@ export default function GlobalAdmin() {
     const fetchTenants = async () => {
         try {
             const res = await api.get('/tenants');
+            console.log('fetchTenants returned:', res.data);
             setTenants(res.data || []);
         } catch (err) {
             console.error('Failed to fetch tenants', err);
@@ -194,9 +195,17 @@ export default function GlobalAdmin() {
     };
 
     const handleSaveOwner = async (tenantId: string) => {
+        let finalOwner = ownerEditSelected;
+        if (!finalOwner && ownerEditSearch.trim() !== '') {
+            const exactMatch = users.find(u => u.email.toLowerCase() === ownerEditSearch.trim().toLowerCase());
+            if (exactMatch) {
+                finalOwner = exactMatch;
+            }
+        }
         try {
+            console.log('handleSaveOwner - saving owner for tenant:', tenantId, 'owner:', finalOwner);
             await api.put(`/tenants/${tenantId}/owner`, {
-                owner_id: ownerEditSelected?.id || '',
+                owner_id: finalOwner?.id || '',
             });
             setOwnerEditId(null);
             fetchTenants();
@@ -207,8 +216,10 @@ export default function GlobalAdmin() {
     };
 
     const getOwnerEmail = (t: Tenant) => {
+        console.log('getOwnerEmail called for tenant:', t.name, 'owner_id:', t.owner_id, 'type:', typeof t.owner_id);
         if (!t.owner_id) return null;
         const u = users.find(u => u.id === t.owner_id);
+        console.log('Matching user found:', u);
         return u?.email ?? t.owner_id.slice(0, 8) + '…';
     };
 

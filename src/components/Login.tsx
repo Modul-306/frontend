@@ -30,7 +30,7 @@ export default function Login({ onLogin }: { onLogin: (role: string) => void }) 
     };
 
     return (
-        <div className="max-w-md mx-auto glass-panel p-12 md:p-16 mt-20 rounded-3xl shadow-2xl relative overflow-hidden group animate-in zoom-in-95 duration-1000">
+        <div className="max-w-md mx-auto bg-white border border-farm-bark/30 p-12 md:p-16 mt-20 rounded-3xl shadow-2xl relative overflow-hidden group animate-in zoom-in-95 duration-1000">
             <div className="absolute top-0 right-0 w-64 h-64 bg-farm-gold/10 rounded-full blur-3xl -z-10 group-hover:bg-farm-pine/10 transition-colors duration-1000" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-farm-pine/5 rounded-full blur-3xl -z-10" />
 
