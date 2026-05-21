@@ -7,6 +7,7 @@ import Shop from '@/components/Shop';
 import Admin from '@/components/Admin';
 import api from '@/lib/api';
 import { Tenant } from '@/types';
+import UserAuthModal from '@/components/UserAuthModal';
 
 export default function TenantPage() {
     const { slug } = useParams();
@@ -15,6 +16,8 @@ export default function TenantPage() {
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
+    const [showAuthModal, setShowAuthModal] = useState(false);
 
     useEffect(() => {
         if (typeof slug === 'string') {
@@ -22,17 +25,7 @@ export default function TenantPage() {
             setNotFound(false);
             api.get(`/tenants/${slug}`)
                .then(res => {
-                   const t: Tenant = res.data;
-                   setTenant(t);
-
-                   // Check ownership: compare stored user_id with tenant.owner_id
-                   const storedUserId = localStorage.getItem('user_id');
-                   if (storedUserId && t.owner_id === storedUserId) {
-                       setIsOwner(true);
-                   } else {
-                       setIsOwner(false);
-                   }
-
+                   setTenant(res.data);
                    setLoading(false);
                })
                .catch(err => {
@@ -42,6 +35,22 @@ export default function TenantPage() {
                });
         }
     }, [slug]);
+
+    useEffect(() => {
+        const savedEmail = localStorage.getItem('user_email');
+        if (savedEmail && localStorage.getItem('token')) {
+            setUserEmail(savedEmail);
+        }
+    }, []);
+
+    useEffect(() => {
+        const storedUserId = localStorage.getItem('user_id');
+        if (storedUserId && tenant && tenant.owner_id === storedUserId) {
+            setIsOwner(true);
+        } else {
+            setIsOwner(false);
+        }
+    }, [tenant, userEmail]);
 
     if (loading) {
         return (
@@ -118,12 +127,55 @@ export default function TenantPage() {
                             </button>
                         )}
                     </div>
+
+                    <div className="flex items-center gap-4">
+                        {userEmail ? (
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs text-farm-forest/70 font-semibold hidden sm:block">{userEmail}</span>
+                                <button
+                                    id="logout-btn"
+                                    onClick={() => {
+                                        localStorage.removeItem('token');
+                                        localStorage.removeItem('user_id');
+                                        localStorage.removeItem('user_email');
+                                        localStorage.removeItem('user_role');
+                                        setUserEmail(null);
+                                        setView('shop');
+                                    }}
+                                    className="text-farm-forest/60 hover:text-red-500 p-1.5 rounded-full hover:bg-red-50 transition-all duration-300"
+                                    title="Logout"
+                                >
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                id="open-auth-modal-btn"
+                                onClick={() => setShowAuthModal(true)}
+                                className="text-xs font-bold uppercase tracking-[0.2em] text-farm-forest/60 hover:text-farm-gold transition-colors"
+                            >
+                                Login / Register
+                            </button>
+                        )}
+                    </div>
                 </div>
             </nav>
 
             <div className="animate-in fade-in zoom-in-95 duration-1000">
                 {view === 'shop' || !isOwner ? <Shop tenant={tenant} /> : <Admin />}
             </div>
+
+            {showAuthModal && (
+                <UserAuthModal
+                    onClose={() => setShowAuthModal(false)}
+                    onSuccess={(userId, email) => {
+                        setUserEmail(email);
+                        setShowAuthModal(false);
+                    }}
+                />
+            )}
         </main>
     );
 }

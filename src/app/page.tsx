@@ -69,7 +69,7 @@ export default function RootPage() {
                 <div className="flex items-center gap-4">
                     {userEmail ? (
                         <div className="flex items-center gap-3">
-                            <span className="text-xs text-farm-forest/60 font-medium hidden sm:block">{userEmail}</span>
+                            <span className="text-xs text-farm-forest/70 font-semibold hidden sm:block">{userEmail}</span>
                             <button
                                 id="logout-btn"
                                 onClick={() => {
@@ -79,9 +79,12 @@ export default function RootPage() {
                                     localStorage.removeItem('user_role');
                                     setUserEmail(null);
                                 }}
-                                className="text-xs font-bold uppercase tracking-[0.2em] text-farm-forest/60 hover:text-red-500 transition-colors"
+                                className="text-farm-forest/60 hover:text-red-500 p-1.5 rounded-full hover:bg-red-50 transition-all duration-300"
+                                title="Logout"
                             >
-                                Logout
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
                             </button>
                         </div>
                     ) : (
@@ -93,9 +96,6 @@ export default function RootPage() {
                             Login / Register
                         </button>
                     )}
-                    <Link href="/admin-login" className="text-xs font-bold uppercase tracking-[0.2em] text-farm-forest/60 hover:text-farm-gold transition-colors">
-                        Platform Access
-                    </Link>
                 </div>
             </nav>
 
