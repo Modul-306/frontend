@@ -3,9 +3,14 @@
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import api from '@/lib/api';
-import { Product, Blog } from '@/types';
+import { Product, Blog, Tenant } from '@/types';
+import { formatLongDate } from '@/lib/utils';
 
-export default function Shop() {
+interface ShopProps {
+    tenant: Tenant | null;
+}
+
+export default function Shop({ tenant }: ShopProps) {
     const [products, setProducts] = useState<Product[]>([]);
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
@@ -30,98 +35,108 @@ export default function Shop() {
 
     if (loading) return (
         <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-farm-pine"></div>
         </div>
     );
 
     return (
-        <div className="animate-in fade-in duration-500">
-            {/* Hero Section */}
-            <section className="relative h-[60vh] flex items-center justify-center overflow-hidden mb-16">
-                <div className="absolute inset-0 bg-primary/40 z-10" />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-primary/20 z-20" />
+        <div className="pb-32">
+                    {/* Storefront Hero Cover */}
+            <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
                 <img 
-                    src="https://images.unsplash.com/photo-1517154421773-0529f29ea451?auto=format&fit=crop&q=80&w=2000" 
-                    className="absolute inset-0 w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-10000"
-                    alt="Seoul Gyeongbokgung Palace"
+                    src={tenant?.cover_url?.Valid && tenant.cover_url.String ? tenant.cover_url.String : "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1600"}
+                    alt="Farm Cover" 
+                    className="w-full h-full object-cover"
                 />
-                <div className="relative z-30 text-center px-6">
-                    <h1 className="text-6xl md:text-9xl font-black text-white drop-shadow-2xl mb-4 tracking-tighter">VOYAGERA KOREA</h1>
-                    <p className="text-xl md:text-2xl text-white font-medium drop-shadow-md max-w-2xl mx-auto opacity-95">Discover the hidden gems of the morning calm land.</p>
-                </div>
-            </section>
+                <div className="absolute inset-0 bg-gradient-to-t from-farm-cream via-farm-cream/60 to-transparent" />
+            </div>
 
-            <div className="container mx-auto px-6">
-                <section className="mb-24">
-                    <div className="flex items-end justify-between mb-12">
-                        <div>
-                            <span className="text-accent font-bold tracking-widest uppercase text-sm">Experiences</span>
-                            <h2 className="text-5xl font-black text-gray-900">TRAVEL PACKAGES</h2>
-                        </div>
-                        <div className="h-2 w-32 bg-accent rounded-full mb-2" />
+            <div className="container mx-auto px-8 relative -mt-32 z-10">
+                <header className="text-center mb-24 glass-panel p-12 md:p-16 rounded-3xl shadow-xl max-w-5xl mx-auto border-farm-bark">
+                    <span className="premium-badge-gold mb-6 inline-block">Official Local Producer</span>
+                    <h1 className="text-6xl md:text-8xl mb-6 font-serif">Market Selection</h1>
+                    <div className="h-1 w-32 bg-gradient-to-r from-farm-forest to-farm-gold mx-auto mb-8 rounded-full" />
+                    <p className="text-xl md:text-2xl text-farm-forest/70 max-w-2xl mx-auto font-serif italic">
+                        {tenant?.description?.Valid && tenant.description.String
+                            ? tenant.description.String
+                            : 'Freshly harvested and prepared with care for our local community.'}
+                    </p>
+                </header>
+
+                <section className="mb-40">
+                    <div className="flex items-center justify-between mb-12">
+                        <h2 className="text-4xl font-serif text-farm-forest">Current Harvest</h2>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">Showing {products.length} Items</span>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {products.length === 0 ? (
-                            <div className="col-span-full py-20 text-center bg-white rounded-[2rem] border-2 border-dashed border-gray-200 text-gray-400">
-                                <div className="text-5xl mb-4">🗺️</div>
-                                No travel packages available yet.
+                            <div className="col-span-full py-32 text-center glass-panel rounded-3xl text-farm-forest/40 italic font-serif text-2xl border-dashed">
+                                "The pantry awaits its next harvest."
                             </div>
                         ) : products.map((product) => (
-                            <div key={product.id} className="card group">
-                                <div className="relative h-72 overflow-hidden">
+                            <div key={product.id} className="premium-card group flex flex-col h-full bg-white relative">
+                                <div className="absolute top-4 left-4 z-10">
+                                    {product.stock < 10 && product.stock > 0 ? (
+                                        <span className="premium-badge bg-farm-gold text-white border-none shadow-md">Low Stock</span>
+                                    ) : product.stock === 0 ? (
+                                        <span className="premium-badge bg-farm-clay text-white border-none shadow-md">Sold Out</span>
+                                    ) : (
+                                        <span className="premium-badge bg-white/90 backdrop-blur-sm border-none shadow-sm text-farm-forest">In Season</span>
+                                    )}
+                                </div>
+                                <div className="relative aspect-[4/5] overflow-hidden bg-farm-bark/10">
                                     <img 
-                                        src={product.image_url || `https://images.unsplash.com/photo-1533577116850-9ac6608ff28e?auto=format&fit=crop&q=80&w=400`} 
+                                        src={product.image_url?.Valid ? product.image_url.String : `https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=600`} 
                                         alt={product.name} 
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                        className="hover-scale-image" 
                                     />
-                                    <div className="absolute top-4 right-4 bg-accent text-white px-4 py-1.5 rounded-full font-bold shadow-xl">
-                                        ${product.price}
+                                    <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-farm-forest/80 to-transparent flex justify-between items-end">
+                                        <span className="text-farm-cream font-medium text-2xl font-serif tracking-wide drop-shadow-md">CHF {product.price}</span>
                                     </div>
                                 </div>
-                                <div className="p-8">
-                                    <h3 className="text-2xl font-black mb-3 group-hover:text-primary transition-colors">{product.name}</h3>
-                                    <p className="text-gray-500 text-sm mb-6 line-clamp-2 leading-relaxed">{product.description}</p>
-                                    <div className="flex items-center justify-between mt-auto">
-                                        <span className="text-xs font-black uppercase tracking-widest text-gray-400">Limited Spots: {product.stock}</span>
-                                        <button className="bg-primary text-white py-2 px-6 rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 transition-all">Book Now</button>
-                                    </div>
+                                <div className="p-8 flex-1 flex flex-col">
+                                    <h3 className="text-2xl mb-3 font-serif font-medium group-hover:text-farm-pine transition-colors">{product.name}</h3>
+                                    <p className="text-farm-forest/60 text-sm leading-relaxed mb-8 line-clamp-3 flex-1 font-sans">
+                                        {product.description?.Valid ? product.description.String : 'Grown locally with care and tradition. A staple for any community pantry.'}
+                                    </p>
+                                    <button disabled={product.stock === 0} className="premium-btn w-full">Add to Basket</button>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </section>
 
-                <section className="bg-secondary/5 rounded-[4rem] p-12 md:p-24 mb-24 border border-secondary/10 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl" />
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/5 rounded-full -ml-32 -mb-32 blur-3xl" />
-                    
-                    <div className="flex flex-col items-center text-center mb-16 relative z-10">
-                        <span className="text-primary font-black tracking-widest uppercase text-xs mb-4">Voyage Logs</span>
-                        <h2 className="text-6xl font-black text-gray-900 mb-6">TRAVELER'S JOURNAL</h2>
-                        <div className="h-2 w-48 bg-primary rounded-full" />
+                <div className="h-px w-full bg-gradient-to-r from-transparent via-farm-bark to-transparent mb-40" />
+
+                <section className="max-w-4xl mx-auto mb-32">
+                    <div className="text-center mb-24">
+                        <span className="premium-badge mb-6 inline-block">Editorial</span>
+                        <h2 className="text-5xl md:text-6xl font-serif mb-6">Farm Journal</h2>
+                        <p className="text-farm-forest/50 font-sans text-lg max-w-xl mx-auto">Chronicles of our daily labor, community events, and seasonal transitions.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 relative z-10">
+                    <div className="space-y-32">
                         {blogs.length === 0 ? (
-                            <div className="col-span-full py-12 text-center text-gray-400 italic">
-                                No travel stories shared yet. Be the first to explore!
+                            <div className="text-center text-farm-forest/30 italic font-serif text-xl bg-white p-16 rounded-3xl border border-farm-bark/50">
+                                No stories shared just yet.
                             </div>
                         ) : blogs.map((blog) => (
-                            <article key={blog.id} className="bg-white p-10 rounded-[2.5rem] shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-50 hover:border-primary/10 group">
-                                <div className="flex items-center space-x-3 text-primary font-black text-xs uppercase mb-6 tracking-widest">
-                                    <span className="bg-primary/10 px-3 py-1 rounded-full">{new Date(blog.published_at).toLocaleDateString()}</span>
-                                    <span className="w-1.5 h-1.5 bg-accent rounded-full" />
-                                    <span>Adventure</span>
+                            <article key={blog.id} className="group cursor-pointer">
+                                <div className="flex flex-col items-center text-center">
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-farm-gold mb-6 border-b border-farm-gold pb-2">{formatLongDate(blog.published_at)}</span>
+                                    <h3 className="text-5xl md:text-6xl mb-10 leading-[1.1] max-w-3xl font-serif group-hover:text-farm-pine transition-colors">{blog.title}</h3>
+                                    
+                                    <div className="w-full max-w-3xl glass-panel p-10 md:p-14 rounded-3xl text-left relative overflow-hidden transition-all duration-500 group-hover:shadow-xl group-hover:border-farm-pine/20">
+                                        <div className="absolute top-0 left-0 w-2 h-full bg-farm-gold/80" />
+                                        <div className="prose prose-slate prose-lg max-w-none text-farm-forest/80 font-sans leading-relaxed font-light mb-12">
+                                            <ReactMarkdown>{blog.content_md}</ReactMarkdown>
+                                        </div>
+                                        <div className="flex justify-center">
+                                            <button className="premium-btn-outline !px-12">Read Full Entry</button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <h3 className="text-4xl font-black mb-6 leading-tight text-gray-900 group-hover:text-primary transition-colors cursor-pointer">{blog.title}</h3>
-                                <div className="prose prose-slate max-w-none text-gray-600 line-clamp-3 mb-8 leading-relaxed">
-                                    <ReactMarkdown>{blog.content_md}</ReactMarkdown>
-                                </div>
-                                <button className="text-primary font-black uppercase tracking-widest text-sm flex items-center group/btn">
-                                    Explore More
-                                    <span className="ml-3 transform group-hover/btn:translate-x-2 transition-transform">→</span>
-                                </button>
                             </article>
                         ))}
                     </div>

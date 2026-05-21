@@ -1,48 +1,118 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #1e3a8a;
-  --color-primary-dark: #1e3b8a;
-  --color-secondary: #334155;
-  --color-accent: #f59e0b;
-  --color-background: #f8fafc;
+  /* High-End Organic Palette */
+  --color-farm-forest: #0A2E20;
+  --color-farm-pine: #164E35;
+  --color-farm-gold: #D99C2B;
+  --color-farm-honey: #F0B849;
+  --color-farm-cream: #FCFAF6;
+  --color-farm-parchment: #F3EFE6;
+  --color-farm-bark: #E5DFD1;
+  --color-farm-clay: #2C352D;
+  
+  /* Typography Variables loaded from Next.js */
+  /* --font-sans and --font-serif are defined in layout.tsx */
+
+  /* Semantic Mappings */
+  --color-primary: var(--color-farm-forest);
+  --color-secondary: var(--color-farm-cream);
+  --color-accent: var(--color-farm-gold);
+  --color-background: var(--color-farm-cream);
   --color-card: #ffffff;
-  --color-text: #0f172a;
+  --color-text: var(--color-farm-forest);
 }
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: var(--color-farm-cream);
+  --foreground: var(--color-farm-forest);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.glass-nav {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(45, 90, 39, 0.1);
+/* Typography Enhancements */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  @apply tracking-tight text-farm-forest;
 }
 
-.btn-primary {
-  @apply bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md active:scale-95;
+/* Base Inputs */
+input, textarea {
+  font-family: var(--font-sans);
 }
 
-.btn-secondary {
-  @apply bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white px-6 py-2 rounded-lg transition-all duration-200 active:scale-95;
+/* Modern Glass & UI Utility Classes */
+.glass-panel {
+  @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-sm;
 }
 
-.card {
-  @apply bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+.nav-premium {
+  @apply sticky top-0 z-50 px-8 py-4 bg-farm-cream/80 backdrop-blur-xl border-b border-farm-bark transition-all duration-300;
 }
 
-.prose h1, .prose h2, .prose h3 {
-  @apply text-primary font-bold mt-6 mb-4;
+.premium-card {
+  @apply bg-white rounded-2xl border border-farm-bark/60 overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-farm-pine/5 hover:-translate-y-1 hover:border-farm-pine/20;
 }
 
-.prose p {
-  @apply mb-4 leading-relaxed text-gray-700;
+.premium-btn {
+  @apply relative overflow-hidden bg-farm-forest text-farm-cream px-8 py-3 rounded-full font-bold transition-all duration-300 hover:bg-farm-pine active:scale-[0.98] disabled:opacity-50 text-xs uppercase tracking-[0.2em] shadow-md hover:shadow-lg hover:shadow-farm-pine/20;
+}
+
+.premium-btn-outline {
+  @apply bg-transparent border border-farm-forest/20 text-farm-forest hover:bg-farm-forest hover:text-farm-cream px-8 py-3 rounded-full font-bold transition-all duration-300 active:scale-[0.98] text-xs uppercase tracking-[0.2em];
+}
+
+.premium-input {
+  @apply w-full bg-white border border-farm-bark/80 p-4 rounded-xl focus:border-farm-pine focus:ring-4 focus:ring-farm-pine/10 transition-all outline-none text-farm-forest placeholder:text-farm-forest/30 shadow-sm;
+}
+
+.premium-label {
+  @apply text-[11px] font-bold uppercase tracking-[0.15em] text-farm-forest/60 mb-2 block;
+}
+
+.premium-badge {
+  @apply text-[10px] font-bold uppercase tracking-widest bg-farm-parchment text-farm-pine px-3 py-1.5 rounded-full border border-farm-bark shadow-sm;
+}
+
+.premium-badge-gold {
+  @apply text-[10px] font-bold uppercase tracking-widest bg-farm-gold/10 text-farm-gold px-3 py-1.5 rounded-full border border-farm-gold/20 shadow-sm;
+}
+
+/* Section Elements */
+.section-title {
+  @apply text-5xl md:text-6xl mb-6 font-serif font-medium;
+}
+
+.section-divider {
+  @apply h-1 w-24 bg-gradient-to-r from-farm-forest to-farm-gold rounded-full my-8;
+}
+
+/* Micro Animations */
+.hover-scale-image {
+  @apply w-full h-full object-cover transition-transform duration-700 hover:scale-105;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
 }

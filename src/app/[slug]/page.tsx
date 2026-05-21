@@ -1,43 +1,181 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import Shop from '@/components/Shop';
 import Admin from '@/components/Admin';
+import api from '@/lib/api';
+import { Tenant } from '@/types';
+import UserAuthModal from '@/components/UserAuthModal';
 
 export default function TenantPage() {
     const { slug } = useParams();
     const [view, setView] = useState<'shop' | 'admin'>('shop');
+    const [tenant, setTenant] = useState<Tenant | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [notFound, setNotFound] = useState(false);
+    const [isOwner, setIsOwner] = useState(false);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
+    const [showAuthModal, setShowAuthModal] = useState(false);
+
+    useEffect(() => {
+        if (typeof slug === 'string') {
+            setLoading(true);
+            setNotFound(false);
+            api.get(`/tenants/${slug}`)
+               .then(res => {
+                   setTenant(res.data);
+                   setLoading(false);
+               })
+               .catch(err => {
+                   console.error("Could not fetch tenant", err);
+                   setNotFound(true);
+                   setLoading(false);
+               });
+        }
+    }, [slug]);
+
+    useEffect(() => {
+        const savedEmail = localStorage.getItem('user_email');
+        if (savedEmail && localStorage.getItem('token')) {
+            setUserEmail(savedEmail);
+        }
+    }, []);
+
+    useEffect(() => {
+        const storedUserId = localStorage.getItem('user_id');
+        if (storedUserId && tenant && tenant.owner_id === storedUserId) {
+            setIsOwner(true);
+        } else {
+            setIsOwner(false);
+        }
+    }, [tenant, userEmail]);
+
+    if (loading) {
+        return (
+            <main className="min-h-screen bg-farm-cream flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-farm-forest/30 border-t-farm-forest rounded-full animate-spin" />
+                    <p className="text-farm-forest/60 font-serif text-lg">Loading...</p>
+                </div>
+            </main>
+        );
+    }
+
+    if (notFound) {
+        return (
+            <main className="min-h-screen bg-farm-cream flex items-center justify-center px-6">
+                <div className="text-center max-w-lg animate-in fade-in zoom-in-95 duration-700">
+                    {/* Big 404 */}
+                    <div className="mb-6 select-none">
+                        <span className="text-[10rem] md:text-[14rem] font-serif font-black text-farm-forest/10 leading-none">
+                            404
+                        </span>
+                    </div>
+
+                    {/* Message */}
+                    <h1 className="text-3xl md:text-4xl font-serif font-bold text-farm-forest mb-3">
+                        Lost in the Fields
+                    </h1>
+                    <p className="text-farm-forest/60 text-base md:text-lg mb-8 leading-relaxed">
+                        The farm <span className="font-semibold text-farm-forest/80">&ldquo;{slug}&rdquo;</span> doesn&apos;t exist or may have moved. Let&apos;s get you back on track.
+                    </p>
+
+                    {/* CTA Button */}
+                    <Link
+                        href="/"
+                        className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-farm-forest to-farm-pine text-farm-cream font-bold text-sm uppercase tracking-widest rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+                    >
+                        <span>🏠</span>
+                        Take me back to safety
+                    </Link>
+                </div>
+            </main>
+        );
+    }
 
     return (
-        <main className="min-h-screen bg-background">
-            <nav className="glass-nav sticky top-0 z-50 px-6 py-4">
-                <div className="container mx-auto flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">C</div>
-                        <span className="text-2xl font-black text-primary tracking-tight uppercase">{slug}</span>
-                    </div>
+        <main className="min-h-screen bg-farm-cream">
+            <nav className="nav-premium">
+                <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                    <Link href="/" className="flex items-center space-x-3 group cursor-pointer">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-farm-forest to-farm-pine flex items-center justify-center text-farm-cream font-serif text-xl font-bold shadow-md group-hover:shadow-lg transition-all duration-300 overflow-hidden">
+                            {tenant?.icon_url?.Valid ? (
+                                <img src={tenant.icon_url.String} alt="Farm Logo" className="w-full h-full object-cover" />
+                            ) : (
+                                typeof slug === 'string' ? slug.charAt(0).toUpperCase() : 'F'
+                            )}
+                        </div>
+                        <span className="text-2xl font-serif font-bold text-farm-forest uppercase tracking-widest">{tenant?.name || slug}</span>
+                    </Link>
                     
-                    <div className="flex bg-gray-100 p-1 rounded-xl shadow-inner border border-gray-200">
-                        <button 
-                            className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 ${view === 'shop' ? 'bg-white text-primary shadow-sm scale-100' : 'text-gray-500 hover:text-primary'}`} 
-                            onClick={() => setView('shop')}
-                        >
-                            Public Shop
-                        </button>
-                        <button 
-                            className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 ${view === 'admin' ? 'bg-white text-primary shadow-sm scale-100' : 'text-gray-500 hover:text-primary'}`} 
-                            onClick={() => setView('admin')}
-                        >
-                            Farmer Dashboard
-                        </button>
+                    {isOwner && (
+                        <div className="flex bg-farm-bark/30 p-1 rounded-full border border-farm-bark backdrop-blur-sm shadow-inner">
+                            <button 
+                                className={`px-8 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-300 ${view === 'shop' ? 'bg-white text-farm-forest shadow-sm' : 'text-farm-forest/50 hover:text-farm-forest'}`} 
+                                onClick={() => setView('shop')}
+                            >
+                                Storefront
+                            </button>
+                            <button 
+                                id="workbench-btn"
+                                className={`px-8 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-300 ${view === 'admin' ? 'bg-white text-farm-forest shadow-sm' : 'text-farm-forest/50 hover:text-farm-forest'}`} 
+                                onClick={() => setView('admin')}
+                            >
+                                Workbench
+                            </button>
+                        </div>
+                    )}
+
+                    <div className="flex items-center gap-4">
+                        {userEmail ? (
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs text-farm-forest/70 font-semibold hidden sm:block">{userEmail}</span>
+                                <button
+                                    id="logout-btn"
+                                    onClick={() => {
+                                        localStorage.removeItem('token');
+                                        localStorage.removeItem('user_id');
+                                        localStorage.removeItem('user_email');
+                                        localStorage.removeItem('user_role');
+                                        setUserEmail(null);
+                                        setView('shop');
+                                    }}
+                                    className="text-farm-forest/60 hover:text-red-500 p-1.5 rounded-full hover:bg-red-50 transition-all duration-300"
+                                    title="Logout"
+                                >
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                id="open-auth-modal-btn"
+                                onClick={() => setShowAuthModal(true)}
+                                className="text-xs font-bold uppercase tracking-[0.2em] text-farm-forest/60 hover:text-farm-gold transition-colors"
+                            >
+                                Login / Register
+                            </button>
+                        )}
                     </div>
                 </div>
             </nav>
 
-            <div className="transition-all duration-500">
-                {view === 'shop' ? <Shop /> : <Admin />}
+            <div className="animate-in fade-in zoom-in-95 duration-1000">
+                {view === 'shop' || !isOwner ? <Shop tenant={tenant} /> : <Admin />}
             </div>
+
+            {showAuthModal && (
+                <UserAuthModal
+                    onClose={() => setShowAuthModal(false)}
+                    onSuccess={(userId, email) => {
+                        setUserEmail(email);
+                        setShowAuthModal(false);
+                    }}
+                />
+            )}
         </main>
     );
 }

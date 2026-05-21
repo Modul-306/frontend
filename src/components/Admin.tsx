@@ -6,12 +6,27 @@ import api from '@/lib/api';
 export default function Admin() {
     const [productName, setProductName] = useState('');
     const [productDesc, setProductDesc] = useState('');
-    const [productPrice, setProductPrice] = useState(0);
-    const [productStock, setProductStock] = useState(0);
+    const [productPrice, setProductPrice] = useState<number | ''>('');
+    const [productStock, setProductStock] = useState<number | ''>('');
     const [productImage, setProductImage] = useState<File | null>(null);
     const [blogTitle, setBlogTitle] = useState('');
     const [blogContent, setBlogContent] = useState('');
+    const [coverUrl, setCoverUrl] = useState('');
+    const [description, setDescription] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const handleSaveAppearance = async () => {
+        setLoading(true);
+        try {
+            await api.put('/tenants/appearance', { cover_url: coverUrl, description });
+            alert('Appearance saved successfully!');
+        } catch (err) {
+            console.error('Failed to save appearance', err);
+            alert('Error saving appearance.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleAddProduct = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -25,7 +40,6 @@ export default function Admin() {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 imageUrl = uploadRes.data.url;
-                // Add the host for local display if needed, but the backend returns path
                 if (!imageUrl.startsWith('http')) {
                     imageUrl = `http://localhost:9000${imageUrl}`;
                 }
@@ -34,15 +48,15 @@ export default function Admin() {
             await api.post('/products', {
                 name: productName,
                 description: productDesc,
-                price: productPrice,
-                stock: productStock,
+                price: Number(productPrice),
+                stock: Number(productStock),
                 image_url: imageUrl
             });
             alert('Product added successfully!');
             setProductName('');
             setProductDesc('');
-            setProductPrice(0);
-            setProductStock(0);
+            setProductPrice('');
+            setProductStock('');
             setProductImage(null);
         } catch (err) {
             console.error('Failed to add product', err);
@@ -72,87 +86,191 @@ export default function Admin() {
     };
 
     return (
-        <div className="container mx-auto px-6 py-12 animate-in slide-in-from-bottom-4 duration-700">
-            <header className="mb-16">
-                <div className="flex items-center space-x-4 mb-2">
-                    <span className="h-1 w-12 bg-accent rounded-full" />
-                    <span className="text-xs font-black uppercase tracking-[0.3em] text-primary">Control Center</span>
-                </div>
-                <h1 className="text-6xl font-black text-gray-900 tracking-tighter">VOYAGERA ADMIN</h1>
-                <p className="text-gray-500 font-medium text-lg mt-2">Manage your adventures and stories across South Korea.</p>
+        <div className="container mx-auto px-8 py-24">
+            <header className="mb-24 text-center">
+                <span className="premium-badge-gold mb-6 inline-block">Producer Dashboard</span>
+                <h1 className="text-5xl md:text-6xl mb-6 font-serif">Workbench</h1>
+                <div className="h-1 w-24 bg-gradient-to-r from-farm-forest to-farm-gold mx-auto mb-8 rounded-full" />
+                <p className="text-farm-forest/50 font-sans text-lg max-w-2xl mx-auto font-light">Manage your seasonal inventory and community records.</p>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-                <section className="bg-white p-12 rounded-[3.5rem] shadow-2xl shadow-primary/5 border border-gray-100 transition-all hover:shadow-primary/10">
-                    <div className="flex items-center space-x-6 mb-12">
-                        <div className="w-16 h-16 bg-primary/10 rounded-[2rem] flex items-center justify-center text-primary rotate-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h2 className="text-3xl font-black text-gray-900">Experience Hub</h2>
-                            <p className="text-gray-400 text-sm font-bold uppercase tracking-wider">Travel Packages</p>
+            <section className="glass-panel p-10 md:p-14 rounded-3xl relative overflow-hidden mb-12 max-w-4xl mx-auto">
+                <div className="absolute top-0 left-0 w-64 h-64 bg-farm-gold/5 rounded-full blur-3xl -z-10" />
+                
+                <div className="mb-8">
+                    <h2 className="text-3xl font-serif mb-2 text-farm-forest">Storefront Settings</h2>
+                    <p className="text-farm-forest/40 font-sans text-sm">Update your public farm presentation.</p>
+                </div>
+
+                <div className="flex flex-col gap-8">
+                    {/* Logo upload */}
+                    <div className="flex flex-col md:flex-row items-center gap-8">
+                        <div className="flex-1 w-full relative group/file">
+                            <label className="premium-label mb-2 block">Farm Icon (Logo)</label>
+                            <input className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20 mt-8" type="file" accept="image/*" onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                setLoading(true);
+                                try {
+                                    const formData = new FormData();
+                                    formData.append('file', file);
+                                    const uploadRes = await api.post('/upload', formData, {
+                                        headers: { 'Content-Type': 'multipart/form-data' }
+                                    });
+                                    let imageUrl = uploadRes.data.url;
+                                    if (!imageUrl.startsWith('http')) {
+                                        imageUrl = `http://localhost:9000${imageUrl}`;
+                                    }
+                                    await api.put('/tenants/icon', { icon_url: imageUrl });
+                                    alert('Farm icon updated successfully!');
+                                } catch (err) {
+                                    console.error('Failed to update farm icon', err);
+                                    alert('Error updating icon.');
+                                } finally {
+                                    setLoading(false);
+                                }
+                            }} />
+                            <div className="w-full bg-white/50 border-2 border-dashed border-farm-bark/80 p-8 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 group-hover/file:border-farm-pine group-hover/file:bg-farm-pine/5">
+                                <svg className="w-6 h-6 mb-3 text-farm-forest/30 group-hover/file:text-farm-pine transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                <span className="font-sans font-bold text-xs uppercase tracking-widest text-farm-forest/50 group-hover/file:text-farm-pine transition-colors">
+                                    Upload New Logo
+                                </span>
+                            </div>
                         </div>
                     </div>
+
+                    {/* Cover image upload */}
+                    <div>
+                        <label className="premium-label mb-2 block">Hero Cover Image</label>
+                        <div className="relative group/cover">
+                            <input
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                                type="file"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    setLoading(true);
+                                    try {
+                                        const formData = new FormData();
+                                        formData.append('file', file);
+                                        const uploadRes = await api.post('/upload', formData, {
+                                            headers: { 'Content-Type': 'multipart/form-data' }
+                                        });
+                                        let imageUrl = uploadRes.data.url;
+                                        if (!imageUrl.startsWith('http')) {
+                                            imageUrl = `http://localhost:9000${imageUrl}`;
+                                        }
+                                        setCoverUrl(imageUrl);
+                                    } catch (err) {
+                                        console.error('Failed to upload cover image', err);
+                                        alert('Error uploading cover image.');
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }}
+                            />
+                            <div className="w-full bg-white/50 border-2 border-dashed border-farm-bark/80 p-8 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 group-hover/cover:border-farm-pine group-hover/cover:bg-farm-pine/5">
+                                <svg className="w-6 h-6 mb-3 text-farm-forest/30 group-hover/cover:text-farm-pine transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                <span className="font-sans font-bold text-xs uppercase tracking-widest text-farm-forest/50 group-hover/cover:text-farm-pine transition-colors">
+                                    {coverUrl ? '✓ Cover uploaded — click to change' : 'Upload Hero Cover Image'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                        <label className="premium-label mb-2 block">Farm Description</label>
+                        <textarea
+                            className="premium-input h-28 resize-none"
+                            placeholder="A short tagline shown on your public storefront..."
+                            value={description}
+                            onChange={e => setDescription(e.target.value)}
+                        />
+                    </div>
+
+                    <button
+                        disabled={loading}
+                        onClick={handleSaveAppearance}
+                        className="premium-btn max-w-xs"
+                    >
+                        {loading ? 'Saving...' : 'Save Appearance'}
+                    </button>
+                </div>
+            </section>
+
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <section className="glass-panel p-10 md:p-14 rounded-3xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-farm-gold/5 rounded-full blur-3xl -z-10 group-hover:bg-farm-gold/10 transition-colors duration-700" />
                     
-                    <form onSubmit={handleAddProduct} className="space-y-8">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Package Name</label>
-                            <input className="w-full bg-gray-50/50 border-2 border-transparent p-5 rounded-3xl focus:bg-white focus:border-primary/20 transition-all outline-none font-bold text-gray-700 shadow-inner" placeholder="e.g. Moonlight Palace Tour" value={productName} onChange={e => setProductName(e.target.value)} required />
+                    <div className="mb-12">
+                        <h2 className="text-3xl font-serif mb-2 text-farm-forest">Inventory Control</h2>
+                        <p className="text-farm-forest/40 font-sans text-sm">Record new produce and handcrafted items.</p>
+                    </div>
+                    
+                    <form onSubmit={handleAddProduct} className="space-y-8 relative z-10">
+                        <div>
+                            <label className="premium-label">Item Name</label>
+                            <input className="premium-input" placeholder="e.g. Sourdough Loaf" value={productName} onChange={e => setProductName(e.target.value)} required />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Itinerary / Description</label>
-                            <textarea className="w-full bg-gray-50/50 border-2 border-transparent p-5 rounded-3xl h-32 focus:bg-white focus:border-primary/20 transition-all outline-none font-medium text-gray-600 shadow-inner" placeholder="Detailed daily plan..." value={productDesc} onChange={e => setProductDesc(e.target.value)} />
+                        <div>
+                            <label className="premium-label">Provenance & Description</label>
+                            <textarea className="premium-input h-32 resize-none" placeholder="Details about growth or preparation..." value={productDesc} onChange={e => setProductDesc(e.target.value)} />
                         </div>
-                        <div className="grid grid-cols-2 gap-8">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Price (USD)</label>
-                                <input className="w-full bg-gray-50/50 border-2 border-transparent p-5 rounded-3xl focus:bg-white focus:border-primary/20 transition-all outline-none font-bold text-gray-700 shadow-inner" type="number" step="0.01" value={productPrice} onChange={e => setProductPrice(Number(e.target.value))} required />
+                        <div className="grid grid-cols-2 gap-6">
+                            <div>
+                                <label className="premium-label">Price (CHF)</label>
+                                <input className="premium-input" type="number" step="0.05" placeholder="0.00" value={productPrice} onChange={e => setProductPrice(Number(e.target.value))} required />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Max Travelers</label>
-                                <input className="w-full bg-gray-50/50 border-2 border-transparent p-5 rounded-3xl focus:bg-white focus:border-primary/20 transition-all outline-none font-bold text-gray-700 shadow-inner" type="number" value={productStock} onChange={e => setProductStock(Number(e.target.value))} required />
+                            <div>
+                                <label className="premium-label">Units Available</label>
+                                <input className="premium-input" type="number" placeholder="0" value={productStock} onChange={e => setProductStock(Number(e.target.value))} required />
                             </div>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Cover Image</label>
+                        <div>
+                            <label className="premium-label">Product Portrait</label>
                             <div className="relative group/file">
-                                <input className="w-full bg-gray-50/50 border-2 border-dashed border-gray-200 p-8 rounded-3xl focus:border-primary/20 transition-all outline-none text-transparent cursor-pointer file:hidden" type="file" onChange={e => setProductImage(e.target.files?.[0] || null)} />
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-gray-400 font-bold uppercase text-xs tracking-widest group-hover/file:text-primary transition-colors">
-                                    {productImage ? productImage.name : 'Click to upload package image'}
+                                <input className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" type="file" onChange={e => setProductImage(e.target.files?.[0] || null)} />
+                                <div className="w-full bg-white/50 border-2 border-dashed border-farm-bark/80 p-10 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 group-hover/file:border-farm-pine group-hover/file:bg-farm-pine/5">
+                                    <svg className="w-8 h-8 mb-4 text-farm-forest/30 group-hover/file:text-farm-pine transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                    <span className="font-sans font-bold text-xs uppercase tracking-widest text-farm-forest/50 group-hover/file:text-farm-pine transition-colors">
+                                        {productImage ? productImage.name : 'Upload record photo'}
+                                    </span>
                                 </div>
                             </div>
                         </div>
-                        <button disabled={loading} className="w-full bg-primary text-white py-5 font-black uppercase tracking-[0.2em] text-sm rounded-[2rem] shadow-xl shadow-primary/20 hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50">
-                            {loading ? 'Finalizing...' : 'Create Experience'}
+                        <button disabled={loading} className="premium-btn w-full mt-4">
+                            {loading ? 'Recording...' : 'Update Inventory'}
                         </button>
                     </form>
                 </section>
 
-                <section className="bg-white p-12 rounded-[3.5rem] shadow-2xl shadow-secondary/5 border border-gray-100 transition-all hover:shadow-secondary/10">
-                    <div className="flex items-center space-x-6 mb-12">
-                        <div className="w-16 h-16 bg-secondary/10 rounded-[2rem] flex items-center justify-center text-secondary -rotate-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h2 className="text-3xl font-black text-gray-900">Voyage Logs</h2>
-                            <p className="text-gray-400 text-sm font-bold uppercase tracking-wider">Travel Journal</p>
-                        </div>
+                <section className="glass-panel p-10 md:p-14 rounded-3xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-farm-pine/5 rounded-full blur-3xl -z-10 group-hover:bg-farm-pine/10 transition-colors duration-700" />
+                    
+                    <div className="mb-12">
+                        <h2 className="text-3xl font-serif mb-2 text-farm-forest">Farm Journal</h2>
+                        <p className="text-farm-forest/40 font-sans text-sm">Share community notes and updates.</p>
                     </div>
                     
-                    <form onSubmit={handleCreateBlog} className="space-y-8">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary/60 ml-1">Journal Title</label>
-                            <input className="w-full bg-gray-50/50 border-2 border-transparent p-5 rounded-3xl focus:bg-white focus:border-secondary/20 transition-all outline-none font-bold text-gray-700 shadow-inner" placeholder="e.g. My first night in Myeongdong" value={blogTitle} onChange={e => setBlogTitle(e.target.value)} required />
+                    <form onSubmit={handleCreateBlog} className="space-y-8 relative z-10 h-full flex flex-col">
+                        <div>
+                            <label className="premium-label">Headline</label>
+                            <input className="premium-input font-serif text-lg" placeholder="e.g. News from the Orchard" value={blogTitle} onChange={e => setBlogTitle(e.target.value)} required />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary/60 ml-1">Story (Markdown)</label>
-                            <textarea className="w-full bg-gray-50/50 border-2 border-transparent p-5 rounded-3xl h-[380px] focus:bg-white focus:border-secondary/20 transition-all outline-none font-medium text-gray-600 shadow-inner font-mono text-sm leading-relaxed" placeholder="Tell your adventure here..." value={blogContent} onChange={e => setBlogContent(e.target.value)} required />
+                        <div className="flex-1">
+                            <label className="premium-label">Article Text</label>
+                            <textarea className="premium-input h-[380px] font-sans leading-relaxed resize-none" placeholder="Write your note to the community..." value={blogContent} onChange={e => setBlogContent(e.target.value)} required />
                         </div>
-                        <button disabled={loading} className="w-full bg-secondary text-white py-5 font-black uppercase tracking-[0.2em] text-sm rounded-[2rem] shadow-xl shadow-secondary/20 hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50">
+                        <button disabled={loading} className="premium-btn w-full mt-4">
                             {loading ? 'Publishing...' : 'Publish to Journal'}
                         </button>
                     </form>
