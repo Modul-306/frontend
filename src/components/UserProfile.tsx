@@ -65,12 +65,12 @@ export default function UserProfile() {
             
             const doc = new jsPDF();
             doc.setFontSize(22);
-            doc.text('CattleHof Network - Invoice', 20, 20);
+            doc.text(locale === 'de' ? 'CattleHof Netzwerk - Rechnung' : 'CattleHof Network - Invoice', 20, 20);
             
             doc.setFontSize(10);
-            doc.text(`Order ID: ${order.id}`, 20, 30);
-            doc.text(`Date: ${formatLongDate(order.created_at)}`, 20, 35);
-            doc.text(`Customer: ${user?.email}`, 20, 40);
+            doc.text(`${t.admin.orders.order_id}: ${order.id}`, 20, 30);
+            doc.text(`${t.global_admin.date_col}: ${formatLongDate(order.created_at)}`, 20, 35);
+            doc.text(`${locale === 'de' ? 'Kunde' : 'Customer'}: ${user?.email}`, 20, 40);
             
             const tableData = items.map((item: any) => [
                 item.product_name,
@@ -81,9 +81,14 @@ export default function UserProfile() {
             
             autoTable(doc, {
                 startY: 50,
-                head: [['Product', 'Qty', 'Price', 'Total']],
+                head: [[
+                    t.admin.inventory.name, 
+                    locale === 'de' ? 'Menge' : 'Qty', 
+                    t.admin.inventory.price, 
+                    t.shop.total
+                ]],
                 body: tableData,
-                foot: [['', '', 'Grand Total', formatCurrency(order.total_amount)]],
+                foot: [['', '', locale === 'de' ? 'Gesamtsumme' : 'Grand Total', formatCurrency(order.total_amount)]],
                 theme: 'striped',
                 headStyles: { fillColor: [22, 78, 53] }
             });
@@ -138,7 +143,7 @@ export default function UserProfile() {
                                             <button 
                                                 onClick={() => handleDownloadInvoice(order)}
                                                 className="p-3 bg-farm-bark/10 text-farm-forest/40 hover:text-farm-pine hover:bg-farm-pine/10 rounded-2xl transition-all"
-                                                title={locale === 'de' ? 'Rechnung herunterladen' : 'Download Invoice'}
+                                                title={t.profile.download_invoice}
                                             >
                                                 <Download size={20} />
                                             </button>
@@ -165,7 +170,7 @@ export default function UserProfile() {
                             </div>
                             {loyalty && parseFloat(loyalty.discount_percent) > 0 && (
                                 <div className="flex justify-between items-center text-sm">
-                                    <span className="text-farm-cream/60">{locale === 'de' ? 'Aktiver Rabatt' : 'Active Discount'}</span>
+                                    <span className="text-farm-cream/60">{t.profile.active_discount}</span>
                                     <span className="font-bold text-green-400">{loyalty.discount_percent}%</span>
                                 </div>
                             )}

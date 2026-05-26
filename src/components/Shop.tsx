@@ -186,7 +186,7 @@ export default function Shop({ tenant }: ShopProps) {
                                         </div>
                                         <div className="flex-1">
                                             <h4 className="font-serif text-lg text-farm-forest">{item.product.name}</h4>
-                                            <p className="text-xs text-farm-forest/60">{formatCurrency(item.product.price)} / unit</p>
+                                            <p className="text-xs text-farm-forest/60">{formatCurrency(item.product.price)} / {t.common.unit}</p>
                                             <div className="flex items-center gap-3 mt-2">
                                                 <button onClick={() => updateQuantity(item.product.id, -1)} className="w-6 h-6 rounded-full border border-farm-bark/30 flex items-center justify-center hover:bg-farm-bark/10 text-xs">-</button>
                                                 <span className="text-xs font-bold">{item.quantity}</span>
@@ -263,7 +263,7 @@ export default function Shop({ tenant }: ShopProps) {
                     <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 mb-12">
                         <div>
                             <h2 className="text-4xl font-serif text-farm-forest mb-2">{t.shop.harvest_title}</h2>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">{locale === 'de' ? 'Zeige' : 'Showing'} {products.length} {locale === 'de' ? 'Artikel' : 'Items'}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">{t.shop.showing} {products.length} {t.shop.items}</span>
                         </div>
                         
                         <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
@@ -284,7 +284,7 @@ export default function Shop({ tenant }: ShopProps) {
                                 onChange={(e) => setCategory(e.target.value)}
                                 className="premium-input !py-3 !px-6 !text-xs min-w-[150px] appearance-none cursor-pointer"
                             >
-                                <option value="">{locale === 'de' ? 'Alle Kategorien' : 'All Categories'}</option>
+                                <option value="">{t.common.all_categories}</option>
                                 {categories.map(c => (
                                     <option key={c} value={c}>{c}</option>
                                 ))}
@@ -295,7 +295,7 @@ export default function Shop({ tenant }: ShopProps) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {products.length === 0 ? (
                             <div className="col-span-full py-32 text-center glass-panel rounded-3xl text-farm-forest/40 italic font-serif text-2xl border-dashed">
-                                "{locale === 'de' ? 'Die Vorratskammer wartet auf die nächste Ernte.' : 'The pantry awaits its next harvest.'}"
+                                "{t.shop.no_products || (locale === 'de' ? 'Die Vorratskammer wartet auf die nächste Ernte.' : 'The pantry awaits its next harvest.')}"
                             </div>
                         ) : products.map((product) => (
                             <div key={product.id} className="premium-card group flex flex-col h-full bg-white relative">
@@ -381,7 +381,7 @@ export default function Shop({ tenant }: ShopProps) {
                     <div className="space-y-32">
                         {blogs.length === 0 ? (
                             <div className="text-center text-farm-forest/30 italic font-serif text-xl bg-white p-16 rounded-3xl border border-farm-bark/50">
-                                {locale === 'de' ? 'Noch keine Geschichten geteilt.' : 'No stories shared just yet.'}
+                                {t.shop.no_stories}
                             </div>
                         ) : blogs.map((blog) => (
                             <article key={blog.id} className="group cursor-pointer">

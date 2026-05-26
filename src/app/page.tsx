@@ -169,7 +169,7 @@ export default function RootPage() {
                             onChange={(e) => setCategory(e.target.value)}
                             className="premium-input !py-4 !px-8 cursor-pointer appearance-none bg-white min-w-[180px]"
                         >
-                            <option value="">{t.shop.market_selection}</option>
+                            <option value="">{t.common.all_categories}</option>
                             {categories.map(c => (
                                 <option key={c} value={c}>{c}</option>
                             ))}

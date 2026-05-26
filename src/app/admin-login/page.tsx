@@ -4,9 +4,11 @@ import Link from 'next/link';
 import GlobalAdmin from '@/components/GlobalAdmin';
 import Login from '@/components/Login';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function AdminLoginPage() {
     const { user, loading, logout, login } = useAuth();
+    const { t } = useLanguage();
 
     if (loading) {
         return (
@@ -25,7 +27,7 @@ export default function AdminLoginPage() {
                 }} />
                 <div className="mt-8 text-center animate-in fade-in duration-1000 delay-500">
                     <Link href="/" className="text-farm-forest/40 hover:text-farm-forest font-bold text-xs uppercase tracking-widest transition-colors">
-                        ← Return to Public Directory
+                        ← {t.common.back}
                     </Link>
                 </div>
             </main>
@@ -40,7 +42,7 @@ export default function AdminLoginPage() {
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-farm-forest to-farm-pine flex items-center justify-center text-farm-cream font-serif text-xl font-bold shadow-md group-hover:shadow-lg transition-all duration-300">
                             P
                         </div>
-                        <span className="text-2xl font-serif font-bold text-farm-forest uppercase tracking-widest">Platform Admin</span>
+                        <span className="text-2xl font-serif font-bold text-farm-forest uppercase tracking-widest">{t.auth.platform_admin_badge}</span>
                     </Link>
                     <div className="flex items-center gap-4">
                         <span className="text-xs text-farm-forest/70 font-semibold hidden sm:block">{user.email}</span>
@@ -48,7 +50,7 @@ export default function AdminLoginPage() {
                             id="logout-btn"
                             onClick={logout}
                             className="text-farm-forest/60 hover:text-red-500 p-1.5 rounded-full hover:bg-red-50 transition-all duration-300"
-                            title="Logout"
+                            title={t.common.logout}
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
