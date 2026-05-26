@@ -15,6 +15,8 @@ export default function RootPage() {
     const { t } = useLanguage();
     const [tenants, setTenants] = useState<Tenant[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [category, setCategory] = useState('');
+    const [categories, setCategories] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -27,25 +29,24 @@ export default function RootPage() {
     ];
 
     useEffect(() => {
-        const fetchTenants = async () => {
+        const fetchData = async () => {
             try {
-                const res = await api.get('tenants');
-                setTenants(res.data || []);
+                const [tenantsRes, catsRes] = await Promise.all([
+                    api.get('tenants', { params: { search: searchQuery, category } }),
+                    api.get('tenants/categories')
+                ]);
+                setTenants(tenantsRes.data || []);
+                setCategories(catsRes.data || []);
             } catch (err) {
-                console.error('Failed to fetch tenants', err);
+                console.error('Failed to fetch data', err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchTenants();
-    }, []);
+        fetchData();
+    }, [searchQuery, category]);
 
-    const filteredTenants = tenants.filter(t => 
-        t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.slug.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    if (loading) return (
+    if (loading && tenants.length === 0) return (
         <div className="flex items-center justify-center min-h-screen bg-farm-cream">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-farm-pine"></div>
         </div>
@@ -142,35 +143,47 @@ export default function RootPage() {
 
             {/* Farm Directory */}
             <div id="directory" className="container mx-auto px-8 pb-48 relative z-10">
-                <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
+                <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-8 border-b border-farm-bark pb-12">
                     <div>
                         <h2 className="section-title !mb-4">{t.home.our_producers}</h2>
                         <p className="text-farm-forest/60 font-sans text-lg">{t.home.producers_subtitle}</p>
                     </div>
                     
-                    <div className="w-full md:w-96 relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg className="w-5 h-5 text-farm-forest/40 group-focus-within:text-farm-pine transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                    <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                        <div className="relative group min-w-[300px]">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <svg className="w-5 h-5 text-farm-forest/40 group-focus-within:text-farm-pine transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input 
+                                type="text" 
+                                className="premium-input !pl-12 !py-4" 
+                                placeholder={t.home.search_placeholder} 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
                         </div>
-                        <input 
-                            type="text" 
-                            className="premium-input !pl-12" 
-                            placeholder={t.home.search_placeholder} 
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+                        <select 
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            className="premium-input !py-4 !px-8 cursor-pointer appearance-none bg-white min-w-[180px]"
+                        >
+                            <option value="">{t.shop.market_selection}</option>
+                            {categories.map(c => (
+                                <option key={c} value={c}>{c}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                    {filteredTenants.length === 0 ? (
-                        <div className="col-span-full py-32 text-center glass-panel rounded-3xl">
+                    {tenants.length === 0 ? (
+                        <div className="col-span-full py-32 text-center glass-panel rounded-3xl border-dashed">
                             <p className="text-xl text-farm-forest/60 font-serif italic mb-4">{t.home.no_producers}</p>
-                            <button onClick={() => setSearchQuery('')} className="text-farm-gold font-bold uppercase text-xs hover:underline">{t.home.clear_search}</button>
+                            <button onClick={() => {setSearchQuery(''); setCategory('');}} className="text-farm-gold font-bold uppercase text-xs hover:underline">{t.home.clear_search}</button>
                         </div>
-                    ) : filteredTenants.map((tenant, index) => (
+                    ) : tenants.map((tenant, index) => (
                         <Link href={`/${tenant.slug}`} key={tenant.id} className="premium-card group block flex flex-col h-full">
                             <div className="relative h-72 overflow-hidden bg-farm-bark/20">
                                 <img 
@@ -181,8 +194,11 @@ export default function RootPage() {
                                     alt="Farm market stall"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-farm-forest/80 via-farm-forest/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
-                                <div className="absolute top-4 right-4">
+                                <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
                                     <span className="premium-badge bg-white/90 backdrop-blur-sm border-none text-farm-forest">{t.home.featured}</span>
+                                    {tenant.category?.Valid && (
+                                        <span className="premium-badge-gold bg-farm-gold text-white border-none text-[8px]">{tenant.category.String}</span>
+                                    )}
                                 </div>
                             </div>
                             

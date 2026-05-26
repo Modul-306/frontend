@@ -134,7 +134,9 @@
     "view": "Bewertungen anzeigen",
     "login_required": "Bitte anmelden, um eine Bewertung abzugeben",
     "success": "Bewertung abgeschickt!",
-    "error": "Bewertung konnte nicht gesendet werden"
+    "error": "Bewertung konnte nicht gesendet werden",
+    "loyalty_reward": "Treue-Belohnung: {tier} ({percent}% Rabatt)",
+    "active_discount": "Aktiver Rabatt"
   },
   "home": {
     "hero_badge": "Kuratierte lokale Produzenten",
