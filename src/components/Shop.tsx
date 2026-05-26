@@ -373,7 +373,7 @@ export default function Shop({ tenant }: ShopProps) {
 
                 <section className="max-w-4xl mx-auto mb-32">
                     <div className="text-center mb-24">
-                        <span className="premium-badge mb-6 inline-block">Editorial</span>
+                        <span className="premium-badge mb-6 inline-block">{t.home.editorial}</span>
                         <h2 className="text-5xl md:text-6xl font-serif mb-6">{t.shop.journal_title}</h2>
                         <p className="text-farm-forest/50 font-sans text-lg max-w-xl mx-auto">{t.shop.journal_subtitle}</p>
                     </div>

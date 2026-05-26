@@ -60,10 +60,10 @@ export default function RootPage() {
             <div className="absolute top-60 -left-20 w-72 h-72 bg-farm-pine/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
 
             {/* Premium Header Nav */}
-            <nav className="absolute top-0 left-0 w-full px-8 py-6 z-10 flex justify-between items-center">
+            <nav className="absolute top-0 left-0 w-full px-8 py-6 !z-[1000] flex justify-between items-center">
                 <div className="text-farm-forest font-serif font-bold text-2xl tracking-tighter flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-gradient-to-tr from-farm-forest to-farm-pine text-farm-cream flex items-center justify-center text-sm">T</span>
-                    TerraHarvest
+                    <span className="w-8 h-8 rounded-full bg-gradient-to-tr from-farm-forest to-farm-pine text-farm-cream flex items-center justify-center text-sm">{t.common.brand_name.charAt(0)}</span>
+                    {t.common.brand_name}
                 </div>
                 <div className="flex items-center gap-4">
                     <LanguageToggle />
@@ -247,27 +247,27 @@ export default function RootPage() {
                 <div className="container mx-auto px-8 relative z-10">
                     <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-8 text-center md:text-left">
                         <div>
-                            <h2 className="text-4xl text-farm-cream font-serif mb-4">TerraHarvest</h2>
+                            <h2 className="text-4xl text-farm-cream font-serif mb-4">{t.common.brand_name}</h2>
                             <p className="text-farm-cream/60 max-w-sm font-sans font-light leading-relaxed">
                                 {t.home.footer_desc}
                             </p>
                         </div>
                         <div className="flex gap-12">
                             <div className="flex flex-col gap-4">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-farm-gold">Platform</span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-farm-gold">{t.home.platform}</span>
                                 <Link href="/admin-login" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">{t.admin.workbench}</Link>
                                 <a href="#" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">{t.home.browse_btn}</a>
                             </div>
                             <div className="flex flex-col gap-4">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-farm-gold">Legal</span>
-                                <a href="#" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">Privacy Policy</a>
-                                <a href="#" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">Terms of Service</a>
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-farm-gold">{t.home.legal}</span>
+                                <a href="#" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">{t.home.privacy_policy}</a>
+                                <a href="#" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">{t.home.terms_of_service}</a>
                             </div>
                         </div>
                     </div>
                     
                     <div className="pt-8 border-t border-farm-cream/10 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <p className="text-farm-cream/40 text-xs">© {new Date().getFullYear()} TerraHarvest Platform. All rights reserved.</p>
+                        <p className="text-farm-cream/40 text-xs">© {new Date().getFullYear()} {t.common.platform_name}. {t.home.rights_reserved}</p>
                     </div>
                 </div>
             </footer>

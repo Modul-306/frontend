@@ -15,7 +15,9 @@
     "are_you_sure": "Are you sure?",
     "visit_storefront": "Storefront",
     "unit": "unit",
-    "all_categories": "All Categories"
+    "all_categories": "All Categories",
+    "brand_name": "TerraHarvest",
+    "platform_name": "TerraHarvest Platform"
   },
   "shop": {
     "basket": "Your Basket",
@@ -177,7 +179,13 @@
     "footer_desc": "Elevating local agriculture through design and community connection.",
     "featured": "Featured",
     "est": "Est.",
-    "default_farm_desc": "Discover our curated selection of seasonal produce and artisanal goods, harvested with dedication and sustainable practices."
+    "default_farm_desc": "Discover our curated selection of seasonal produce and artisanal goods, harvested with dedication and sustainable practices.",
+    "editorial": "Editorial",
+    "platform": "Platform",
+    "legal": "Legal",
+    "privacy_policy": "Privacy Policy",
+    "terms_of_service": "Terms of Service",
+    "rights_reserved": "All rights reserved."
   },
   "auth": {
     "welcome": "Welcome Back",
