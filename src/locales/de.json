@@ -14,7 +14,8 @@
     "error": "Fehler",
     "are_you_sure": "Sind Sie sicher?",
     "visit_storefront": "Ladenfront",
-    "unit": "Einheit"
+    "unit": "Einheit",
+    "all_categories": "Alle Kategorien"
   },
   "shop": {
     "basket": "Ihr Warenkorb",
@@ -39,7 +40,8 @@
     "showing": "Zeige",
     "items": "Artikel",
     "default_desc": "Frisch geerntet und mit Sorgfalt für unsere lokale Gemeinschaft zubereitet.",
-    "default_product_desc": "Lokal mit Sorgfalt und Tradition angebaut. Ein Grundnahrungsmittel für jede Vorratskammer."
+    "default_product_desc": "Lokal mit Sorgfalt und Tradition angebaut. Ein Grundnahrungsmittel für jede Vorratskammer.",
+    "no_products": "Die Vorratskammer wartet auf die nächste Ernte."
   },
   "admin": {
     "workbench": "Werkbank",
@@ -58,7 +60,8 @@
       "save_success": "Erscheinungsbild erfolgreich gespeichert!",
       "save_error": "Fehler beim Speichern.",
       "logo_success": "Logo aktualisiert!",
-      "logo_error": "Fehler beim Aktualisieren des Logos."
+      "logo_error": "Fehler beim Aktualisieren des Logos.",
+      "specialty": "Hof-Spezialität / Kategorie"
     },
     "inventory": {
       "add_new": "Neuen Artikel hinzufügen",
@@ -68,6 +71,7 @@
       "price": "Preis",
       "stock": "Vorrat",
       "low_stock": "Niedriger Lagerbestand",
+      "category_placeholder": "Kategorie (z.B. Obst, Fleisch)",
       "photo": "Belegfoto hochladen",
       "current": "Aktueller Lagerbestand",
       "units": "Einheiten",
@@ -101,10 +105,12 @@
       "status_error": "Fehler beim Aktualisieren des Status."
     },
     "overview": {
+      "title": "Übersicht",
       "revenue_trend": "Umsatzentwicklung (Letzte 30 Tage)",
       "top_products": "Meistverkaufte Produkte",
       "financial_restricted": "Finanzdaten für Personal eingeschränkt.",
-      "view_all_orders": "Alle Bestellungen anzeigen"
+      "view_all_orders": "Alle Bestellungen anzeigen",
+      "download_report": "Monatsbericht PDF"
     }
   },
   "profile": {
@@ -116,11 +122,13 @@
     "loyalty_status": "Treuestatus",
     "tier": "Stufe",
     "harvest_elite": "Ernte-Elite",
+    "active_discount": "Aktiver Rabatt",
     "total_spent": "Gesamtausgaben",
     "loyalty_quote": "Ihre Unterstützung hilft unseren lokalen Bauern direkt, ihre traditionellen Praktiken aufrechtzuerhalten.",
     "write_review": "Bewertung schreiben",
     "review_desc": "Kürzlich etwas gekauft? Teilen Sie Ihre Gedanken mit der Gemeinschaft!",
-    "browse_products": "Meine Produkte durchsuchen"
+    "browse_products": "Meine Produkte durchsuchen",
+    "download_invoice": "Rechnung herunterladen"
   },
   "reviews": {
     "title": "Gemeinschaftsbewertungen",
@@ -206,6 +214,9 @@
     "delete_success": "Hof gelöscht.",
     "delete_error": "Löschen fehlgeschlagen.",
     "assign_success": "Besitzer zugewiesen!",
-    "assign_error": "Zuweisung fehlgeschlagen."
+    "assign_error": "Zuweisung fehlgeschlagen.",
+    "active_status": "Aktiv",
+    "revoke_title": "Register widerrufen",
+    "fetch_error": "Fehler beim Laden der Stände."
   }
 }

@@ -124,19 +124,22 @@ export default function Admin() {
     const handleDownloadReport = () => {
         const doc = new jsPDF();
         doc.setFontSize(22);
-        doc.text('CattleHof Producer Report', 20, 20);
+        doc.text(locale === 'de' ? 'CattleHof Produzentenbericht' : 'CattleHof Producer Report', 20, 20);
         
         doc.setFontSize(10);
-        doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 30);
-        doc.text(`Total Revenue: ${formatCurrency(stats.totalRevenue)}`, 20, 40);
-        doc.text(`Total Orders: ${stats.orderCount}`, 20, 45);
+        doc.text(`${locale === 'de' ? 'Erstellt am' : 'Generated'}: ${new Date().toLocaleDateString()}`, 20, 30);
+        doc.text(`${locale === 'de' ? 'Gesamtumsatz' : 'Total Revenue'}: ${formatCurrency(stats.totalRevenue)}`, 20, 40);
+        doc.text(`${locale === 'de' ? 'Bestellungen insgesamt' : 'Total Orders'}: ${stats.orderCount}`, 20, 45);
         
-        doc.text('Top Products Performance:', 20, 60);
+        doc.text(locale === 'de' ? 'Leistung der Top-Produkte:' : 'Top Products Performance:', 20, 60);
         const tableData = topProducts.map((p: any) => [p.name, p.total_sold]);
         
         autoTable(doc, {
             startY: 65,
-            head: [['Product Name', 'Total Sold']],
+            head: [[
+                t.admin.inventory.name, 
+                locale === 'de' ? 'Verkaufte Menge' : 'Total Sold'
+            ]],
             body: tableData,
             theme: 'grid',
             headStyles: { fillColor: [22, 78, 53] }
@@ -310,13 +313,13 @@ export default function Admin() {
                 {activeTab === 'storefront' && (
                     <div className="space-y-8 animate-in fade-in duration-500">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-3xl font-serif text-farm-forest">{locale === 'de' ? 'Übersicht' : 'Overview'}</h2>
+                            <h2 className="text-3xl font-serif text-farm-forest">{t.admin.overview.title}</h2>
                             <button 
                                 onClick={handleDownloadReport}
                                 className="premium-btn-outline !py-2 !px-4 flex items-center gap-2 !text-[10px]"
                             >
                                 <Download size={14} />
-                                {locale === 'de' ? 'Monatsbericht PDF' : 'Monthly Report PDF'}
+                                {t.admin.overview.download_report}
                             </button>
                         </div>
                         {/* Stats Grid */}
@@ -361,7 +364,7 @@ export default function Admin() {
                         {/* Charts Section */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             <section className="glass-panel p-8 rounded-3xl min-h-[400px]">
-                                <h2 className="text-xl font-serif mb-6 text-farm-forest border-b pb-4">Revenue Trend (Last 30 Days)</h2>
+                                <h2 className="text-xl font-serif mb-6 text-farm-forest border-b pb-4">{t.admin.overview.revenue_trend}</h2>
                                 {showFinancials ? (
                                     <div className="h-64 w-full">
                                         <ResponsiveContainer width="100%" height="100%">
@@ -384,7 +387,7 @@ export default function Admin() {
                             </section>
 
                             <section className="glass-panel p-8 rounded-3xl min-h-[400px]">
-                                <h2 className="text-xl font-serif mb-6 text-farm-forest border-b pb-4">Top Selling Products</h2>
+                                <h2 className="text-xl font-serif mb-6 text-farm-forest border-b pb-4">{t.admin.overview.top_products}</h2>
                                 <div className="h-64 w-full">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <BarChart data={topProducts} layout="vertical">
@@ -462,7 +465,7 @@ export default function Admin() {
                                         <textarea className="premium-input h-24 !text-xs" value={description} onChange={e => setDescription(e.target.value)} />
                                     </div>
                                     <div>
-                                        <label className="premium-label mb-2 block">{locale === 'de' ? 'Hof-Spezialität / Kategorie' : 'Farm Specialty / Category'}</label>
+                                        <label className="premium-label mb-2 block">{t.admin.storefront.specialty}</label>
                                         <input className="premium-input !text-xs" value={farmCategory} onChange={e => setFarmCategory(e.target.value)} placeholder="e.g. Dairy, Vegetables, Honey" />
                                     </div>
                                     <button onClick={handleSaveAppearance} disabled={loading} className="premium-btn w-full !py-2 !text-xs">{loading ? t.common.loading : t.common.save}</button>
@@ -483,7 +486,7 @@ export default function Admin() {
                                     <input className="premium-input" type="number" placeholder={t.admin.inventory.price} value={productPrice} onChange={e => setProductPrice(Number(e.target.value))} required />
                                     <input className="premium-input" type="number" placeholder={t.admin.inventory.stock} value={productStock} onChange={e => setProductStock(Number(e.target.value))} required />
                                 </div>
-                                <input className="premium-input" placeholder={locale === 'de' ? 'Kategorie (z.B. Obst, Fleisch)' : 'Category (e.g. Fruits, Meat)'} value={productCategory} onChange={e => setProductCategory(e.target.value)} />
+                                <input className="premium-input" placeholder={t.admin.inventory.category_placeholder} value={productCategory} onChange={e => setProductCategory(e.target.value)} />
                                 <input type="file" onChange={e => setProductImage(e.target.files?.[0] || null)} />
                                 <div className="flex gap-2">
                                     <button disabled={loading} className="premium-btn flex-1">{editingProductId ? t.common.save : t.common.confirm}</button>

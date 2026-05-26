@@ -14,7 +14,8 @@
     "error": "Error",
     "are_you_sure": "Are you sure?",
     "visit_storefront": "Storefront",
-    "unit": "unit"
+    "unit": "unit",
+    "all_categories": "All Categories"
   },
   "shop": {
     "basket": "Your Basket",
@@ -39,7 +40,8 @@
     "showing": "Showing",
     "items": "Items",
     "default_desc": "Freshly harvested and prepared with care for our local community.",
-    "default_product_desc": "Grown locally with care and tradition. A staple for any community pantry."
+    "default_product_desc": "Grown locally with care and tradition. A staple for any community pantry.",
+    "no_products": "The pantry awaits its next harvest."
   },
   "admin": {
     "workbench": "Workbench",
@@ -58,7 +60,8 @@
       "save_success": "Appearance saved successfully!",
       "save_error": "Error saving appearance.",
       "logo_success": "Logo updated!",
-      "logo_error": "Error updating logo."
+      "logo_error": "Error updating logo.",
+      "specialty": "Farm Specialty / Category"
     },
     "inventory": {
       "add_new": "Add New Item",
@@ -68,6 +71,7 @@
       "price": "Price",
       "stock": "Stock",
       "low_stock": "Low Stock",
+      "category_placeholder": "Category (e.g. Fruits, Meat)",
       "photo": "Upload record photo",
       "current": "Current Inventory",
       "units": "units",
@@ -101,10 +105,12 @@
       "status_error": "Error updating status."
     },
     "overview": {
+      "title": "Overview",
       "revenue_trend": "Revenue Trend (Last 30 Days)",
       "top_products": "Top Selling Products",
       "financial_restricted": "Financial data restricted for staff members.",
-      "view_all_orders": "View All Orders"
+      "view_all_orders": "View All Orders",
+      "download_report": "Monthly Report PDF"
     }
   },
   "profile": {
@@ -116,11 +122,13 @@
     "loyalty_status": "Loyalty Status",
     "tier": "Tier",
     "harvest_elite": "Harvest Elite",
+    "active_discount": "Active Discount",
     "total_spent": "Total Spent",
     "loyalty_quote": "Your support directly helps our local farmers sustain their traditional practices.",
     "write_review": "Write a Review",
     "review_desc": "Recently purchased something? Share your thoughts with the community!",
-    "browse_products": "Browse My Products"
+    "browse_products": "Browse My Products",
+    "download_invoice": "Download Invoice"
   },
   "reviews": {
     "title": "Community Reviews",
@@ -205,6 +213,9 @@
     "delete_success": "Farm deleted.",
     "delete_error": "Delete failed.",
     "assign_success": "Owner assigned!",
-    "assign_error": "Assignment failed."
+    "assign_error": "Assignment failed.",
+    "active_status": "Active",
+    "revoke_title": "Revoke Registry",
+    "fetch_error": "Failed to fetch stalls."
   }
 }

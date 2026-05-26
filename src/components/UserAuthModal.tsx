@@ -160,7 +160,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
                         disabled={loading}
                         className="premium-btn w-full mt-2"
                     >
-                        {loading ? '...' : tab === 'login' ? t.auth.sign_in : t.auth.sign_up}
+                        {loading ? t.common.loading : tab === 'login' ? t.auth.sign_in : t.auth.sign_up}
                     </button>
                 </form>
             </div>
