@@ -6,12 +6,22 @@ import { Product, Blog, Order, OrderItem } from '@/types';
 import { formatLongDate, formatCurrency } from '@/lib/utils';
 import { useLanguage } from '@/context/LanguageContext';
 import { useNotify } from '@/context/NotificationContext';
+import { useAuth } from '@/context/AuthContext';
+import { 
+    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+    BarChart, Bar, Cell
+} from 'recharts';
+import { TrendingUp, Package, ShoppingCart, BookOpen, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function Admin() {
+    const { user } = useAuth();
     const { t, locale } = useLanguage();
     const { notify } = useNotify();
     const [activeTab, setActiveTab] = useState<'storefront' | 'inventory' | 'journal' | 'orders'>('storefront');
     const [loading, setLoading] = useState(false);
+    
+    // Privacy state for staff
+    const [showFinancials, setShowFinancials] = useState(user?.role !== 'staff');
     
     // Form States
     const [productName, setProductName] = useState('');
@@ -35,11 +45,68 @@ export default function Admin() {
     const [selectedOrderItems, setSelectedOrderItems] = useState<OrderItem[]>([]);
     const [viewingOrderId, setViewingOrderId] = useState<string | null>(null);
 
+    // Stats States
+    const [stats, setStats] = useState({
+        totalRevenue: 0,
+        orderCount: 0,
+        lowStockCount: 0,
+        blogCount: 0
+    });
+    const [revenueData, setRevenueData] = useState([]);
+    const [topProducts, setTopProducts] = useState([]);
+
     useEffect(() => {
+        if (activeTab === 'storefront') {
+            calculateStats();
+            fetchAnalytics();
+        }
         if (activeTab === 'inventory') fetchProducts();
         if (activeTab === 'journal') fetchBlogs();
         if (activeTab === 'orders') fetchOrders();
     }, [activeTab]);
+
+    const calculateStats = async () => {
+        try {
+            const [pRes, bRes, oRes] = await Promise.all([
+                api.get('products'),
+                api.get('blogs'),
+                api.get('orders')
+            ]);
+            
+            const products: Product[] = pRes.data || [];
+            const blogs: Blog[] = bRes.data || [];
+            const orders: Order[] = oRes.data || [];
+
+            const totalRevenue = orders.reduce((acc, o) => acc + (o.status === 'completed' ? parseFloat(o.total_amount) : 0), 0);
+            const lowStockCount = products.filter(p => p.stock < 10).length;
+
+            setStats({
+                totalRevenue,
+                orderCount: orders.length,
+                lowStockCount,
+                blogCount: blogs.length
+            });
+            
+            setProducts(products);
+            setBlogs(blogs);
+            setOrders(orders);
+        } catch (err) {
+            console.error('Failed to calculate stats', err);
+        }
+    };
+
+    const fetchAnalytics = async () => {
+        try {
+            const [revRes, topRes] = await Promise.all([
+                api.get('analytics/revenue'),
+                api.get('analytics/top-products')
+            ]);
+            setRevenueData(revRes.data?.reverse() || []);
+            setTopProducts(topRes.data || []);
+        } catch (err) {
+            console.error('Failed to fetch analytics', err);
+        }
+    };
 
     const fetchProducts = async () => {
         try {
@@ -202,45 +269,154 @@ export default function Admin() {
 
             <main className="max-w-6xl mx-auto">
                 {activeTab === 'storefront' && (
-                    <section className="glass-panel p-10 rounded-3xl animate-in fade-in duration-500">
-                        <h2 className="text-2xl font-serif mb-8 text-farm-forest border-b pb-4">{t.admin.storefront.title}</h2>
-                        <div className="grid gap-8">
-                            <div>
-                                <label className="premium-label mb-2 block">{t.admin.storefront.logo}</label>
-                                <input type="file" onChange={async (e) => {
-                                    const file = e.target.files?.[0];
-                                    if (!file) return;
-                                    setLoading(true);
-                                    try {
-                                        const formData = new FormData();
-                                        formData.append('file', file);
-                                        const uploadRes = await api.post('upload', formData, {
-                                            headers: { 'Content-Type': 'multipart/form-data' }
-                                        });
-                                        let imageUrl = uploadRes.data.url;
-                                        if (!imageUrl.startsWith('http')) {
-                                            imageUrl = `${window.location.origin}${imageUrl}`;
-                                        }
-                                        await api.put('tenants/icon', { icon_url: imageUrl });
-                                        notify(t.admin.storefront.logo_success, 'success');
-                                    } catch (err) {
-                                        notify(t.admin.storefront.logo_error, 'error');
-                                    } finally {
-                                        setLoading(false);
-                                    }
-                                }} />
+                    <div className="space-y-8 animate-in fade-in duration-500">
+                        {/* Stats Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="glass-panel p-6 rounded-3xl border-farm-pine/20 flex items-center gap-4 relative overflow-hidden">
+                                <div className="p-3 bg-farm-pine/10 rounded-2xl text-farm-pine"><TrendingUp size={24} /></div>
+                                <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40 mb-0.5">{t.shop.total}</p>
+                                    <p className="text-xl font-serif text-farm-forest">
+                                        {showFinancials ? formatCurrency(stats.totalRevenue) : '••••••'}
+                                    </p>
+                                </div>
+                                {user?.role === 'staff' && (
+                                    <button onClick={() => setShowFinancials(!showFinancials)} className="absolute top-4 right-4 text-farm-forest/20 hover:text-farm-forest transition-colors">
+                                        {showFinancials ? <EyeOff size={14} /> : <Eye size={14} />}
+                                    </button>
+                                )}
                             </div>
-                            <div>
-                                <label className="premium-label mb-2 block">{t.admin.storefront.cover}</label>
-                                <input className="premium-input" value={coverUrl} onChange={e => setCoverUrl(e.target.value)} placeholder="https://..." />
+                            <div className="glass-panel p-6 rounded-3xl border-farm-gold/20 flex items-center gap-4">
+                                <div className="p-3 bg-farm-gold/10 rounded-2xl text-farm-gold"><ShoppingCart size={24} /></div>
+                                <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40 mb-0.5">{t.admin.tabs.orders}</p>
+                                    <p className="text-xl font-serif text-farm-forest">{stats.orderCount}</p>
+                                </div>
                             </div>
-                            <div>
-                                <label className="premium-label mb-2 block">{t.admin.storefront.description}</label>
-                                <textarea className="premium-input h-24" value={description} onChange={e => setDescription(e.target.value)} />
+                            <div className="glass-panel p-6 rounded-3xl border-red-100 flex items-center gap-4">
+                                <div className="p-3 bg-red-50 rounded-2xl text-red-500"><AlertCircle size={24} /></div>
+                                <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40 mb-0.5">{t.admin.inventory.low_stock}</p>
+                                    <p className="text-xl font-serif text-red-500">{stats.lowStockCount}</p>
+                                </div>
                             </div>
-                            <button onClick={handleSaveAppearance} disabled={loading} className="premium-btn max-w-xs">{loading ? t.common.loading : t.common.save}</button>
+                            <div className="glass-panel p-6 rounded-3xl flex items-center gap-4">
+                                <div className="p-3 bg-farm-bark/10 rounded-2xl text-farm-forest"><BookOpen size={24} /></div>
+                                <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40 mb-0.5">{t.admin.tabs.journal}</p>
+                                    <p className="text-xl font-serif text-farm-forest">{stats.blogCount}</p>
+                                </div>
+                            </div>
                         </div>
-                    </section>
+
+                        {/* Charts Section */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <section className="glass-panel p-8 rounded-3xl min-h-[400px]">
+                                <h2 className="text-xl font-serif mb-6 text-farm-forest border-b pb-4">Revenue Trend (Last 30 Days)</h2>
+                                {showFinancials ? (
+                                    <div className="h-64 w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={revenueData}>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
+                                                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fontSize: 10}} />
+                                                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10}} />
+                                                <Tooltip 
+                                                    contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                                                    formatter={(value) => formatCurrency(value as string | number)}
+                                                />                                                <Line type="monotone" dataKey="revenue" stroke="#3d5245" strokeWidth={3} dot={{ r: 4, fill: '#3d5245' }} activeDot={{ r: 6 }} />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                ) : (
+                                    <div className="h-64 flex items-center justify-center bg-farm-parchment/30 rounded-2xl border border-dashed border-farm-bark/20 italic text-farm-forest/30">
+                                        {t.admin.overview.financial_restricted}
+                                    </div>
+                                )}
+                            </section>
+
+                            <section className="glass-panel p-8 rounded-3xl min-h-[400px]">
+                                <h2 className="text-xl font-serif mb-6 text-farm-forest border-b pb-4">Top Selling Products</h2>
+                                <div className="h-64 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={topProducts} layout="vertical">
+                                            <XAxis type="number" hide />
+                                            <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10}} width={100} />
+                                            <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ borderRadius: '1rem', border: 'none' }} />
+                                            <Bar dataKey="total_sold" fill="#8b7355" radius={[0, 4, 4, 0]}>
+                                                {topProducts.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={['#3d5245', '#4a6354', '#577463', '#648572', '#719681'][index % 5]} />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <section className="lg:col-span-2 glass-panel p-8 rounded-3xl">
+                                <h2 className="text-xl font-serif mb-6 text-farm-forest border-b pb-4">{t.admin.orders.title} (Recent)</h2>
+                                <div className="space-y-4">
+                                    {orders.slice(0, 5).map(o => (
+                                        <div key={o.id} className="flex justify-between items-center p-4 bg-white/50 rounded-2xl border border-farm-bark/10">
+                                            <div>
+                                                <p className="text-xs font-bold text-farm-forest">Order #{o.id.slice(0, 8)}</p>
+                                                <p className="text-[10px] text-farm-forest/40">{formatLongDate(o.created_at)}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm font-bold">{formatCurrency(o.total_amount)}</p>
+                                                <span className={`text-[9px] px-2 py-0.5 rounded-full uppercase font-bold ${o.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                                    {o.status}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {orders.length === 0 && <p className="text-center text-farm-forest/30 italic py-8">{t.admin.orders.select_order}</p>}
+                                    <button onClick={() => setActiveTab('orders')} className="w-full text-center text-xs font-bold text-farm-pine hover:underline mt-4">View All Orders</button>
+                                </div>
+                            </section>
+
+                            <section className="glass-panel p-8 rounded-3xl h-fit">
+                                <h2 className="text-xl font-serif mb-6 text-farm-forest border-b pb-4">{t.admin.storefront.title}</h2>
+                                <div className="space-y-6">
+                                    <div>
+                                        <label className="premium-label mb-2 block">{t.admin.storefront.logo}</label>
+                                        <input type="file" className="text-xs" onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+                                            setLoading(true);
+                                            try {
+                                                const formData = new FormData();
+                                                formData.append('file', file);
+                                                const uploadRes = await api.post('upload', formData, {
+                                                    headers: { 'Content-Type': 'multipart/form-data' }
+                                                });
+                                                let imageUrl = uploadRes.data.url;
+                                                if (!imageUrl.startsWith('http')) {
+                                                    imageUrl = `${window.location.origin}${imageUrl}`;
+                                                }
+                                                await api.put('tenants/icon', { icon_url: imageUrl });
+                                                notify(t.admin.storefront.logo_success, 'success');
+                                            } catch (err) {
+                                                notify(t.admin.storefront.logo_error, 'error');
+                                            } finally {
+                                                setLoading(false);
+                                            }
+                                        }} />
+                                    </div>
+                                    <div>
+                                        <label className="premium-label mb-2 block">{t.admin.storefront.cover}</label>
+                                        <input className="premium-input !text-xs" value={coverUrl} onChange={e => setCoverUrl(e.target.value)} placeholder="https://..." />
+                                    </div>
+                                    <div>
+                                        <label className="premium-label mb-2 block">{t.admin.storefront.description}</label>
+                                        <textarea className="premium-input h-24 !text-xs" value={description} onChange={e => setDescription(e.target.value)} />
+                                    </div>
+                                    <button onClick={handleSaveAppearance} disabled={loading} className="premium-btn w-full !py-2 !text-xs">{loading ? t.common.loading : t.common.save}</button>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
                 )}
 
                 {activeTab === 'inventory' && (

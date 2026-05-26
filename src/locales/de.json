@@ -67,6 +67,7 @@
       "desc": "Beschreibung",
       "price": "Preis",
       "stock": "Vorrat",
+      "low_stock": "Niedriger Lagerbestand",
       "photo": "Belegfoto hochladen",
       "current": "Aktueller Lagerbestand",
       "units": "Einheiten",
@@ -98,7 +99,42 @@
       "select_order": "Wählen Sie eine Bestellung aus, um Details anzuzeigen.",
       "status_success": "Status aktualisiert!",
       "status_error": "Fehler beim Aktualisieren des Status."
+    },
+    "overview": {
+      "revenue_trend": "Umsatzentwicklung (Letzte 30 Tage)",
+      "top_products": "Meistverkaufte Produkte",
+      "financial_restricted": "Finanzdaten für Personal eingeschränkt.",
+      "view_all_orders": "Alle Bestellungen anzeigen"
     }
+  },
+  "profile": {
+    "title": "Kundenprofil",
+    "member_badge": "Mitglied der Cattlehof-Gemeinschaft",
+    "history_title": "Ihre Bestellhistorie",
+    "no_orders": "Sie haben noch keine Bestellungen aufgegeben.",
+    "start_browsing": "Stöbern beginnen",
+    "loyalty_status": "Treuestatus",
+    "tier": "Stufe",
+    "harvest_elite": "Ernte-Elite",
+    "total_spent": "Gesamtausgaben",
+    "loyalty_quote": "Ihre Unterstützung hilft unseren lokalen Bauern direkt, ihre traditionellen Praktiken aufrechtzuerhalten.",
+    "write_review": "Bewertung schreiben",
+    "review_desc": "Kürzlich etwas gekauft? Teilen Sie Ihre Gedanken mit der Gemeinschaft!",
+    "browse_products": "Meine Produkte durchsuchen"
+  },
+  "reviews": {
+    "title": "Gemeinschaftsbewertungen",
+    "based_on": "Basierend auf {count} Bewertungen",
+    "share_exp": "Teilen Sie Ihre Erfahrung",
+    "placeholder": "Sagen Sie uns, was Sie denken...",
+    "submit": "Bewertung abschicken",
+    "no_reviews": "Noch keine Bewertungen. Seien Sie der Erste, der seine Gedanken teilt!",
+    "no_comment": "Kein Kommentar hinterlassen.",
+    "hide": "Bewertungen ausblenden",
+    "view": "Bewertungen anzeigen",
+    "login_required": "Bitte anmelden, um eine Bewertung abzugeben",
+    "success": "Bewertung abgeschickt!",
+    "error": "Bewertung konnte nicht gesendet werden"
   },
   "home": {
     "hero_badge": "Kuratierte lokale Produzenten",

@@ -67,6 +67,7 @@
       "desc": "Description",
       "price": "Price",
       "stock": "Stock",
+      "low_stock": "Low Stock",
       "photo": "Upload record photo",
       "current": "Current Inventory",
       "units": "units",
@@ -98,7 +99,42 @@
       "select_order": "Select an order to view details.",
       "status_success": "Status updated!",
       "status_error": "Error updating status."
+    },
+    "overview": {
+      "revenue_trend": "Revenue Trend (Last 30 Days)",
+      "top_products": "Top Selling Products",
+      "financial_restricted": "Financial data restricted for staff members.",
+      "view_all_orders": "View All Orders"
     }
+  },
+  "profile": {
+    "title": "Customer Profile",
+    "member_badge": "Member of the Cattlehof Community",
+    "history_title": "Your Order History",
+    "no_orders": "You haven't placed any orders yet.",
+    "start_browsing": "Start Browsing",
+    "loyalty_status": "Loyalty Status",
+    "tier": "Tier",
+    "harvest_elite": "Harvest Elite",
+    "total_spent": "Total Spent",
+    "loyalty_quote": "Your support directly helps our local farmers sustain their traditional practices.",
+    "write_review": "Write a Review",
+    "review_desc": "Recently purchased something? Share your thoughts with the community!",
+    "browse_products": "Browse My Products"
+  },
+  "reviews": {
+    "title": "Community Reviews",
+    "based_on": "Based on {count} reviews",
+    "share_exp": "Share your experience",
+    "placeholder": "Tell us what you think...",
+    "submit": "Submit Review",
+    "no_reviews": "No reviews yet. Be the first to share your thoughts!",
+    "no_comment": "No comment provided.",
+    "hide": "Hide Reviews",
+    "view": "View Reviews",
+    "login_required": "Please login to leave a review",
+    "success": "Review submitted!",
+    "error": "Failed to submit review"
   },
   "home": {
     "hero_badge": "Curated Local Producers",
