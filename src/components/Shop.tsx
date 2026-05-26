@@ -86,7 +86,7 @@ export default function Shop({ tenant }: ShopProps) {
             }
             return [...prev, { product, quantity: 1 }];
         });
-        notify(locale === 'de' ? `${product.name} hinzugefügt!` : `${product.name} added!`, 'success');
+        notify(t.shop.added_to_basket.replace('{name}', product.name), 'success');
     };
 
     const removeFromBasket = (productId: string) => {
@@ -126,7 +126,7 @@ export default function Shop({ tenant }: ShopProps) {
             setTimeout(() => setOrderSuccess(false), 5000);
         } catch (err) {
             console.error("Checkout failed", err);
-            notify(locale === 'de' ? "Bestellung fehlgeschlagen. Bitte versuchen Sie es erneut." : "Checkout failed. Please try again.", 'error');
+            notify(t.shop.checkout_failed, 'error');
         } finally {
             setIsCheckingOut(false);
         }
@@ -248,7 +248,7 @@ export default function Shop({ tenant }: ShopProps) {
                     <p className="text-xl md:text-2xl text-farm-forest/70 max-w-2xl mx-auto font-serif italic">
                         {tenant?.description?.Valid && tenant.description.String
                             ? tenant.description.String
-                            : (locale === 'de' ? 'Frisch geerntet und mit Sorgfalt für unsere lokale Gemeinschaft zubereitet.' : 'Freshly harvested and prepared with care for our local community.')}
+                            : t.shop.default_desc}
                     </p>
                     {userLoyalty && parseFloat(userLoyalty.discount_percent) > 0 && (
                         <div className="mt-8 inline-flex items-center gap-2 bg-farm-gold/10 text-farm-gold px-4 py-2 rounded-full border border-farm-gold/20 animate-pulse-soft">
@@ -295,7 +295,7 @@ export default function Shop({ tenant }: ShopProps) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {products.length === 0 ? (
                             <div className="col-span-full py-32 text-center glass-panel rounded-3xl text-farm-forest/40 italic font-serif text-2xl border-dashed">
-                                "{t.shop.no_products || (locale === 'de' ? 'Die Vorratskammer wartet auf die nächste Ernte.' : 'The pantry awaits its next harvest.')}"
+                                "{t.shop.no_products}"
                             </div>
                         ) : products.map((product) => (
                             <div key={product.id} className="premium-card group flex flex-col h-full bg-white relative">
@@ -321,7 +321,7 @@ export default function Shop({ tenant }: ShopProps) {
                                 <div className="p-8 flex-1 flex flex-col">
                                     <h3 className="text-2xl mb-3 font-serif font-medium group-hover:text-farm-pine transition-colors">{product.name}</h3>
                                     <p className="text-farm-forest/60 text-sm leading-relaxed mb-8 line-clamp-3 flex-1 font-sans">
-                                        {product.description?.Valid ? product.description.String : (locale === 'de' ? 'Lokal mit Sorgfalt und Tradition angebaut. Ein Grundnahrungsmittel für jede Vorratskammer.' : 'Grown locally with care and tradition. A staple for any community pantry.')}
+                                        {product.description?.Valid ? product.description.String : t.shop.default_product_desc}
                                     </p>
                                     <div className="space-y-3">
                                         <button 

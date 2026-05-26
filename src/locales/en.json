@@ -32,7 +32,7 @@
     "sold_out": "Sold Out",
     "in_season": "In Season",
     "add_to_basket": "Add to Basket",
-    "added_to_basket": "item added to basket!",
+    "added_to_basket": "{name} added to basket!",
     "journal_title": "Farm Journal",
     "journal_subtitle": "Chronicles of our daily labor, community events, and seasonal transitions.",
     "read_more": "Read Full Entry",
@@ -61,7 +61,8 @@
       "save_error": "Error saving appearance.",
       "logo_success": "Logo updated!",
       "logo_error": "Error updating logo.",
-      "specialty": "Farm Specialty / Category"
+      "specialty": "Farm Specialty / Category",
+      "specialty_placeholder": "e.g. Dairy, Vegetables, Honey"
     },
     "inventory": {
       "add_new": "Add New Item",
@@ -95,7 +96,9 @@
     },
     "orders": {
       "title": "Customer Orders",
+      "recent": "(Recent)",
       "order_id": "Order ID",
+      "order_prefix": "Order #",
       "details": "Order Details",
       "status": "Change Status",
       "mark_completed": "Mark Completed",
@@ -110,7 +113,13 @@
       "top_products": "Top Selling Products",
       "financial_restricted": "Financial data restricted for staff members.",
       "view_all_orders": "View All Orders",
-      "download_report": "Monthly Report PDF"
+      "download_report": "Monthly Report PDF",
+      "report_title": "CattleHof Producer Report",
+      "generated_at": "Generated",
+      "total_revenue": "Total Revenue",
+      "total_orders": "Total Orders",
+      "top_products_performance": "Top Products Performance:",
+      "total_sold": "Total Sold"
     }
   },
   "profile": {
@@ -128,7 +137,11 @@
     "write_review": "Write a Review",
     "review_desc": "Recently purchased something? Share your thoughts with the community!",
     "browse_products": "Browse My Products",
-    "download_invoice": "Download Invoice"
+    "download_invoice": "Download Invoice",
+    "invoice_title": "CattleHof Network - Invoice",
+    "customer": "Customer",
+    "qty": "Qty",
+    "grand_total": "Grand Total"
   },
   "reviews": {
     "title": "Community Reviews",
@@ -170,7 +183,9 @@
     "welcome": "Welcome Back",
     "create_account": "Create Account",
     "email": "Email",
+    "email_placeholder": "you@example.com",
     "password": "Password",
+    "password_placeholder": "••••••••",
     "confirm_password": "Confirm Password",
     "sign_in": "Sign In",
     "sign_up": "Create Account",
@@ -197,12 +212,15 @@
     "register_btn": "Register New Stall",
     "stall_info": "Stall Information",
     "market_name": "Market Name",
+    "name_placeholder": "e.g. Sunny Meadows Farm",
     "access_slug": "Access Slug (URL)",
+    "slug_placeholder": "sunny-meadows",
     "commit_btn": "Commit to Registry",
     "active_stalls": "Active Stalls",
     "stall_col": "Stall",
     "status_col": "Status",
     "ledger_col": "Assigned Ledger",
+    "id_prefix": "ID:",
     "date_col": "Registry Date",
     "action_col": "Action",
     "unassigned": "(Unassigned)",
@@ -214,6 +232,7 @@
     "delete_error": "Delete failed.",
     "assign_success": "Owner assigned!",
     "assign_error": "Assignment failed.",
+    "add_owner": "Add Owner",
     "active_status": "Active",
     "revoke_title": "Revoke Registry",
     "fetch_error": "Failed to fetch stalls."

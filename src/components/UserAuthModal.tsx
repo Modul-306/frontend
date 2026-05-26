@@ -116,7 +116,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
                             id="auth-email"
                             className="premium-input"
                             type="email"
-                            placeholder="you@example.com"
+                            placeholder={t.auth.email_placeholder}
                             value={email}
                             onChange={e => setEmail(e.target.value)}
                             required
@@ -128,7 +128,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
                             id="auth-password"
                             className="premium-input"
                             type="password"
-                            placeholder="••••••••"
+                            placeholder={t.auth.password_placeholder}
                             value={password}
                             onChange={e => setPassword(e.target.value)}
                             required
@@ -141,7 +141,7 @@ export default function UserAuthModal({ onClose, onSuccess }: Props) {
                                 id="auth-confirm-password"
                                 className="premium-input"
                                 type="password"
-                                placeholder="••••••••"
+                                placeholder={t.auth.password_placeholder}
                                 value={confirmPassword}
                                 onChange={e => setConfirmPassword(e.target.value)}
                                 required

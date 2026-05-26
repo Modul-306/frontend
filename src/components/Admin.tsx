@@ -124,21 +124,21 @@ export default function Admin() {
     const handleDownloadReport = () => {
         const doc = new jsPDF();
         doc.setFontSize(22);
-        doc.text(locale === 'de' ? 'CattleHof Produzentenbericht' : 'CattleHof Producer Report', 20, 20);
+        doc.text(t.admin.overview.report_title, 20, 20);
         
         doc.setFontSize(10);
-        doc.text(`${locale === 'de' ? 'Erstellt am' : 'Generated'}: ${new Date().toLocaleDateString()}`, 20, 30);
-        doc.text(`${locale === 'de' ? 'Gesamtumsatz' : 'Total Revenue'}: ${formatCurrency(stats.totalRevenue)}`, 20, 40);
-        doc.text(`${locale === 'de' ? 'Bestellungen insgesamt' : 'Total Orders'}: ${stats.orderCount}`, 20, 45);
+        doc.text(`${t.admin.overview.generated_at}: ${new Date().toLocaleDateString()}`, 20, 30);
+        doc.text(`${t.admin.overview.total_revenue}: ${formatCurrency(stats.totalRevenue)}`, 20, 40);
+        doc.text(`${t.admin.overview.total_orders}: ${stats.orderCount}`, 20, 45);
         
-        doc.text(locale === 'de' ? 'Leistung der Top-Produkte:' : 'Top Products Performance:', 20, 60);
+        doc.text(t.admin.overview.top_products_performance, 20, 60);
         const tableData = topProducts.map((p: any) => [p.name, p.total_sold]);
         
         autoTable(doc, {
             startY: 65,
             head: [[
                 t.admin.inventory.name, 
-                locale === 'de' ? 'Verkaufte Menge' : 'Total Sold'
+                t.admin.overview.total_sold
             ]],
             body: tableData,
             theme: 'grid',
@@ -407,12 +407,12 @@ export default function Admin() {
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             <section className="lg:col-span-2 glass-panel p-8 rounded-3xl">
-                                <h2 className="text-xl font-serif mb-6 text-farm-forest border-b pb-4">{t.admin.orders.title} (Recent)</h2>
+                                <h2 className="text-xl font-serif mb-6 text-farm-forest border-b pb-4">{t.admin.orders.title} {t.admin.orders.recent}</h2>
                                 <div className="space-y-4">
                                     {orders.slice(0, 5).map(o => (
                                         <div key={o.id} className="flex justify-between items-center p-4 bg-white/50 rounded-2xl border border-farm-bark/10">
                                             <div>
-                                                <p className="text-xs font-bold text-farm-forest">Order #{o.id.slice(0, 8)}</p>
+                                                <p className="text-xs font-bold text-farm-forest">{t.admin.orders.order_prefix}{o.id.slice(0, 8)}</p>
                                                 <p className="text-[10px] text-farm-forest/40">{formatLongDate(o.created_at)}</p>
                                             </div>
                                             <div className="text-right">
@@ -424,7 +424,7 @@ export default function Admin() {
                                         </div>
                                     ))}
                                     {orders.length === 0 && <p className="text-center text-farm-forest/30 italic py-8">{t.admin.orders.select_order}</p>}
-                                    <button onClick={() => setActiveTab('orders')} className="w-full text-center text-xs font-bold text-farm-pine hover:underline mt-4">View All Orders</button>
+                                    <button onClick={() => setActiveTab('orders')} className="w-full text-center text-xs font-bold text-farm-pine hover:underline mt-4">{t.admin.overview.view_all_orders}</button>
                                 </div>
                             </section>
 
@@ -466,7 +466,7 @@ export default function Admin() {
                                     </div>
                                     <div>
                                         <label className="premium-label mb-2 block">{t.admin.storefront.specialty}</label>
-                                        <input className="premium-input !text-xs" value={farmCategory} onChange={e => setFarmCategory(e.target.value)} placeholder="e.g. Dairy, Vegetables, Honey" />
+                                        <input className="premium-input !text-xs" value={farmCategory} onChange={e => setFarmCategory(e.target.value)} placeholder={t.admin.storefront.specialty_placeholder} />
                                     </div>
                                     <button onClick={handleSaveAppearance} disabled={loading} className="premium-btn w-full !py-2 !text-xs">{loading ? t.common.loading : t.common.save}</button>
                                 </div>
