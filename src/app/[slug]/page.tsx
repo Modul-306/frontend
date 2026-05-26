@@ -32,11 +32,17 @@ export default function TenantPage() {
             const fetchData = async () => {
                 try {
                     const res = await api.get(`/tenants/${slug}`);
-                    setTenant(res.data);
+                    const tenantData = res.data;
+                    setTenant(tenantData);
                     
-                    // Fetch owners for this tenant
-                    const ownersRes = await api.get(`/tenants/${res.data.id}/owners`);
-                    setOwners(ownersRes.data || []);
+                    // Fetch owners for this tenant - don't fail if this fails
+                    try {
+                        const ownersRes = await api.get(`/tenants/${tenantData.id}/owners`);
+                        setOwners(ownersRes.data || []);
+                    } catch (ownersErr) {
+                        console.warn("Could not fetch owners", ownersErr);
+                        setOwners([]);
+                    }
                 } catch (err) {
                     console.error("Could not fetch tenant data", err);
                     setNotFound(true);
@@ -104,7 +110,7 @@ export default function TenantPage() {
                             {tenant?.icon_url?.Valid ? (
                                 <img src={tenant.icon_url.String} alt="Farm Logo" className="w-full h-full object-cover" />
                             ) : (
-                                typeof slug === 'string' ? slug.charAt(0).toUpperCase() : 'F'
+                                typeof slug === 'string' ? slug.charAt(0).toUpperCase() : t.common.brand_name.charAt(0)
                             )}
                         </div>
                         <span className="text-2xl font-serif font-bold text-farm-forest uppercase tracking-widest">{tenant?.name || slug}</span>

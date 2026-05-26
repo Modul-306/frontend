@@ -15,7 +15,9 @@
     "are_you_sure": "Sind Sie sicher?",
     "visit_storefront": "Ladenfront",
     "unit": "Einheit",
-    "all_categories": "Alle Kategorien"
+    "all_categories": "Alle Kategorien",
+    "brand_name": "TerraHarvest",
+    "platform_name": "TerraHarvest Plattform"
   },
   "shop": {
     "basket": "Ihr Warenkorb",
@@ -178,7 +180,13 @@
     "footer_desc": "Aufwertung der lokalen Landwirtschaft durch Design und Gemeinschaftsverbindung.",
     "featured": "Hervorgehoben",
     "est": "Gegr.",
-    "default_farm_desc": "Entdecken Sie unsere kuratierte Auswahl an saisonalen Produkten und handwerklichen Waren, die mit Hingabe und nachhaltigen Praktiken geerntet wurden."
+    "default_farm_desc": "Entdecken Sie unsere kuratierte Auswahl an saisonalen Produkten und handwerklichen Waren, die mit Hingabe und nachhaltigen Praktiken geerntet wurden.",
+    "editorial": "Editorial",
+    "platform": "Plattform",
+    "legal": "Rechtliches",
+    "privacy_policy": "Datenschutzerklärung",
+    "terms_of_service": "AGB",
+    "rights_reserved": "Alle Rechte vorbehalten."
   },
   "auth": {
     "welcome": "Willkommen zurück",
