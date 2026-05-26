@@ -134,7 +134,8 @@
     "view": "View Reviews",
     "login_required": "Please login to leave a review",
     "success": "Review submitted!",
-    "error": "Failed to submit review"
+    "error": "Failed to submit review",
+    "loyalty_reward": "Loyalty Reward: {tier} ({percent}% Off)"
   },
   "home": {
     "hero_badge": "Curated Local Producers",

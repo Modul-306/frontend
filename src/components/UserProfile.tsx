@@ -5,7 +5,9 @@ import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { formatCurrency, formatLongDate } from '@/lib/utils';
-import { ShoppingBag, Star, MessageSquare } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { ShoppingBag, Star, MessageSquare, Download } from 'lucide-react';
 
 interface Review {
     id: string;
@@ -24,13 +26,15 @@ interface Order {
 
 export default function UserProfile() {
     const { user } = useAuth();
-    const { t } = useLanguage();
+    const { t, locale } = useLanguage();
     const [orders, setOrders] = useState<Order[]>([]);
+    const [loyalty, setLoyalty] = useState<{tier: string, discount_percent: string} | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (user) {
             fetchOrders();
+            fetchLoyalty();
         }
     }, [user]);
 
@@ -42,6 +46,51 @@ export default function UserProfile() {
             console.error('Failed to fetch orders', err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchLoyalty = async () => {
+        try {
+            const res = await api.get('loyalty');
+            setLoyalty(res.data);
+        } catch (err) {
+            console.error('Failed to fetch loyalty', err);
+        }
+    };
+
+    const handleDownloadInvoice = async (order: Order) => {
+        try {
+            const res = await api.get(`orders/${order.id}`);
+            const items = res.data || [];
+            
+            const doc = new jsPDF();
+            doc.setFontSize(22);
+            doc.text('CattleHof Network - Invoice', 20, 20);
+            
+            doc.setFontSize(10);
+            doc.text(`Order ID: ${order.id}`, 20, 30);
+            doc.text(`Date: ${formatLongDate(order.created_at)}`, 20, 35);
+            doc.text(`Customer: ${user?.email}`, 20, 40);
+            
+            const tableData = items.map((item: any) => [
+                item.product_name,
+                item.quantity,
+                formatCurrency(item.price_at_time),
+                formatCurrency(parseFloat(item.price_at_time) * item.quantity)
+            ]);
+            
+            autoTable(doc, {
+                startY: 50,
+                head: [['Product', 'Qty', 'Price', 'Total']],
+                body: tableData,
+                foot: [['', '', 'Grand Total', formatCurrency(order.total_amount)]],
+                theme: 'striped',
+                headStyles: { fillColor: [22, 78, 53] }
+            });
+            
+            doc.save(`invoice_${order.id.slice(0, 8)}.pdf`);
+        } catch (err) {
+            console.error('Failed to download invoice', err);
         }
     };
 
@@ -86,6 +135,13 @@ export default function UserProfile() {
                                                     {order.status}
                                                 </span>
                                             </div>
+                                            <button 
+                                                onClick={() => handleDownloadInvoice(order)}
+                                                className="p-3 bg-farm-bark/10 text-farm-forest/40 hover:text-farm-pine hover:bg-farm-pine/10 rounded-2xl transition-all"
+                                                title={locale === 'de' ? 'Rechnung herunterladen' : 'Download Invoice'}
+                                            >
+                                                <Download size={20} />
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -105,8 +161,14 @@ export default function UserProfile() {
                         <div className="space-y-6">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-farm-cream/60">{t.profile.tier}</span>
-                                <span className="font-bold text-farm-gold uppercase tracking-widest">{t.profile.harvest_elite}</span>
+                                <span className="font-bold text-farm-gold uppercase tracking-widest">{loyalty?.tier || t.profile.harvest_elite}</span>
                             </div>
+                            {loyalty && parseFloat(loyalty.discount_percent) > 0 && (
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-farm-cream/60">{locale === 'de' ? 'Aktiver Rabatt' : 'Active Discount'}</span>
+                                    <span className="font-bold text-green-400">{loyalty.discount_percent}%</span>
+                                </div>
+                            )}
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-farm-cream/60">{t.profile.total_spent}</span>
                                 <span className="font-bold">{formatCurrency(orders.reduce((acc, o) => acc + parseFloat(o.total_amount), 0))}</span>

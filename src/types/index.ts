@@ -12,6 +12,7 @@ export interface Tenant {
     description?: NullString;
     created_at: string | NullTime;
     owner_id?: NullUUID;
+    category?: NullString;
 }
 
 export type NullUUID = string | null;
@@ -30,6 +31,7 @@ export interface Product {
     stock: number;
     image_url: NullString;
     created_at: string | NullTime;
+    category?: NullString;
 }
 
 export interface Blog {

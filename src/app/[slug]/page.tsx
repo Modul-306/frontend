@@ -18,6 +18,7 @@ export default function TenantPage() {
     const { t, locale } = useLanguage();
     const [view, setView] = useState<'shop' | 'admin'>('shop');
     const [tenant, setTenant] = useState<Tenant | null>(null);
+    const [owners, setOwners] = useState<{id: string}[]>([]);
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -27,16 +28,24 @@ export default function TenantPage() {
             setLoading(true);
             setNotFound(false);
             localStorage.setItem('tenant_slug', slug); // Store for API interceptor
-            api.get(`/tenants/${slug}`)
-               .then(res => {
-                   setTenant(res.data);
-                   setLoading(false);
-               })
-               .catch(err => {
-                   console.error("Could not fetch tenant", err);
-                   setNotFound(true);
-                   setLoading(false);
-               });
+            
+            const fetchData = async () => {
+                try {
+                    const res = await api.get(`/tenants/${slug}`);
+                    setTenant(res.data);
+                    
+                    // Fetch owners for this tenant
+                    const ownersRes = await api.get(`/tenants/${res.data.id}/owners`);
+                    setOwners(ownersRes.data || []);
+                } catch (err) {
+                    console.error("Could not fetch tenant data", err);
+                    setNotFound(true);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            
+            fetchData();
         }
         return () => {
             localStorage.removeItem('tenant_slug');
@@ -45,7 +54,7 @@ export default function TenantPage() {
 
     const isOwner = user && tenant && (
         user.role === 'platform_admin' || 
-        (user.role === 'farmer_admin' && user.tenant_id === tenant.id)
+        owners.some(o => o.id === user.id)
     );
 
     if (loading) {
@@ -88,7 +97,7 @@ export default function TenantPage() {
 
     return (
         <main className="min-h-screen bg-farm-cream">
-            <nav className="nav-premium">
+            <nav className="nav-premium !z-[1000] relative">
                 <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
                     <Link href="/" className="flex items-center space-x-3 group cursor-pointer">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-farm-forest to-farm-pine flex items-center justify-center text-farm-cream font-serif text-xl font-bold shadow-md group-hover:shadow-lg transition-all duration-300 overflow-hidden">

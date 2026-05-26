@@ -11,7 +11,9 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     BarChart, Bar, Cell
 } from 'recharts';
-import { TrendingUp, Package, ShoppingCart, BookOpen, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { TrendingUp, Package, ShoppingCart, BookOpen, AlertCircle, Eye, EyeOff, Download } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function Admin() {
     const { user } = useAuth();
@@ -28,6 +30,7 @@ export default function Admin() {
     const [productDesc, setProductDesc] = useState('');
     const [productPrice, setProductPrice] = useState<number | ''>('');
     const [productStock, setProductStock] = useState<number | ''>('');
+    const [productCategory, setProductCategory] = useState('');
     const [productImage, setProductImage] = useState<File | null>(null);
     const [editingProductId, setEditingProductId] = useState<string | null>(null);
 
@@ -37,6 +40,7 @@ export default function Admin() {
 
     const [coverUrl, setCoverUrl] = useState('');
     const [description, setDescription] = useState('');
+    const [farmCategory, setFarmCategory] = useState('');
 
     // Data States
     const [products, setProducts] = useState<Product[]>([]);
@@ -59,6 +63,15 @@ export default function Admin() {
         if (activeTab === 'storefront') {
             calculateStats();
             fetchAnalytics();
+            
+            const slug = localStorage.getItem('tenant_slug');
+            if (slug) {
+                api.get(`tenants/${slug}`).then(res => {
+                    setCoverUrl(res.data.cover_url?.String || '');
+                    setDescription(res.data.description?.String || '');
+                    setFarmCategory(res.data.category?.String || '');
+                });
+            }
         }
         if (activeTab === 'inventory') fetchProducts();
         if (activeTab === 'journal') fetchBlogs();
@@ -108,6 +121,30 @@ export default function Admin() {
         }
     };
 
+    const handleDownloadReport = () => {
+        const doc = new jsPDF();
+        doc.setFontSize(22);
+        doc.text('CattleHof Producer Report', 20, 20);
+        
+        doc.setFontSize(10);
+        doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 30);
+        doc.text(`Total Revenue: ${formatCurrency(stats.totalRevenue)}`, 20, 40);
+        doc.text(`Total Orders: ${stats.orderCount}`, 20, 45);
+        
+        doc.text('Top Products Performance:', 20, 60);
+        const tableData = topProducts.map((p: any) => [p.name, p.total_sold]);
+        
+        autoTable(doc, {
+            startY: 65,
+            head: [['Product Name', 'Total Sold']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: { fillColor: [22, 78, 53] }
+        });
+        
+        doc.save('monthly_performance_report.pdf');
+    };
+
     const fetchProducts = async () => {
         try {
             const res = await api.get('products');
@@ -150,7 +187,7 @@ export default function Admin() {
     const handleSaveAppearance = async () => {
         setLoading(true);
         try {
-            await api.put('tenants/appearance', { cover_url: coverUrl, description });
+            await api.put('tenants/appearance', { cover_url: coverUrl, description, category: farmCategory });
             notify(t.admin.storefront.save_success, 'success');
         } catch (err) {
             notify(t.admin.storefront.save_error, 'error');
@@ -181,6 +218,7 @@ export default function Admin() {
                 description: productDesc,
                 price: Number(productPrice),
                 stock: Number(productStock),
+                category: productCategory,
                 image_url: imageUrl || (editingProductId ? products.find(p => p.id === editingProductId)?.image_url?.String : '')
             };
 
@@ -196,6 +234,7 @@ export default function Admin() {
             setProductDesc('');
             setProductPrice('');
             setProductStock('');
+            setProductCategory('');
             setProductImage(null);
             setEditingProductId(null);
             fetchProducts();
@@ -270,6 +309,16 @@ export default function Admin() {
             <main className="max-w-6xl mx-auto">
                 {activeTab === 'storefront' && (
                     <div className="space-y-8 animate-in fade-in duration-500">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-3xl font-serif text-farm-forest">{locale === 'de' ? 'Übersicht' : 'Overview'}</h2>
+                            <button 
+                                onClick={handleDownloadReport}
+                                className="premium-btn-outline !py-2 !px-4 flex items-center gap-2 !text-[10px]"
+                            >
+                                <Download size={14} />
+                                {locale === 'de' ? 'Monatsbericht PDF' : 'Monthly Report PDF'}
+                            </button>
+                        </div>
                         {/* Stats Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div className="glass-panel p-6 rounded-3xl border-farm-pine/20 flex items-center gap-4 relative overflow-hidden">
@@ -412,6 +461,10 @@ export default function Admin() {
                                         <label className="premium-label mb-2 block">{t.admin.storefront.description}</label>
                                         <textarea className="premium-input h-24 !text-xs" value={description} onChange={e => setDescription(e.target.value)} />
                                     </div>
+                                    <div>
+                                        <label className="premium-label mb-2 block">{locale === 'de' ? 'Hof-Spezialität / Kategorie' : 'Farm Specialty / Category'}</label>
+                                        <input className="premium-input !text-xs" value={farmCategory} onChange={e => setFarmCategory(e.target.value)} placeholder="e.g. Dairy, Vegetables, Honey" />
+                                    </div>
                                     <button onClick={handleSaveAppearance} disabled={loading} className="premium-btn w-full !py-2 !text-xs">{loading ? t.common.loading : t.common.save}</button>
                                 </div>
                             </section>
@@ -430,10 +483,18 @@ export default function Admin() {
                                     <input className="premium-input" type="number" placeholder={t.admin.inventory.price} value={productPrice} onChange={e => setProductPrice(Number(e.target.value))} required />
                                     <input className="premium-input" type="number" placeholder={t.admin.inventory.stock} value={productStock} onChange={e => setProductStock(Number(e.target.value))} required />
                                 </div>
+                                <input className="premium-input" placeholder={locale === 'de' ? 'Kategorie (z.B. Obst, Fleisch)' : 'Category (e.g. Fruits, Meat)'} value={productCategory} onChange={e => setProductCategory(e.target.value)} />
                                 <input type="file" onChange={e => setProductImage(e.target.files?.[0] || null)} />
                                 <div className="flex gap-2">
                                     <button disabled={loading} className="premium-btn flex-1">{editingProductId ? t.common.save : t.common.confirm}</button>
-                                    {editingProductId && <button type="button" onClick={() => setEditingProductId(null)} className="premium-btn-outline">{t.common.cancel}</button>}
+                                    {editingProductId && <button type="button" onClick={() => {
+                                        setEditingProductId(null);
+                                        setProductName('');
+                                        setProductDesc('');
+                                        setProductPrice('');
+                                        setProductStock('');
+                                        setProductCategory('');
+                                    }} className="premium-btn-outline">{t.common.cancel}</button>}
                                 </div>
                             </form>
                         </section>
@@ -447,7 +508,12 @@ export default function Admin() {
                                             {p.image_url?.Valid && <img src={p.image_url.String} className="w-full h-full object-cover" />}
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-sm">{p.name}</h4>
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="font-bold text-sm">{p.name}</h4>
+                                                {p.category?.Valid && (
+                                                    <span className="bg-farm-pine/10 text-farm-pine text-[8px] px-2 py-0.5 rounded-full font-bold uppercase">{p.category.String}</span>
+                                                )}
+                                            </div>
                                             <p className="text-xs text-farm-forest/50">{formatCurrency(p.price)} | {p.stock} {t.admin.inventory.units}</p>
                                         </div>
                                     </div>
@@ -458,6 +524,7 @@ export default function Admin() {
                                             setProductDesc(p.description?.String || '');
                                             setProductPrice(Number(p.price));
                                             setProductStock(p.stock);
+                                            setProductCategory(p.category?.String || '');
                                         }} className="text-farm-pine hover:underline text-xs font-bold">{t.common.edit}</button>
                                         <button onClick={() => handleDeleteProduct(p.id)} className="text-red-400 hover:underline text-xs font-bold">{t.common.delete}</button>
                                     </div>

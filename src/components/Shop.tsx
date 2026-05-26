@@ -28,16 +28,24 @@ export default function Shop({ tenant }: ShopProps) {
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [orderSuccess, setOrderSuccess] = useState(false);
     const [viewingProductId, setViewingProductId] = useState<string | null>(null);
+    
+    // Search & Filter States
+    const [search, setSearch] = useState('');
+    const [category, setCategory] = useState('');
+    const [categories, setCategories] = useState<string[]>([]);
+    const [userLoyalty, setUserLoyalty] = useState<{tier: string, discount_percent: string} | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [productsRes, blogsRes] = await Promise.all([
-                    api.get('products'),
+                const [productsRes, blogsRes, catsRes] = await Promise.all([
+                    api.get('products', { params: { search, category } }),
                     api.get('blogs'),
+                    api.get('categories')
                 ]);
                 setProducts(productsRes.data || []);
                 setBlogs(blogsRes.data || []);
+                setCategories(catsRes.data || []);
             } catch (err) {
                 console.error('Failed to fetch data', err);
             } finally {
@@ -45,6 +53,10 @@ export default function Shop({ tenant }: ShopProps) {
             }
         };
         fetchData();
+        
+        if (user) {
+            api.get('loyalty').then(res => setUserLoyalty(res.data)).catch(() => {});
+        }
 
         const savedBasket = localStorage.getItem(`basket_${tenant?.slug}`);
         if (savedBasket) {
@@ -54,7 +66,7 @@ export default function Shop({ tenant }: ShopProps) {
                 console.error("Failed to parse basket", e);
             }
         }
-    }, [tenant?.slug]);
+    }, [tenant?.slug, search, category]);
 
     useEffect(() => {
         if (tenant?.slug) {
@@ -238,12 +250,46 @@ export default function Shop({ tenant }: ShopProps) {
                             ? tenant.description.String
                             : (locale === 'de' ? 'Frisch geerntet und mit Sorgfalt für unsere lokale Gemeinschaft zubereitet.' : 'Freshly harvested and prepared with care for our local community.')}
                     </p>
+                    {userLoyalty && parseFloat(userLoyalty.discount_percent) > 0 && (
+                        <div className="mt-8 inline-flex items-center gap-2 bg-farm-gold/10 text-farm-gold px-4 py-2 rounded-full border border-farm-gold/20 animate-pulse-soft">
+                            <span className="text-xs font-bold uppercase tracking-widest">
+                                {t.reviews.loyalty_reward.replace('{tier}', userLoyalty.tier).replace('{percent}', userLoyalty.discount_percent)}
+                            </span>
+                        </div>
+                    )}
                 </header>
 
                 <section className="mb-40">
-                    <div className="flex items-center justify-between mb-12">
-                        <h2 className="text-4xl font-serif text-farm-forest">{t.shop.harvest_title}</h2>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">{locale === 'de' ? 'Zeige' : 'Showing'} {products.length} {locale === 'de' ? 'Artikel' : 'Items'}</span>
+                    <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 mb-12">
+                        <div>
+                            <h2 className="text-4xl font-serif text-farm-forest mb-2">{t.shop.harvest_title}</h2>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">{locale === 'de' ? 'Zeige' : 'Showing'} {products.length} {locale === 'de' ? 'Artikel' : 'Items'}</span>
+                        </div>
+                        
+                        <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                            <div className="relative">
+                                <input 
+                                    type="text" 
+                                    placeholder={t.home.search_placeholder}
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    className="premium-input !py-3 !px-6 !text-xs min-w-[250px]"
+                                />
+                                {search && (
+                                    <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-farm-forest/40 hover:text-farm-forest">×</button>
+                                )}
+                            </div>
+                            <select 
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                className="premium-input !py-3 !px-6 !text-xs min-w-[150px] appearance-none cursor-pointer"
+                            >
+                                <option value="">{locale === 'de' ? 'Alle Kategorien' : 'All Categories'}</option>
+                                {categories.map(c => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
