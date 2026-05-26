@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useNotify } from '@/context/NotificationContext';
 import UserAuthModal from './UserAuthModal';
+import ProductReviews from './ProductReviews';
 
 interface ShopProps {
     tenant: Tenant | null;
@@ -26,6 +27,7 @@ export default function Shop({ tenant }: ShopProps) {
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [orderSuccess, setOrderSuccess] = useState(false);
+    const [viewingProductId, setViewingProductId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -275,13 +277,46 @@ export default function Shop({ tenant }: ShopProps) {
                                     <p className="text-farm-forest/60 text-sm leading-relaxed mb-8 line-clamp-3 flex-1 font-sans">
                                         {product.description?.Valid ? product.description.String : (locale === 'de' ? 'Lokal mit Sorgfalt und Tradition angebaut. Ein Grundnahrungsmittel für jede Vorratskammer.' : 'Grown locally with care and tradition. A staple for any community pantry.')}
                                     </p>
-                                    <button 
-                                        disabled={product.stock === 0} 
-                                        onClick={() => addToBasket(product)}
-                                        className="premium-btn w-full"
-                                    >
-                                        {t.shop.add_to_basket}
-                                    </button>
+                                    <div className="space-y-3">
+                                        <button 
+                                            disabled={product.stock === 0} 
+                                            onClick={() => addToBasket(product)}
+                                            className="premium-btn w-full"
+                                        >
+                                            {t.shop.add_to_basket}
+                                        </button>
+                                        <button 
+                                            onClick={() => setViewingProductId(viewingProductId === product.id ? null : product.id)}
+                                            className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40 hover:text-farm-pine w-full text-center transition-colors"
+                                        >
+                                            {viewingProductId === product.id ? t.reviews.hide : t.reviews.view}
+                                        </button>
+                                    </div>
+                                    {viewingProductId === product.id && (
+                                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 overflow-y-auto">
+                                            <div className="absolute inset-0 bg-farm-cream/95 backdrop-blur-md" onClick={() => setViewingProductId(null)} />
+                                            <div className="relative w-full max-w-6xl bg-white rounded-[3rem] shadow-2xl p-8 md:p-16 animate-in zoom-in-95 duration-500 overflow-y-auto max-h-full border border-farm-bark/10">
+                                                <button 
+                                                    onClick={() => setViewingProductId(null)}
+                                                    className="absolute top-8 right-8 text-farm-forest/40 hover:text-farm-forest"
+                                                >
+                                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                                <div className="flex flex-col md:flex-row gap-12 items-center mb-16 border-b border-farm-bark/10 pb-16">
+                                                    <div className="w-48 h-48 rounded-full overflow-hidden shadow-xl border-4 border-white">
+                                                        <img src={product.image_url?.Valid ? product.image_url.String : `https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400`} className="w-full h-full object-cover" />
+                                                    </div>
+                                                    <div className="text-center md:text-left">
+                                                        <h2 className="text-4xl md:text-6xl font-serif text-farm-forest mb-4">{product.name}</h2>
+                                                        <p className="text-xl text-farm-forest/60 font-serif italic max-w-xl">{product.description?.Valid ? product.description.String : t.shop.default_product_desc}</p>
+                                                    </div>
+                                                </div>
+                                                <ProductReviews productId={product.id} />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}

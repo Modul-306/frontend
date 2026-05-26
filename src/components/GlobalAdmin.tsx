@@ -24,7 +24,7 @@ interface User {
 export default function GlobalAdmin() {
     const { t, locale } = useLanguage();
     const { notify } = useNotify();
-    const [tenants, setTenants] = useState<Tenant[]>([]);
+    const [tenants, setTenants] = useState<(Tenant & { owners: User[] })[]>([]);
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
     const [name, setName] = useState('');
@@ -39,7 +39,11 @@ export default function GlobalAdmin() {
     const fetchTenants = async () => {
         try {
             const res = await api.get('tenants');
-            setTenants(res.data || []);
+            const tenantsWithOwners = await Promise.all((res.data || []).map(async (t: Tenant) => {
+                const ownersRes = await api.get(`tenants/${t.id}/owners`);
+                return { ...t, owners: ownersRes.data || [] };
+            }));
+            setTenants(tenantsWithOwners);
         } catch (err) {
             console.error('Failed to fetch tenants', err);
         }
@@ -82,13 +86,24 @@ export default function GlobalAdmin() {
         }
     };
 
-    const handleAssignOwner = async (tenantId: string, ownerId: string) => {
+    const handleAddOwner = async (tenantId: string, ownerId: string) => {
+        if (!ownerId) return;
         try {
-            await api.put(`tenants/${tenantId}/owner`, { owner_id: ownerId });
+            await api.post(`tenants/${tenantId}/owners`, { user_id: ownerId });
             notify(t.global_admin.assign_success, 'success');
             fetchTenants();
         } catch {
             notify(t.global_admin.assign_error, 'error');
+        }
+    };
+
+    const handleRemoveOwner = async (tenantId: string, ownerId: string) => {
+        try {
+            await api.delete(`tenants/${tenantId}/owners/${ownerId}`);
+            notify(t.common.success, 'success');
+            fetchTenants();
+        } catch {
+            notify(t.common.error, 'error');
         }
     };
 
@@ -186,13 +201,21 @@ export default function GlobalAdmin() {
                                                     <span className="premium-badge text-[9px] bg-green-50 text-green-700 border-green-200">Active</span>
                                                 </td>
                                                 <td className="px-8 py-6">
+                                                    <div className="flex flex-wrap gap-2 mb-2">
+                                                        {tenant.owners.map(owner => (
+                                                            <span key={owner.id} className="inline-flex items-center gap-1 bg-farm-pine/10 text-farm-pine px-2 py-0.5 rounded-full text-[10px] font-bold">
+                                                                {owner.email}
+                                                                <button onClick={() => handleRemoveOwner(tenant.id, owner.id)} className="hover:text-red-500">×</button>
+                                                            </span>
+                                                        ))}
+                                                    </div>
                                                     <select 
-                                                        className="bg-transparent border-none text-xs font-bold text-farm-pine focus:ring-0 cursor-pointer p-0 pr-8"
-                                                        value={tenant.owner_id || ''}
-                                                        onChange={(e) => handleAssignOwner(tenant.id, e.target.value)}
+                                                        className="bg-transparent border-none text-xs font-bold text-farm-forest/40 focus:ring-0 cursor-pointer p-0 pr-8 hover:text-farm-pine transition-colors"
+                                                        value=""
+                                                        onChange={(e) => handleAddOwner(tenant.id, e.target.value)}
                                                     >
-                                                        <option value="">{t.global_admin.unassigned}</option>
-                                                        {users.map(u => (
+                                                        <option value="">+ {t.global_admin.ledger_col}</option>
+                                                        {users.filter(u => !tenant.owners.find(o => o.id === u.id)).map(u => (
                                                             <option key={u.id} value={u.id}>{u.email}</option>
                                                         ))}
                                                     </select>
