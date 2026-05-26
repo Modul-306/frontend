@@ -148,7 +148,7 @@ export default function GlobalAdmin() {
                                 <label className="premium-label">{t.global_admin.market_name}</label>
                                 <input 
                                     className="premium-input" 
-                                    placeholder="e.g. Sunny Meadows Farm" 
+                                    placeholder={t.global_admin.name_placeholder} 
                                     value={name} 
                                     onChange={e => setName(e.target.value)} 
                                     required 
@@ -160,7 +160,7 @@ export default function GlobalAdmin() {
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-farm-forest/30 text-sm">/</span>
                                     <input 
                                         className="premium-input !pl-8" 
-                                        placeholder="sunny-meadows" 
+                                        placeholder={t.global_admin.slug_placeholder} 
                                         value={slug} 
                                         onChange={e => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))} 
                                         required 
@@ -205,7 +205,7 @@ export default function GlobalAdmin() {
                                                         </div>
                                                         <div>
                                                             <div className="font-serif font-bold text-farm-forest">{tenant.name}</div>
-                                                            <div className="text-[10px] text-farm-forest/40 font-mono tracking-tighter">ID: {tenant.id.slice(0, 8)}...</div>
+                                                            <div className="text-[10px] text-farm-forest/40 font-mono tracking-tighter">{t.global_admin.id_prefix} {tenant.id.slice(0, 8)}...</div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -226,7 +226,7 @@ export default function GlobalAdmin() {
                                                         value=""
                                                         onChange={(e) => handleAddOwner(tenant.id, e.target.value)}
                                                     >
-                                                        <option value="">+ {t.global_admin.ledger_col}</option>
+                                                        <option value="">+ {t.global_admin.add_owner}</option>
                                                         {users.filter(u => !tenant.owners.find(o => o.id === u.id)).map(u => (
                                                             <option key={u.id} value={u.id}>{u.email}</option>
                                                         ))}

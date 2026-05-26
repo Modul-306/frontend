@@ -65,12 +65,12 @@ export default function UserProfile() {
             
             const doc = new jsPDF();
             doc.setFontSize(22);
-            doc.text(locale === 'de' ? 'CattleHof Netzwerk - Rechnung' : 'CattleHof Network - Invoice', 20, 20);
+            doc.text(t.profile.invoice_title, 20, 20);
             
             doc.setFontSize(10);
             doc.text(`${t.admin.orders.order_id}: ${order.id}`, 20, 30);
             doc.text(`${t.global_admin.date_col}: ${formatLongDate(order.created_at)}`, 20, 35);
-            doc.text(`${locale === 'de' ? 'Kunde' : 'Customer'}: ${user?.email}`, 20, 40);
+            doc.text(`${t.profile.customer}: ${user?.email}`, 20, 40);
             
             const tableData = items.map((item: any) => [
                 item.product_name,
@@ -83,12 +83,12 @@ export default function UserProfile() {
                 startY: 50,
                 head: [[
                     t.admin.inventory.name, 
-                    locale === 'de' ? 'Menge' : 'Qty', 
+                    t.profile.qty, 
                     t.admin.inventory.price, 
                     t.shop.total
                 ]],
                 body: tableData,
-                foot: [['', '', locale === 'de' ? 'Gesamtsumme' : 'Grand Total', formatCurrency(order.total_amount)]],
+                foot: [['', '', t.profile.grand_total, formatCurrency(order.total_amount)]],
                 theme: 'striped',
                 headStyles: { fillColor: [22, 78, 53] }
             });

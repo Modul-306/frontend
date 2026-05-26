@@ -32,7 +32,7 @@
     "sold_out": "Ausverkauft",
     "in_season": "Saisonal",
     "add_to_basket": "In den Warenkorb",
-    "added_to_basket": "Artikel zum Warenkorb hinzugefügt!",
+    "added_to_basket": "{name} hinzugefügt!",
     "journal_title": "Hof-Journal",
     "journal_subtitle": "Chroniken unserer täglichen Arbeit, Gemeinschaftsanlässe und saisonalen Übergänge.",
     "read_more": "Vollständigen Eintrag lesen",
@@ -61,7 +61,8 @@
       "save_error": "Fehler beim Speichern.",
       "logo_success": "Logo aktualisiert!",
       "logo_error": "Fehler beim Aktualisieren des Logos.",
-      "specialty": "Hof-Spezialität / Kategorie"
+      "specialty": "Hof-Spezialität / Kategorie",
+      "specialty_placeholder": "z.B. Milchprodukte, Gemüse, Honig"
     },
     "inventory": {
       "add_new": "Neuen Artikel hinzufügen",
@@ -95,7 +96,9 @@
     },
     "orders": {
       "title": "Kundenbestellungen",
+      "recent": "(Kürzlich)",
       "order_id": "Bestell-ID",
+      "order_prefix": "Bestellung #",
       "details": "Bestelldetails",
       "status": "Status ändern",
       "mark_completed": "Als abgeschlossen markieren",
@@ -110,7 +113,13 @@
       "top_products": "Meistverkaufte Produkte",
       "financial_restricted": "Finanzdaten für Personal eingeschränkt.",
       "view_all_orders": "Alle Bestellungen anzeigen",
-      "download_report": "Monatsbericht PDF"
+      "download_report": "Monatsbericht PDF",
+      "report_title": "CattleHof Produzentenbericht",
+      "generated_at": "Erstellt am",
+      "total_revenue": "Gesamtumsatz",
+      "total_orders": "Bestellungen insgesamt",
+      "top_products_performance": "Leistung der Top-Produkte:",
+      "total_sold": "Verkaufte Menge"
     }
   },
   "profile": {
@@ -128,7 +137,11 @@
     "write_review": "Bewertung schreiben",
     "review_desc": "Kürzlich etwas gekauft? Teilen Sie Ihre Gedanken mit der Gemeinschaft!",
     "browse_products": "Meine Produkte durchsuchen",
-    "download_invoice": "Rechnung herunterladen"
+    "download_invoice": "Rechnung herunterladen",
+    "invoice_title": "CattleHof Netzwerk - Rechnung",
+    "customer": "Kunde",
+    "qty": "Menge",
+    "grand_total": "Gesamtsumme"
   },
   "reviews": {
     "title": "Gemeinschaftsbewertungen",
@@ -171,7 +184,9 @@
     "welcome": "Willkommen zurück",
     "create_account": "Konto erstellen",
     "email": "E-Mail",
+    "email_placeholder": "ihre@email.ch",
     "password": "Passwort",
+    "password_placeholder": "••••••••",
     "confirm_password": "Passwort bestätigen",
     "sign_in": "Anmelden",
     "sign_up": "Konto erstellen",
@@ -198,12 +213,15 @@
     "register_btn": "Neuen Stand registrieren",
     "stall_info": "Stand-Informationen",
     "market_name": "Markt-Name",
+    "name_placeholder": "z.B. Sonnenwiesen-Hof",
     "access_slug": "Zugriffs-Slug (URL)",
+    "slug_placeholder": "sonnenwiesen",
     "commit_btn": "In das Register eintragen",
     "active_stalls": "Aktive Stände",
     "stall_col": "Stand",
     "status_col": "Status",
     "ledger_col": "Zugewiesenes Ledger",
+    "id_prefix": "ID:",
     "date_col": "Eintragsdatum",
     "action_col": "Aktion",
     "unassigned": "(Nicht zugewiesen)",
@@ -215,6 +233,7 @@
     "delete_error": "Löschen fehlgeschlagen.",
     "assign_success": "Besitzer zugewiesen!",
     "assign_error": "Zuweisung fehlgeschlagen.",
+    "add_owner": "Besitzer hinzufügen",
     "active_status": "Aktiv",
     "revoke_title": "Register widerrufen",
     "fetch_error": "Fehler beim Laden der Stände."
