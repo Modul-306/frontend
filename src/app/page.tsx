@@ -55,9 +55,9 @@ export default function RootPage() {
     return (
         <main className="min-h-screen bg-farm-cream relative overflow-hidden">
             {/* Dynamic Background Elements */}
-            <div className="absolute top-0 left-0 w-full h-[800px] bg-gradient-to-b from-farm-parchment to-transparent -z-10" />
-            <div className="absolute -top-40 -right-40 w-96 h-96 bg-farm-gold/10 rounded-full blur-3xl animate-float" />
-            <div className="absolute top-60 -left-20 w-72 h-72 bg-farm-pine/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+            <div className="absolute top-0 left-0 w-full h-[800px] bg-gradient-to-b from-farm-parchment to-transparent -z-10 pointer-events-none" />
+            <div className="absolute -top-40 -right-40 w-96 h-96 bg-farm-gold/10 rounded-full blur-3xl animate-float pointer-events-none" />
+            <div className="absolute top-60 -left-20 w-72 h-72 bg-farm-pine/5 rounded-full blur-3xl animate-float pointer-events-none" style={{ animationDelay: '2s' }} />
 
             {/* Premium Header Nav */}
             <nav className="absolute top-0 left-0 w-full px-8 py-6 !z-[1000] flex justify-between items-center">
@@ -85,7 +85,7 @@ export default function RootPage() {
                         <button
                             id="open-auth-modal-btn"
                             onClick={() => setShowAuthModal(true)}
-                            className="text-xs font-bold uppercase tracking-[0.2em] text-farm-forest/60 hover:text-farm-gold transition-colors"
+                            className="px-4 py-2 -mr-4 text-xs font-bold uppercase tracking-[0.2em] text-farm-forest/60 hover:text-farm-gold transition-all duration-300 rounded-lg hover:bg-farm-forest/5"
                         >
                             {t.common.login} / {t.common.register}
                         </button>
