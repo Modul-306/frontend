@@ -19,6 +19,11 @@ export default function Admin() {
     const { user } = useAuth();
     const { t, locale } = useLanguage();
     const { notify } = useNotify();
+
+    if (!user || (user.role !== 'farmer_admin' && user.role !== 'platform_admin' && user.role !== 'staff')) {
+        return null;
+    }
+
     const [activeTab, setActiveTab] = useState<'storefront' | 'inventory' | 'journal' | 'orders'>('storefront');
     const [loading, setLoading] = useState(false);
     
