@@ -29,7 +29,9 @@ export default function UserProfile() {
 
     // Profile Form State
     const [fullName, setFullName] = useState('');
-    const [address, setAddress] = useState('');
+    const [street, setStreet] = useState('');
+    const [zipCode, setZipCode] = useState('');
+    const [city, setCity] = useState('');
 
     useEffect(() => {
         if (user) {
@@ -63,7 +65,9 @@ export default function UserProfile() {
         try {
             const res = await api.get('auth/profile');
             setFullName(res.data.full_name || '');
-            setAddress(res.data.address || '');
+            setStreet(res.data.street || '');
+            setZipCode(res.data.zip_code || '');
+            setCity(res.data.city || '');
         } catch (err) {
             console.error('Failed to fetch profile', err);
         }
@@ -73,7 +77,12 @@ export default function UserProfile() {
         e.preventDefault();
         setSaving(true);
         try {
-            await api.put('auth/profile', { full_name: fullName, address });
+            await api.put('auth/profile', { 
+                full_name: fullName, 
+                street,
+                zip_code: zipCode,
+                city
+            });
             notify(t.profile.update_success, 'success');
         } catch (err) {
             notify(t.profile.update_error, 'error');
@@ -170,14 +179,38 @@ export default function UserProfile() {
                             <div className="space-y-3">
                                 <label className="premium-label flex items-center gap-2">
                                     <MapPin size={14} />
-                                    {t.profile.address}
+                                    {t.profile.street}
                                 </label>
-                                <textarea 
-                                    className="premium-input min-h-[120px] py-4" 
-                                    placeholder={t.profile.address_placeholder}
-                                    value={address}
-                                    onChange={e => setAddress(e.target.value)}
+                                <input 
+                                    type="text"
+                                    className="premium-input" 
+                                    placeholder={t.profile.street_placeholder}
+                                    value={street}
+                                    onChange={e => setStreet(e.target.value)}
                                 />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                    <label className="premium-label">{t.profile.zip_code}</label>
+                                    <input 
+                                        type="text"
+                                        className="premium-input" 
+                                        placeholder={t.profile.zip_placeholder}
+                                        value={zipCode}
+                                        onChange={e => setZipCode(e.target.value)}
+                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="premium-label">{t.profile.city}</label>
+                                    <input 
+                                        type="text"
+                                        className="premium-input" 
+                                        placeholder={t.profile.city_placeholder}
+                                        value={city}
+                                        onChange={e => setCity(e.target.value)}
+                                    />
+                                </div>
                             </div>
 
                             <button 
