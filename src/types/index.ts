@@ -49,6 +49,11 @@ export interface Order {
     status: 'pending' | 'completed' | 'cancelled';
     total_amount: string; // From backend it's a string decimal
     created_at: string | NullTime;
+    full_name?: NullString;
+    email?: string;
+    street?: NullString;
+    zip_code?: NullString;
+    city?: NullString;
 }
 
 export interface OrderItem {

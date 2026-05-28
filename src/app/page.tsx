@@ -67,7 +67,6 @@ export default function RootPage() {
                     {t.common.brand_name}
                 </div>
                 <div className="flex items-center gap-4">
-                    <LanguageToggle />
                     {user ? (
                         <div className="flex items-center gap-2">
                             <Link 
@@ -100,6 +99,7 @@ export default function RootPage() {
                             <span className="hidden sm:inline">{t.common.login}</span>
                         </button>
                     )}
+                    <LanguageToggle />
                 </div>
             </nav>
 
