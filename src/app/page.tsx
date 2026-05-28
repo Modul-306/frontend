@@ -9,6 +9,7 @@ import UserAuthModal from '@/components/UserAuthModal';
 import LanguageToggle from '@/components/LanguageToggle';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { User as UserIcon, LogOut, LogIn } from 'lucide-react';
 
 export default function RootPage() {
     const { user, logout } = useAuth();
@@ -68,26 +69,35 @@ export default function RootPage() {
                 <div className="flex items-center gap-4">
                     <LanguageToggle />
                     {user ? (
-                        <div className="flex items-center gap-3">
-                            <span className="text-xs text-farm-forest/70 font-semibold hidden sm:block">{user.email}</span>
+                        <div className="flex items-center gap-2">
+                            <Link 
+                                href="/profile" 
+                                className="flex items-center gap-2 p-2 rounded-full hover:bg-farm-forest/5 transition-colors group"
+                                title={t.profile.title}
+                            >
+                                <div className="w-8 h-8 rounded-full bg-farm-forest/10 flex items-center justify-center text-farm-forest group-hover:bg-farm-forest group-hover:text-farm-cream transition-all">
+                                    <UserIcon size={18} />
+                                </div>
+                                <span className="text-xs font-bold text-farm-forest/70 hidden sm:block">{user.email.split('@')[0]}</span>
+                            </Link>
                             <button
                                 id="logout-btn"
                                 onClick={logout}
-                                className="text-farm-forest/60 hover:text-red-500 p-1.5 rounded-full hover:bg-red-50 transition-all duration-300"
+                                className="text-farm-forest/40 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition-all duration-300"
                                 title={t.common.logout}
                             >
-                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                </svg>
+                                <LogOut size={20} />
                             </button>
                         </div>
                     ) : (
                         <button
                             id="open-auth-modal-btn"
                             onClick={() => setShowAuthModal(true)}
-                            className="px-4 py-2 -mr-4 text-xs font-bold uppercase tracking-[0.2em] text-farm-forest/60 hover:text-farm-gold transition-all duration-300 rounded-lg hover:bg-farm-forest/5"
+                            className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-farm-forest/60 hover:text-farm-forest transition-all duration-300 rounded-full hover:bg-farm-forest/5"
+                            title={t.common.login}
                         >
-                            {t.common.login} / {t.common.register}
+                            <LogIn size={18} />
+                            <span className="hidden sm:inline">{t.common.login}</span>
                         </button>
                     )}
                 </div>
