@@ -157,7 +157,7 @@ export default function TenantPage() {
                             <button
                                 id="open-auth-modal-btn"
                                 onClick={() => setShowAuthModal(true)}
-                                className="text-xs font-bold uppercase tracking-[0.2em] text-farm-forest/60 hover:text-farm-gold transition-colors"
+                                className="px-4 py-2 -mr-4 text-xs font-bold uppercase tracking-[0.2em] text-farm-forest/60 hover:text-farm-gold transition-all duration-300 rounded-lg hover:bg-farm-forest/5"
                             >
                                 {t.common.login} / {t.common.register}
                             </button>
