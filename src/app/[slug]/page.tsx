@@ -61,6 +61,7 @@ export default function TenantPage() {
 
     const isOwner = user && tenant && (
         user.role === 'platform_admin' || 
+        user.tenant_id === tenant.id ||
         owners.some(o => o.id === user.id)
     );
 
