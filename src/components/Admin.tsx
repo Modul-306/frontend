@@ -458,7 +458,28 @@ export default function Admin() {
                                     </div>
                                     <div>
                                         <label className="premium-label mb-2 block">{t.admin.storefront.cover}</label>
-                                        <input className="premium-input !text-xs" value={coverUrl} onChange={e => setCoverUrl(e.target.value)} placeholder="https://..." />
+                                        <input type="file" className="text-xs" onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+                                            setLoading(true);
+                                            try {
+                                                const formData = new FormData();
+                                                formData.append('file', file);
+                                                const uploadRes = await api.post('upload', formData, {
+                                                    headers: { 'Content-Type': 'multipart/form-data' }
+                                                });
+                                                let imageUrl = uploadRes.data.url;
+                                                if (!imageUrl.startsWith('http')) {
+                                                    imageUrl = `${window.location.origin}${imageUrl}`;
+                                                }
+                                                setCoverUrl(imageUrl);
+                                                notify(t.admin.storefront.save_success, 'success');
+                                            } catch (err) {
+                                                notify(t.admin.storefront.save_error, 'error');
+                                            } finally {
+                                                setLoading(false);
+                                            }
+                                        }} />
                                     </div>
                                     <div>
                                         <label className="premium-label mb-2 block">{t.admin.storefront.description}</label>
@@ -600,6 +621,14 @@ export default function Admin() {
                                 {viewingOrderId ? (
                                     <div className="glass-panel p-8 rounded-3xl sticky top-24">
                                         <h3 className="font-serif text-xl mb-6 border-b pb-4">{t.admin.orders.details}</h3>
+                                        <div className="mb-8 space-y-2">
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">{t.profile.customer}</p>
+                                            <p className="text-sm font-bold">{orders.find(o => o.id === viewingOrderId)?.full_name?.String || orders.find(o => o.id === viewingOrderId)?.email}</p>
+                                            <div className="text-xs text-farm-forest/60">
+                                                <p>{orders.find(o => o.id === viewingOrderId)?.street?.String}</p>
+                                                <p>{orders.find(o => o.id === viewingOrderId)?.zip_code?.String} {orders.find(o => o.id === viewingOrderId)?.city?.String}</p>
+                                            </div>
+                                        </div>
                                         <div className="space-y-4 mb-8">
                                             {selectedOrderItems.map(item => (
                                                 <div key={item.id} className="flex justify-between text-sm">

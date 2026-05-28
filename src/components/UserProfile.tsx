@@ -8,7 +8,7 @@ import { useNotify } from '@/context/NotificationContext';
 import { formatCurrency, formatLongDate } from '@/lib/utils';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { ShoppingBag, Star, MessageSquare, Download, User as UserIcon, MapPin, Settings, CheckCircle } from 'lucide-react';
+import { ShoppingBag, Star, MessageSquare, Download, User as UserIcon, MapPin, Settings, CheckCircle, Mail } from 'lucide-react';
 
 interface Order {
     id: string;
@@ -171,7 +171,10 @@ export default function UserProfile() {
                                     />
                                 </div>
                                 <div className="space-y-3 text-farm-forest/40">
-                                    <label className="premium-label">{t.auth.email}</label>
+                                    <label className="premium-label flex items-center gap-2">
+                                        <Mail size={14} />
+                                        {t.auth.email}
+                                    </label>
                                     <input type="text" className="premium-input bg-farm-bark/10 cursor-not-allowed" value={user.email} disabled />
                                 </div>
                             </div>
@@ -281,7 +284,7 @@ export default function UserProfile() {
                 </section>
 
                 <aside className="space-y-8">
-                    <div className="glass-panel p-8 rounded-3xl bg-farm-forest text-farm-cream border-none shadow-2xl relative overflow-hidden">
+                    <div className="p-8 rounded-3xl bg-farm-forest text-farm-cream border-none shadow-2xl relative overflow-hidden">
                         <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-farm-gold/10 rounded-full blur-2xl" />
                         <h3 className="text-2xl font-serif mb-6">{t.profile.loyalty_status}</h3>
                         <div className="space-y-6">
