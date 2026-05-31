@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { useLanguage } from '@/context/LanguageContext';
@@ -23,7 +23,7 @@ interface User {
 }
 
 export default function GlobalAdmin() {
-    const { t, locale } = useLanguage();
+    const { t } = useLanguage();
     const { notify } = useNotify();
     const [tenants, setTenants] = useState<(Tenant & { owners: User[] })[]>([]);
     const [users, setUsers] = useState<User[]>([]);
@@ -31,6 +31,15 @@ export default function GlobalAdmin() {
     const [name, setName] = useState('');
     const [slug, setSlug] = useState('');
     const [showRegisterForm, setShowRegisterForm] = useState(false);
+
+    // States for adding owners via searchbar
+    const [activeSearchTenantId, setActiveSearchTenantId] = useState<string | null>(null);
+    const [ownerSearchQuery, setOwnerSearchQuery] = useState('');
+
+    // States for inline tenant editing
+    const [editingTenantId, setEditingTenantId] = useState<string | null>(null);
+    const [editName, setEditName] = useState('');
+    const [editSlug, setEditSlug] = useState('');
 
     useEffect(() => {
         fetchTenants();
@@ -82,6 +91,24 @@ export default function GlobalAdmin() {
             fetchTenants();
         } catch {
             notify(t.global_admin.create_error, 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSaveTenant = async (id: string) => {
+        if (!editName.trim() || !editSlug.trim()) {
+            notify('Stall name and slug cannot be empty', 'error');
+            return;
+        }
+        setLoading(true);
+        try {
+            await api.put(`tenants/${id}`, { name: editName, slug: editSlug });
+            notify(t.common.success || 'Stall updated successfully', 'success');
+            setEditingTenantId(null);
+            fetchTenants();
+        } catch {
+            notify(t.common.error || 'Failed to update Stall', 'error');
         } finally {
             setLoading(false);
         }
@@ -197,54 +224,167 @@ export default function GlobalAdmin() {
                                         {tenants.map((tenant) => (
                                             <tr key={tenant.id} className="group hover:bg-farm-parchment/50 transition-colors">
                                                 <td className="px-8 py-6">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 rounded-full bg-farm-bark/10 flex items-center justify-center font-serif font-bold text-farm-forest overflow-hidden">
-                                                            {tenant.icon_url?.Valid ? (
-                                                                <img src={tenant.icon_url.String} className="w-full h-full object-cover" />
-                                                            ) : tenant.name.charAt(0)}
+                                                    {editingTenantId === tenant.id ? (
+                                                        <div className="flex flex-col gap-2 max-w-xs">
+                                                            <input
+                                                                type="text"
+                                                                className="premium-input !py-1 !px-3 !text-sm !rounded-xl"
+                                                                value={editName}
+                                                                onChange={e => setEditName(e.target.value)}
+                                                                placeholder="Market Name"
+                                                                required
+                                                            />
+                                                            <div className="relative">
+                                                                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-farm-forest/30 text-xs">/</span>
+                                                                <input
+                                                                    type="text"
+                                                                    className="premium-input !py-1 !px-3 !pl-6 !text-xs !rounded-xl"
+                                                                    value={editSlug}
+                                                                    onChange={e => setEditSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+                                                                    placeholder="access-slug"
+                                                                    required
+                                                                />
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            <div className="font-serif font-bold text-farm-forest">{tenant.name}</div>
-                                                            <div className="text-[10px] text-farm-forest/40 font-mono tracking-tighter">{t.global_admin.id_prefix} {tenant.id.slice(0, 8)}...</div>
+                                                    ) : (
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="w-10 h-10 rounded-full bg-farm-bark/10 flex items-center justify-center font-serif font-bold text-farm-forest overflow-hidden">
+                                                                {tenant.icon_url?.Valid ? (
+                                                                    <img src={tenant.icon_url.String} className="w-full h-full object-cover" />
+                                                                ) : tenant.name.charAt(0)}
+                                                            </div>
+                                                            <div>
+                                                                <div className="font-serif font-bold text-farm-forest">{tenant.name}</div>
+                                                                <div className="text-[10px] text-farm-forest/40 font-mono tracking-tighter">/{tenant.slug} • {tenant.id.slice(0, 8)}...</div>
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    )}
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <span className="premium-badge text-[9px] bg-green-50 text-green-700 border-green-200">{t.global_admin.active_status}</span>
                                                 </td>
                                                 <td className="px-8 py-6">
-                                                    <div className="flex flex-wrap gap-2 mb-2">
+                                                    <div className="flex flex-wrap gap-2 mb-3">
                                                         {tenant.owners.map(owner => (
-                                                            <span key={owner.id} className="inline-flex items-center gap-1 bg-farm-pine/10 text-farm-pine px-2 py-0.5 rounded-full text-[10px] font-bold">
+                                                            <span key={owner.id} className="inline-flex items-center gap-1.5 bg-farm-pine/10 text-farm-pine px-2 py-0.5 rounded-full text-[10px] font-bold transition-all">
                                                                 {owner.email}
-                                                                <button onClick={() => handleRemoveOwner(tenant.id, owner.id)} className="hover:text-red-500">×</button>
+                                                                <button onClick={() => handleRemoveOwner(tenant.id, owner.id)} className="hover:text-red-500 font-sans text-xs">×</button>
                                                             </span>
                                                         ))}
                                                     </div>
-                                                    <select 
-                                                        className="bg-transparent border-none text-xs font-bold text-farm-forest/40 focus:ring-0 cursor-pointer p-0 pr-8 hover:text-farm-pine transition-colors"
-                                                        value=""
-                                                        onChange={(e) => handleAddOwner(tenant.id, e.target.value)}
-                                                    >
-                                                        <option value="">+ {t.global_admin.add_owner}</option>
-                                                        {users.filter(u => !tenant.owners.find(o => o.id === u.id)).map(u => (
-                                                            <option key={u.id} value={u.id}>{u.email}</option>
-                                                        ))}
-                                                    </select>
+                                                    {activeSearchTenantId === tenant.id ? (
+                                                        <div className="relative w-64">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Search users..."
+                                                                className="premium-input !py-1.5 !px-3 !text-xs !rounded-xl w-full border border-farm-pine/20 focus:border-farm-pine"
+                                                                value={ownerSearchQuery}
+                                                                onChange={(e) => setOwnerSearchQuery(e.target.value)}
+                                                                autoFocus
+                                                            />
+                                                            {ownerSearchQuery.trim() !== '' && (
+                                                                <div className="absolute z-50 left-0 right-0 bg-white border border-farm-bark/10 rounded-2xl shadow-2xl max-h-48 overflow-y-auto mt-2 divide-y divide-farm-bark/5 overflow-x-hidden">
+                                                                    {users
+                                                                        .filter(u => !tenant.owners.find(o => o.id === u.id))
+                                                                        .filter(u => u.email.toLowerCase().includes(ownerSearchQuery.toLowerCase()))
+                                                                        .map(u => (
+                                                                            <button
+                                                                                key={u.id}
+                                                                                onClick={() => {
+                                                                                    handleAddOwner(tenant.id, u.id);
+                                                                                    setActiveSearchTenantId(null);
+                                                                                    setOwnerSearchQuery('');
+                                                                                }}
+                                                                                className="w-full text-left px-4 py-2.5 text-xs hover:bg-farm-forest/5 text-farm-forest font-mono transition-colors block truncate"
+                                                                            >
+                                                                                {u.email}
+                                                                            </button>
+                                                                        ))}
+                                                                    {users
+                                                                        .filter(u => !tenant.owners.find(o => o.id === u.id))
+                                                                        .filter(u => u.email.toLowerCase().includes(ownerSearchQuery.toLowerCase()))
+                                                                        .length === 0 && (
+                                                                        <div className="px-4 py-2.5 text-xs text-farm-forest/40 italic">
+                                                                            No matching users
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                            <div className="mt-1 flex gap-2">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setActiveSearchTenantId(null);
+                                                                        setOwnerSearchQuery('');
+                                                                    }}
+                                                                    className="text-[10px] text-red-500 font-bold hover:underline"
+                                                                >
+                                                                    {t.common.cancel}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => {
+                                                                setActiveSearchTenantId(tenant.id);
+                                                                setOwnerSearchQuery('');
+                                                            }}
+                                                            className="text-xs font-bold text-farm-forest/40 hover:text-farm-pine transition-colors flex items-center gap-1"
+                                                        >
+                                                            + {t.global_admin.add_owner}
+                                                        </button>
+                                                    )}
                                                 </td>
                                                 <td className="px-8 py-6 text-right text-xs font-medium text-farm-forest/60">
                                                     {formatDate(tenant.created_at)}
                                                 </td>
                                                 <td className="px-8 py-6 text-right">
-                                                    <button 
-                                                        onClick={() => handleDeleteTenant(tenant.id)}
-                                                        className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-all p-2 hover:bg-red-50 rounded-full"
-                                                        title={t.global_admin.revoke_title}
-                                                    >
-                                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h14" />
-                                                        </svg>
-                                                    </button>
+                                                    {editingTenantId === tenant.id ? (
+                                                        <div className="flex justify-end gap-2">
+                                                            <button 
+                                                                onClick={() => handleSaveTenant(tenant.id)}
+                                                                className="text-green-600 hover:text-green-800 p-2 hover:bg-green-50 rounded-full transition-all"
+                                                                title="Save"
+                                                            >
+                                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                                </svg>
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => setEditingTenantId(null)}
+                                                                className="text-farm-forest/40 hover:text-farm-forest p-2 hover:bg-farm-forest/5 rounded-full transition-all"
+                                                                title="Cancel"
+                                                            >
+                                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                                            <button 
+                                                                onClick={() => {
+                                                                    setEditingTenantId(tenant.id);
+                                                                    setEditName(tenant.name);
+                                                                    setEditSlug(tenant.slug);
+                                                                }}
+                                                                className="text-farm-forest/40 hover:text-farm-forest p-2 hover:bg-farm-forest/5 rounded-full transition-all"
+                                                                title="Edit Stall"
+                                                            >
+                                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                                </svg>
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleDeleteTenant(tenant.id)}
+                                                                className="text-red-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-full transition-all"
+                                                                title={t.global_admin.revoke_title}
+                                                            >
+                                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h14" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}
