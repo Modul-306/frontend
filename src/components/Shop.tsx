@@ -243,7 +243,12 @@ export default function Shop({ tenant }: ShopProps) {
 
             <div className="container mx-auto px-8 relative -mt-32 z-10">
                 <header className="text-center mb-24 glass-panel p-12 md:p-16 rounded-3xl shadow-xl max-w-5xl mx-auto border-farm-bark">
-                    <span className="premium-badge-gold mb-6 inline-block">{t.shop.producer_badge}</span>
+                    <div className="flex justify-center gap-2 mb-6">
+                        <span className="premium-badge-gold">{t.shop.producer_badge}</span>
+                        {tenant?.category?.Valid && tenant.category.String && (
+                            <span className="premium-badge bg-farm-gold text-white border-none">{tenant.category.String}</span>
+                        )}
+                    </div>
                     <h1 className="text-6xl md:text-8xl mb-6 font-serif">{t.shop.market_selection}</h1>
                     <div className="h-1 w-32 bg-gradient-to-r from-farm-forest to-farm-gold mx-auto mb-8 rounded-full" />
                     <p className="text-xl md:text-2xl text-farm-forest/70 max-w-2xl mx-auto font-serif italic">
