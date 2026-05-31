@@ -124,9 +124,10 @@ export default function Shop({ tenant }: ShopProps) {
             setOrderSuccess(true);
             setIsBasketOpen(false);
             setTimeout(() => setOrderSuccess(false), 5000);
-        } catch (err) {
+        } catch (err: any) {
             console.error("Checkout failed", err);
-            notify(t.shop.checkout_failed, 'error');
+            const errMsg = err.response?.data?.error || t.shop.checkout_failed;
+            notify(errMsg, 'error');
         } finally {
             setIsCheckingOut(false);
         }
