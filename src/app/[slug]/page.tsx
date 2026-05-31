@@ -169,7 +169,7 @@ export default function TenantPage() {
                                 className="text-farm-forest/60 hover:text-farm-forest p-2 rounded-full hover:bg-farm-forest/5 transition-all duration-300"
                                 title={t.common.login}
                             >
-                                <LogIn size={18} />
+                                <LogIn size={20} />
                             </button>
                         )}
                     </div>
