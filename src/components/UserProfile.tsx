@@ -290,7 +290,7 @@ export default function UserProfile() {
                         <div className="space-y-6">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-farm-cream/60">{t.profile.tier}</span>
-                                <span className="font-bold text-farm-gold uppercase tracking-widest">{loyalty?.tier || t.profile.harvest_elite}</span>
+                                <span className="font-bold text-farm-gold uppercase tracking-widest">{loyalty?.tier || 'Seedling'}</span>
                             </div>
                             {loyalty && parseFloat(loyalty.discount_percent) > 0 && (
                                 <div className="flex justify-between items-center text-sm">
