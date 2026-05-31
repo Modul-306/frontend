@@ -177,7 +177,7 @@ export default function TenantPage() {
             </nav>
 
             <div className="animate-in fade-in zoom-in-95 duration-1000">
-                {view === 'shop' || !isOwner ? <Shop tenant={tenant} /> : <Admin />}
+                {view === 'shop' || !isOwner ? <Shop tenant={tenant} /> : <Admin isOwner={isOwner} />}
             </div>
 
             {showAuthModal && (
