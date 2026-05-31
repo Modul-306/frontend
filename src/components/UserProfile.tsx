@@ -286,7 +286,7 @@ export default function UserProfile() {
                 <aside className="space-y-8">
                     <div className="p-8 rounded-3xl bg-farm-forest text-farm-cream border-none shadow-2xl relative overflow-hidden">
                         <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-farm-gold/10 rounded-full blur-2xl" />
-                        <h3 className="text-2xl font-serif mb-6">{t.profile.loyalty_status}</h3>
+                        <h3 className="text-2xl font-serif mb-6 text-farm-cream">{t.profile.loyalty_status}</h3>
                         <div className="space-y-6">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-farm-cream/60">{t.profile.tier}</span>
