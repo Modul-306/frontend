@@ -15,7 +15,7 @@ import { TrendingUp, Package, ShoppingCart, BookOpen, AlertCircle, Eye, EyeOff, 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-export default function Admin({ isOwner = false }: { isOwner?: boolean }) {
+export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: boolean; onTenantUpdate?: (tenant: any) => void }) {
     const { user } = useAuth();
     const { t, locale } = useLanguage();
     const { notify } = useNotify();
@@ -195,8 +195,11 @@ export default function Admin({ isOwner = false }: { isOwner?: boolean }) {
     const handleSaveAppearance = async () => {
         setLoading(true);
         try {
-            await api.put('tenants/appearance', { cover_url: coverUrl, description, category: farmCategory });
+            const res = await api.put('tenants/appearance', { cover_url: coverUrl, description, category: farmCategory });
             notify(t.admin.storefront.save_success, 'success');
+            if (onTenantUpdate) {
+                onTenantUpdate(res.data);
+            }
         } catch (err) {
             notify(t.admin.storefront.save_error, 'error');
         } finally {
