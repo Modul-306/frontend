@@ -15,12 +15,12 @@ import { TrendingUp, Package, ShoppingCart, BookOpen, AlertCircle, Eye, EyeOff, 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-export default function Admin() {
+export default function Admin({ isOwner = false }: { isOwner?: boolean }) {
     const { user } = useAuth();
     const { t, locale } = useLanguage();
     const { notify } = useNotify();
 
-    if (!user || (user.role !== 'farmer_admin' && user.role !== 'platform_admin' && user.role !== 'staff')) {
+    if (!user || (!isOwner && user.role !== 'farmer_admin' && user.role !== 'platform_admin' && user.role !== 'staff')) {
         return null;
     }
 
