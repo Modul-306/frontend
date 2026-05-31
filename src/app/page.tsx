@@ -67,6 +67,7 @@ export default function RootPage() {
                     {t.common.brand_name}
                 </div>
                 <div className="flex items-center gap-4">
+                    <LanguageToggle />
                     {user ? (
                         <div className="flex items-center gap-2">
                             <Link 
@@ -95,10 +96,9 @@ export default function RootPage() {
                             className="text-farm-forest/60 hover:text-farm-forest p-2 rounded-full hover:bg-farm-forest/5 transition-all duration-300"
                             title={t.common.login}
                         >
-                            <LogIn size={18} />
+                            <LogIn size={20} />
                         </button>
                     )}
-                    <LanguageToggle />
                 </div>
             </nav>
 
