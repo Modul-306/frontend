@@ -246,7 +246,7 @@ export default function Shop({ tenant }: ShopProps) {
                     <div className="flex justify-center gap-2 mb-6">
                         <span className="premium-badge-gold">{t.shop.producer_badge}</span>
                         {tenant?.category?.Valid && tenant.category.String && (
-                            <span className="premium-badge bg-farm-gold text-white border-none">{tenant.category.String}</span>
+                            <span className="store-custom-tag">{tenant.category.String}</span>
                         )}
                     </div>
                     <h1 className="text-6xl md:text-8xl mb-6 font-serif">{t.shop.market_selection}</h1>

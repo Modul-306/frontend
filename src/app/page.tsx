@@ -206,7 +206,7 @@ export default function RootPage() {
                                 <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
                                     <span className="premium-badge bg-white/90 backdrop-blur-sm border-none text-farm-forest">{t.home.featured}</span>
                                     {tenant.category?.Valid && (
-                                        <span className="premium-badge-gold bg-farm-gold text-white border-none text-[8px]">{tenant.category.String}</span>
+                                        <span className="store-custom-tag text-[8px] !px-2.5 !py-1 shadow-sm">{tenant.category.String}</span>
                                     )}
                                 </div>
                             </div>

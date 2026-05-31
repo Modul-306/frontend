@@ -84,6 +84,10 @@ input, textarea {
   @apply text-[10px] font-bold uppercase tracking-widest bg-farm-gold/10 text-farm-gold px-3 py-1.5 rounded-full border border-farm-gold/20 shadow-sm;
 }
 
+.store-custom-tag {
+  @apply text-[10px] font-bold uppercase tracking-widest bg-farm-gold text-white px-3 py-1.5 rounded-full shadow-md border-none;
+}
+
 /* Section Elements */
 .section-title {
   @apply text-5xl md:text-6xl mb-6 font-serif font-medium;
