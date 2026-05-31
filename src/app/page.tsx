@@ -92,11 +92,10 @@ export default function RootPage() {
                         <button
                             id="open-auth-modal-btn"
                             onClick={() => setShowAuthModal(true)}
-                            className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-farm-forest/60 hover:text-farm-forest transition-all duration-300 rounded-full hover:bg-farm-forest/5"
+                            className="text-farm-forest/60 hover:text-farm-forest p-2 rounded-full hover:bg-farm-forest/5 transition-all duration-300"
                             title={t.common.login}
                         >
                             <LogIn size={18} />
-                            <span className="hidden sm:inline">{t.common.login}</span>
                         </button>
                     )}
                     <LanguageToggle />
