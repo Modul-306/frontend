@@ -73,23 +73,23 @@ export default function ProductReviews({ productId }: Props) {
     };
 
     return (
-        <section className="mt-20 border-t border-farm-bark/10 pt-16">
-            <div className="flex flex-col md:flex-row justify-between items-start gap-12">
-                <div className="w-full md:w-1/3">
-                    <h2 className="text-3xl font-serif text-farm-forest mb-6">{t.reviews.title}</h2>
-                    <div className="glass-panel p-8 rounded-3xl text-center mb-8">
-                        <p className="text-5xl font-serif text-farm-pine mb-2">{stats.avg_rating.toFixed(1)}</p>
+        <section className="mt-4 pt-4 border-t border-farm-bark/10 flex-1 min-h-0 flex flex-col overflow-hidden">
+            <div className="flex flex-col md:flex-row justify-between items-stretch gap-12 flex-1 min-h-0 overflow-hidden">
+                <div className="w-full md:w-1/3 flex flex-col gap-6 overflow-y-auto pr-2 max-h-full flex-shrink-0 pb-6">
+                    <h2 className="text-2xl font-serif text-farm-forest mb-2">{t.reviews.title}</h2>
+                    <div className="glass-panel p-6 rounded-3xl text-center">
+                        <p className="text-4xl font-serif text-farm-pine mb-1">{stats.avg_rating.toFixed(1)}</p>
                         <div className="flex justify-center gap-1 mb-2">
                             {[1, 2, 3, 4, 5].map(s => (
-                                <Star key={s} size={20} className={s <= Math.round(stats.avg_rating) ? 'fill-farm-gold text-farm-gold' : 'text-farm-bark/30'} />
+                                <Star key={s} size={16} className={s <= Math.round(stats.avg_rating) ? 'fill-farm-gold text-farm-gold' : 'text-farm-bark/30'} />
                             ))}
                         </div>
-                        <p className="text-xs font-bold uppercase tracking-widest text-farm-forest/40">{t.reviews.based_on.replace('{count}', stats.review_count.toString())}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">{t.reviews.based_on.replace('{count}', stats.review_count.toString())}</p>
                     </div>
 
                     {user && (
-                        <div className="glass-panel p-8 rounded-3xl">
-                            <h3 className="font-serif text-lg mb-6">{t.reviews.share_exp}</h3>
+                        <div className="glass-panel p-6 rounded-3xl">
+                            <h3 className="font-serif text-base mb-4">{t.reviews.share_exp}</h3>
                             <form onSubmit={handleSubmitReview} className="space-y-4">
                                 <div className="flex gap-2">
                                     {[1, 2, 3, 4, 5].map(s => (
@@ -99,19 +99,19 @@ export default function ProductReviews({ productId }: Props) {
                                             onClick={() => setRating(s)}
                                             className="transition-transform active:scale-90"
                                         >
-                                            <Star size={24} className={s <= rating ? 'fill-farm-gold text-farm-gold' : 'text-farm-bark/30'} />
+                                            <Star size={20} className={s <= rating ? 'fill-farm-gold text-farm-gold' : 'text-farm-bark/30'} />
                                         </button>
                                     ))}
                                 </div>
                                 <textarea 
-                                    className="premium-input h-32 !text-sm" 
+                                    className="premium-input h-24 !text-xs !p-3" 
                                     placeholder={t.reviews.placeholder}
                                     value={comment}
                                     onChange={e => setComment(e.target.value)}
                                     required
                                 />
-                                <button disabled={loading} className="premium-btn w-full flex items-center justify-center gap-2">
-                                    <Send size={16} />
+                                <button disabled={loading} className="premium-btn w-full flex items-center justify-center gap-2 py-2 text-[10px]">
+                                    <Send size={12} />
                                     {t.reviews.submit}
                                 </button>
                             </form>
@@ -119,30 +119,30 @@ export default function ProductReviews({ productId }: Props) {
                     )}
                 </div>
 
-                <div className="w-full md:w-2/3 space-y-6">
+                <div className="w-full md:w-2/3 space-y-6 overflow-y-auto pr-4 max-h-full pb-6">
                     {reviews.length > 0 ? (
                         reviews.map(review => (
-                            <div key={review.id} className="bg-white/50 p-8 rounded-3xl border border-farm-bark/10 hover:border-farm-gold/20 transition-all">
-                                <div className="flex justify-between items-start mb-4">
+                            <div key={review.id} className="bg-white/50 p-6 rounded-3xl border border-farm-bark/10 hover:border-farm-gold/20 transition-all">
+                                <div className="flex justify-between items-start mb-3">
                                     <div>
                                         <p className="font-bold text-farm-forest text-sm">{review.user_email}</p>
                                         <div className="flex gap-0.5 mt-1">
                                             {[1, 2, 3, 4, 5].map(s => (
-                                                <Star key={s} size={12} className={s <= review.rating ? 'fill-farm-gold text-farm-gold' : 'text-farm-bark/30'} />
+                                                <Star key={s} size={10} className={s <= review.rating ? 'fill-farm-gold text-farm-gold' : 'text-farm-bark/30'} />
                                             ))}
                                         </div>
                                     </div>
-                                    <p className="text-[10px] text-farm-forest/40 font-bold uppercase tracking-widest">{formatLongDate(review.created_at)}</p>
+                                    <p className="text-[9px] text-farm-forest/40 font-bold uppercase tracking-widest">{formatLongDate(review.created_at)}</p>
                                 </div>
-                                <p className="text-farm-forest/70 text-sm leading-relaxed italic">
+                                <p className="text-farm-forest/70 text-xs leading-relaxed italic">
                                     &quot;{review.comment.Valid ? review.comment.String : t.reviews.no_comment}&quot;
                                 </p>
                             </div>
                         ))
                     ) : (
-                        <div className="py-20 text-center glass-panel rounded-3xl border-dashed">
-                            <MessageSquare className="mx-auto text-farm-bark/20 mb-4" size={48} />
-                            <p className="text-xl font-serif italic text-farm-forest/30">{t.reviews.no_reviews}</p>
+                        <div className="py-16 text-center glass-panel rounded-3xl border-dashed">
+                            <MessageSquare className="mx-auto text-farm-bark/20 mb-3" size={36} />
+                            <p className="text-lg font-serif italic text-farm-forest/30">{t.reviews.no_reviews}</p>
                         </div>
                     )}
                 </div>
