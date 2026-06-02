@@ -40,14 +40,26 @@ export default function Shop({ tenant }: ShopProps) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [productsRes, blogsRes, catsRes] = await Promise.all([
+                const [productsRes, blogsRes, catsRes] = await Promise.allSettled([
                     api.get('products', { params: { search, category } }),
                     api.get('blogs'),
                     api.get('categories')
                 ]);
-                setProducts(productsRes.data || []);
-                setBlogs(blogsRes.data || []);
-                setCategories(catsRes.data || []);
+                if (productsRes.status === 'fulfilled') {
+                    setProducts(productsRes.value.data || []);
+                } else {
+                    console.error('Failed to fetch products', productsRes.reason);
+                }
+                if (blogsRes.status === 'fulfilled') {
+                    setBlogs(blogsRes.value.data || []);
+                } else {
+                    console.error('Failed to fetch blogs', blogsRes.reason);
+                }
+                if (catsRes.status === 'fulfilled') {
+                    setCategories(catsRes.value.data || []);
+                } else {
+                    console.error('Failed to fetch categories', catsRes.reason);
+                }
             } catch (err) {
                 console.error('Failed to fetch data', err);
             } finally {
