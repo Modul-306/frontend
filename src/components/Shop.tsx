@@ -117,9 +117,21 @@ export default function Shop({ tenant }: ShopProps) {
         }));
     };
 
-    const basketTotal = useMemo(() => {
-        return basket.reduce((acc, item) => acc + (parseFloat(item.product.price) * item.quantity), 0).toFixed(2);
+    const discountPercent = useMemo(() => {
+        return userLoyalty ? parseFloat(userLoyalty.discount_percent) : 0;
+    }, [userLoyalty]);
+
+    const basketTotalBeforeDiscount = useMemo(() => {
+        return basket.reduce((acc, item) => acc + (parseFloat(item.product.price) * item.quantity), 0);
     }, [basket]);
+
+    const discountAmount = useMemo(() => {
+        return (basketTotalBeforeDiscount * (discountPercent / 100));
+    }, [basketTotalBeforeDiscount, discountPercent]);
+
+    const basketTotalAfterDiscount = useMemo(() => {
+        return (basketTotalBeforeDiscount - discountAmount).toFixed(2);
+    }, [basketTotalBeforeDiscount, discountAmount]);
 
     const handleCheckout = async () => {
         if (!user) {
@@ -218,10 +230,27 @@ export default function Shop({ tenant }: ShopProps) {
                         </div>
 
                         <div className="p-8 border-t border-farm-bark/20 bg-white">
-                            <div className="flex justify-between items-center mb-6">
-                                <span className="font-serif text-xl">{t.shop.total}</span>
-                                <span className="font-bold text-2xl text-farm-pine">{formatCurrency(basketTotal)}</span>
-                            </div>
+                            {discountPercent > 0 ? (
+                                <div className="space-y-3 mb-6">
+                                    <div className="flex justify-between items-center text-sm text-farm-forest/60">
+                                        <span>{t.shop.subtotal}</span>
+                                        <span>{formatCurrency(basketTotalBeforeDiscount.toFixed(2))}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-sm text-green-600 font-medium">
+                                        <span>{t.shop.loyalty_discount} ({discountPercent}%)</span>
+                                        <span>-{formatCurrency(discountAmount.toFixed(2))}</span>
+                                    </div>
+                                    <div className="pt-3 border-t border-farm-bark/10 flex justify-between items-center">
+                                        <span className="font-serif text-xl">{t.shop.total}</span>
+                                        <span className="font-bold text-2xl text-farm-pine">{formatCurrency(basketTotalAfterDiscount)}</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex justify-between items-center mb-6">
+                                    <span className="font-serif text-xl">{t.shop.total}</span>
+                                    <span className="font-bold text-2xl text-farm-pine">{formatCurrency(basketTotalBeforeDiscount.toFixed(2))}</span>
+                                </div>
+                            )}
                             <button 
                                 onClick={handleCheckout}
                                 disabled={basket.length === 0 || isCheckingOut}
