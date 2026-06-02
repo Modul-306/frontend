@@ -165,7 +165,9 @@
     "review_product": "Produkt bewerten",
     "select_product_to_review": "Wählen Sie ein Produkt zum Bewerten",
     "back_to_list": "Zurück zur Liste",
-    "producer": "Produzent"
+    "producer": "Produzent",
+    "loyalty_rules_title": "Info zum Treuestatus",
+    "loyalty_rules_desc": "Ihr Status basiert auf der Anzahl Bestellungen der letzten 365 Tage. Je mehr Sie bestellen, desto höher Ihr Rabatt:"
   },
   "reviews": {
     "title": "Gemeinschaftsbewertungen",
