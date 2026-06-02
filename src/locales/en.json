@@ -165,7 +165,9 @@
     "review_product": "Review Product",
     "select_product_to_review": "Select a Product to Review",
     "back_to_list": "Back to List",
-    "producer": "Producer"
+    "producer": "Producer",
+    "loyalty_rules_title": "Loyalty Program Info",
+    "loyalty_rules_desc": "Your status is based on your orders placed in the last 365 days. The more you order, the higher your discount:"
   },
   "reviews": {
     "title": "Community Reviews",

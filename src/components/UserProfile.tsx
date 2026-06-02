@@ -8,7 +8,7 @@ import { useNotify } from '@/context/NotificationContext';
 import { formatCurrency, formatLongDate } from '@/lib/utils';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { ShoppingBag, Star, MessageSquare, Download, User as UserIcon, MapPin, Settings, CheckCircle, Mail } from 'lucide-react';
+import { ShoppingBag, Star, MessageSquare, Download, User as UserIcon, MapPin, Settings, CheckCircle, Mail, Info } from 'lucide-react';
 import ProductReviews from './ProductReviews';
 
 interface Order {
@@ -40,6 +40,7 @@ export default function UserProfile() {
     const [loadingProducts, setLoadingProducts] = useState(false);
     const [purchasedProducts, setPurchasedProducts] = useState<{ id: string; name: string; tenantSlug: string; tenantName: string }[]>([]);
     const [reviewingProduct, setReviewingProduct] = useState<{ id: string; name: string; tenantSlug: string } | null>(null);
+    const [showLoyaltyInfo, setShowLoyaltyInfo] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -348,7 +349,30 @@ export default function UserProfile() {
                 <aside className="space-y-8">
                     <div className="p-8 rounded-3xl bg-farm-forest text-farm-cream border-none shadow-2xl relative overflow-hidden">
                         <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-farm-gold/10 rounded-full blur-2xl" />
-                        <h3 style={{ color: '#FCFAF6' }} className="text-2xl font-serif mb-6 !text-farm-cream">{t.profile.loyalty_status}</h3>
+                        <h3 style={{ color: '#FCFAF6' }} className="text-2xl font-serif mb-6 !text-farm-cream flex items-center justify-between">
+                            {t.profile.loyalty_status}
+                            <button 
+                                onClick={() => setShowLoyaltyInfo(!showLoyaltyInfo)} 
+                                className="text-farm-cream/60 hover:text-farm-cream transition-colors p-1"
+                                title="Info"
+                            >
+                                <Info size={16} />
+                            </button>
+                        </h3>
+                        {showLoyaltyInfo && (
+                            <div className="mb-6 p-4 rounded-2xl bg-white/10 border border-white/10 text-xs space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <p className="font-bold text-farm-gold uppercase tracking-wider">{t.profile.loyalty_rules_title}</p>
+                                <p className="text-farm-cream/80 leading-relaxed">
+                                    {t.profile.loyalty_rules_desc}
+                                </p>
+                                <ul className="space-y-1.5 font-mono text-[10px] text-farm-cream/90">
+                                    <li className="flex justify-between border-b border-white/5 pb-1"><span>🌱 Seedling (0-2 Orders):</span> <span className="font-bold text-farm-gold">0%</span></li>
+                                    <li className="flex justify-between border-b border-white/5 pb-1"><span>🌿 Sprout (3-9 Orders):</span> <span className="font-bold text-farm-gold">2%</span></li>
+                                    <li className="flex justify-between border-b border-white/5 pb-1"><span>🌾 Harvester (10-19 Orders):</span> <span className="font-bold text-farm-gold">5%</span></li>
+                                    <li className="flex justify-between"><span>👑 Harvest Elite (20+ Orders):</span> <span className="font-bold text-farm-gold">10%</span></li>
+                                </ul>
+                            </div>
+                        )}
                         <div className="space-y-6">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-farm-cream/60">{t.profile.tier}</span>
