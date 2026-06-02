@@ -64,7 +64,8 @@
       "logo_success": "Logo updated!",
       "logo_error": "Error updating logo.",
       "specialty": "Farm Specialty / Category",
-      "specialty_placeholder": "e.g. Dairy, Vegetables, Honey"
+      "specialty_placeholder": "e.g. Dairy, Vegetables, Honey",
+      "restricted": "Storefront customization is restricted to farm administrators."
     },
     "inventory": {
       "add_new": "Add New Item",
