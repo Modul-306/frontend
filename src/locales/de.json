@@ -64,7 +64,8 @@
       "logo_success": "Logo aktualisiert!",
       "logo_error": "Fehler beim Aktualisieren des Logos.",
       "specialty": "Hof-Spezialität / Kategorie",
-      "specialty_placeholder": "z.B. Milchprodukte, Gemüse, Honig"
+      "specialty_placeholder": "z.B. Milchprodukte, Gemüse, Honig",
+      "restricted": "Die Konfiguration der Ladenfront ist für Administratoren reserviert."
     },
     "inventory": {
       "add_new": "Neuen Artikel hinzufügen",

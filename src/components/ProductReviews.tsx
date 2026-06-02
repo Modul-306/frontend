@@ -37,8 +37,14 @@ export default function ProductReviews({ productId }: Props) {
     const fetchReviews = async () => {
         try {
             const [reviewsRes, statsRes] = await Promise.all([
-                api.get(`products/${productId}/reviews`),
-                api.get(`products/${productId}/reviews/stats`) // I'll need to add this endpoint
+                api.get(`products/${productId}/reviews`).catch(err => {
+                    console.error('Failed to fetch reviews list', err);
+                    return { data: [] };
+                }),
+                api.get(`products/${productId}/reviews/stats`).catch(err => {
+                    console.error('Failed to fetch reviews stats', err);
+                    return { data: { avg_rating: 0, review_count: 0 } };
+                })
             ]);
             setReviews(reviewsRes.data || []);
             setStats(statsRes.data || { avg_rating: 0, review_count: 0 });
@@ -59,7 +65,7 @@ export default function ProductReviews({ productId }: Props) {
             notify(t.reviews.success, 'success');
             setComment('');
             fetchReviews();
-        } catch (err) {
+        } catch {
             notify(t.reviews.error, 'error');
         } finally {
             setLoading(false);
@@ -129,7 +135,7 @@ export default function ProductReviews({ productId }: Props) {
                                     <p className="text-[10px] text-farm-forest/40 font-bold uppercase tracking-widest">{formatLongDate(review.created_at)}</p>
                                 </div>
                                 <p className="text-farm-forest/70 text-sm leading-relaxed italic">
-                                    "{review.comment.Valid ? review.comment.String : t.reviews.no_comment}"
+                                    &quot;{review.comment.Valid ? review.comment.String : t.reviews.no_comment}&quot;
                                 </p>
                             </div>
                         ))

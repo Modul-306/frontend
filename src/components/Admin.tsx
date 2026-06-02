@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
-import { Product, Blog, Order, OrderItem } from '@/types';
+import { Product, Blog, Order, OrderItem, Tenant } from '@/types';
 import { formatLongDate, formatCurrency } from '@/lib/utils';
 import { useLanguage } from '@/context/LanguageContext';
 import { useNotify } from '@/context/NotificationContext';
@@ -15,14 +15,10 @@ import { TrendingUp, Package, ShoppingCart, BookOpen, AlertCircle, Eye, EyeOff, 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: boolean; onTenantUpdate?: (tenant: any) => void }) {
+export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: boolean; onTenantUpdate?: (tenant: Tenant) => void }) {
     const { user } = useAuth();
     const { t, locale } = useLanguage();
     const { notify } = useNotify();
-
-    if (!user || (!isOwner && user.role !== 'farmer_admin' && user.role !== 'platform_admin' && user.role !== 'staff')) {
-        return null;
-    }
 
     const [activeTab, setActiveTab] = useState<'storefront' | 'inventory' | 'journal' | 'orders'>('storefront');
     const [loading, setLoading] = useState(false);
@@ -115,12 +111,17 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
 
     const fetchAnalytics = async () => {
         try {
-            const [revRes, topRes] = await Promise.all([
-                api.get('analytics/revenue'),
-                api.get('analytics/top-products')
-            ]);
-            setRevenueData(revRes.data?.reverse() || []);
-            setTopProducts(topRes.data || []);
+            if (user?.role !== 'staff') {
+                const [revRes, topRes] = await Promise.all([
+                    api.get('analytics/revenue'),
+                    api.get('analytics/top-products')
+                ]);
+                setRevenueData(revRes.data?.reverse() || []);
+                setTopProducts(topRes.data || []);
+            } else {
+                const topRes = await api.get('analytics/top-products');
+                setTopProducts(topRes.data || []);
+            }
         } catch (err) {
             console.error('Failed to fetch analytics', err);
         }
@@ -137,7 +138,7 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
         doc.text(`${t.admin.overview.total_orders}: ${stats.orderCount}`, 20, 45);
         
         doc.text(t.admin.overview.top_products_performance, 20, 60);
-        const tableData = topProducts.map((p: any) => [p.name, p.total_sold]);
+        const tableData = topProducts.map((p: { name: string; total_sold: number | string }) => [p.name, p.total_sold]);
         
         autoTable(doc, {
             startY: 65,
@@ -297,6 +298,10 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
         } catch (err) { notify(t.admin.journal.delete_error, 'error'); }
     };
 
+    if (!user || (!isOwner && user.role !== 'farmer_admin' && user.role !== 'platform_admin' && user.role !== 'staff')) {
+        return null;
+    }
+
     return (
         <div className="container mx-auto px-8 py-12">
             <header className="mb-12 text-center">
@@ -308,7 +313,7 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
                     {(Object.keys(t.admin.tabs) as Array<keyof typeof t.admin.tabs>).map((key) => (
                         <button
                             key={key}
-                            onClick={() => setActiveTab(key as any)}
+                            onClick={() => setActiveTab(key)}
                             className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${activeTab === key ? 'bg-farm-forest text-farm-cream shadow-lg' : 'bg-farm-bark/10 text-farm-forest/60 hover:bg-farm-bark/20'}`}
                         >
                             {t.admin.tabs[key]}
@@ -438,67 +443,76 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
 
                             <section className="glass-panel p-8 rounded-3xl h-fit">
                                 <h2 className="text-xl font-serif mb-6 text-farm-forest border-b pb-4">{t.admin.storefront.title}</h2>
-                                <div className="space-y-6">
-                                    <div>
-                                        <label className="premium-label mb-2 block">{t.admin.storefront.logo}</label>
-                                        <input type="file" className="text-xs" onChange={async (e) => {
-                                            const file = e.target.files?.[0];
-                                            if (!file) return;
-                                            setLoading(true);
-                                            try {
-                                                const formData = new FormData();
-                                                formData.append('file', file);
-                                                const uploadRes = await api.post('upload', formData, {
-                                                    headers: { 'Content-Type': 'multipart/form-data' }
-                                                });
-                                                let imageUrl = uploadRes.data.url;
-                                                if (!imageUrl.startsWith('http')) {
-                                                    imageUrl = `${window.location.origin}${imageUrl}`;
+                                {user?.role === 'staff' ? (
+                                    <div className="py-12 px-4 text-center bg-farm-parchment/30 rounded-2xl border border-dashed border-farm-bark/20 italic text-farm-forest/40 flex flex-col items-center gap-3">
+                                        <span className="text-2xl">🔒</span>
+                                        <p className="text-sm font-serif leading-relaxed">
+                                            {t.admin.storefront.restricted}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-6">
+                                        <div>
+                                            <label className="premium-label mb-2 block">{t.admin.storefront.logo}</label>
+                                            <input type="file" className="text-xs" onChange={async (e) => {
+                                                const file = e.target.files?.[0];
+                                                if (!file) return;
+                                                setLoading(true);
+                                                try {
+                                                    const formData = new FormData();
+                                                    formData.append('file', file);
+                                                    const uploadRes = await api.post('upload', formData, {
+                                                        headers: { 'Content-Type': 'multipart/form-data' }
+                                                    });
+                                                    let imageUrl = uploadRes.data.url;
+                                                    if (!imageUrl.startsWith('http')) {
+                                                        imageUrl = `${window.location.origin}${imageUrl}`;
+                                                    }
+                                                    await api.put('tenants/icon', { icon_url: imageUrl });
+                                                    notify(t.admin.storefront.logo_success, 'success');
+                                                } catch (err) {
+                                                    notify(t.admin.storefront.logo_error, 'error');
+                                                } finally {
+                                                    setLoading(false);
                                                 }
-                                                await api.put('tenants/icon', { icon_url: imageUrl });
-                                                notify(t.admin.storefront.logo_success, 'success');
-                                            } catch (err) {
-                                                notify(t.admin.storefront.logo_error, 'error');
-                                            } finally {
-                                                setLoading(false);
-                                            }
-                                        }} />
-                                    </div>
-                                    <div>
-                                        <label className="premium-label mb-2 block">{t.admin.storefront.cover}</label>
-                                        <input type="file" className="text-xs" onChange={async (e) => {
-                                            const file = e.target.files?.[0];
-                                            if (!file) return;
-                                            setLoading(true);
-                                            try {
-                                                const formData = new FormData();
-                                                formData.append('file', file);
-                                                const uploadRes = await api.post('upload', formData, {
-                                                    headers: { 'Content-Type': 'multipart/form-data' }
-                                                });
-                                                let imageUrl = uploadRes.data.url;
-                                                if (!imageUrl.startsWith('http')) {
-                                                    imageUrl = `${window.location.origin}${imageUrl}`;
+                                            }} />
+                                        </div>
+                                        <div>
+                                            <label className="premium-label mb-2 block">{t.admin.storefront.cover}</label>
+                                            <input type="file" className="text-xs" onChange={async (e) => {
+                                                const file = e.target.files?.[0];
+                                                if (!file) return;
+                                                setLoading(true);
+                                                try {
+                                                    const formData = new FormData();
+                                                    formData.append('file', file);
+                                                    const uploadRes = await api.post('upload', formData, {
+                                                        headers: { 'Content-Type': 'multipart/form-data' }
+                                                    });
+                                                    let imageUrl = uploadRes.data.url;
+                                                    if (!imageUrl.startsWith('http')) {
+                                                        imageUrl = `${window.location.origin}${imageUrl}`;
+                                                    }
+                                                    setCoverUrl(imageUrl);
+                                                    notify(t.admin.storefront.save_success, 'success');
+                                                } catch (err) {
+                                                    notify(t.admin.storefront.save_error, 'error');
+                                                } finally {
+                                                    setLoading(false);
                                                 }
-                                                setCoverUrl(imageUrl);
-                                                notify(t.admin.storefront.save_success, 'success');
-                                            } catch (err) {
-                                                notify(t.admin.storefront.save_error, 'error');
-                                            } finally {
-                                                setLoading(false);
-                                            }
-                                        }} />
+                                            }} />
+                                        </div>
+                                        <div>
+                                            <label className="premium-label mb-2 block">{t.admin.storefront.description}</label>
+                                            <textarea className="premium-input h-24 !text-xs" value={description} onChange={e => setDescription(e.target.value)} />
+                                        </div>
+                                        <div>
+                                            <label className="premium-label mb-2 block">{t.admin.storefront.specialty}</label>
+                                            <input className="premium-input !text-xs" value={farmCategory} onChange={e => setFarmCategory(e.target.value)} placeholder={t.admin.storefront.specialty_placeholder} />
+                                        </div>
+                                        <button onClick={handleSaveAppearance} disabled={loading} className="premium-btn w-full !py-2 !text-xs">{loading ? t.common.loading : t.common.save}</button>
                                     </div>
-                                    <div>
-                                        <label className="premium-label mb-2 block">{t.admin.storefront.description}</label>
-                                        <textarea className="premium-input h-24 !text-xs" value={description} onChange={e => setDescription(e.target.value)} />
-                                    </div>
-                                    <div>
-                                        <label className="premium-label mb-2 block">{t.admin.storefront.specialty}</label>
-                                        <input className="premium-input !text-xs" value={farmCategory} onChange={e => setFarmCategory(e.target.value)} placeholder={t.admin.storefront.specialty_placeholder} />
-                                    </div>
-                                    <button onClick={handleSaveAppearance} disabled={loading} className="premium-btn w-full !py-2 !text-xs">{loading ? t.common.loading : t.common.save}</button>
-                                </div>
+                                )}
                             </section>
                         </div>
                     </div>
