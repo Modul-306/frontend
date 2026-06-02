@@ -451,24 +451,24 @@ export default function Shop({ tenant }: ShopProps) {
                 <UserAuthModal onClose={() => setShowAuthModal(false)} onSuccess={() => setShowAuthModal(false)} />
             )}
             {viewingProduct && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 overflow-y-auto animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 md:p-12 overflow-hidden animate-in fade-in duration-300">
                     <div className="absolute inset-0 bg-farm-cream/95 backdrop-blur-md" onClick={() => setViewingProductId(null)} />
-                    <div className="relative w-full max-w-6xl bg-white rounded-[3rem] shadow-2xl p-8 md:p-16 animate-in zoom-in-95 duration-500 overflow-y-auto max-h-full border border-farm-bark/10">
+                    <div className="relative w-full max-w-6xl bg-white rounded-[3rem] shadow-2xl p-8 md:p-16 animate-in zoom-in-95 duration-500 max-h-[90vh] flex flex-col border border-farm-bark/10 overflow-hidden">
                         <button 
                             onClick={() => setViewingProductId(null)}
-                            className="absolute top-8 right-8 text-farm-forest/40 hover:text-farm-forest"
+                            className="absolute top-8 right-8 text-farm-forest/40 hover:text-farm-forest z-10"
                         >
                             <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
-                        <div className="flex flex-col md:flex-row gap-12 items-center mb-16 border-b border-farm-bark/10 pb-16">
-                            <div className="w-48 h-48 rounded-full overflow-hidden shadow-xl border-4 border-white">
+                        <div className="flex flex-col md:flex-row gap-12 items-center mb-8 border-b border-farm-bark/10 pb-8 flex-shrink-0">
+                            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden shadow-xl border-4 border-white">
                                 <img src={viewingProduct.image_url?.Valid ? viewingProduct.image_url.String : `https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400`} className="w-full h-full object-cover" />
                             </div>
                             <div className="text-center md:text-left">
-                                <h2 className="text-4xl md:text-6xl font-serif text-farm-forest mb-4">{viewingProduct.name}</h2>
-                                <p className="text-xl text-farm-forest/60 font-serif italic max-w-xl">{viewingProduct.description?.Valid ? viewingProduct.description.String : t.shop.default_product_desc}</p>
+                                <h2 className="text-3xl md:text-5xl font-serif text-farm-forest mb-2">{viewingProduct.name}</h2>
+                                <p className="text-lg text-farm-forest/60 font-serif italic max-w-xl line-clamp-2">{viewingProduct.description?.Valid ? viewingProduct.description.String : t.shop.default_product_desc}</p>
                             </div>
                         </div>
                         <ProductReviews productId={viewingProduct.id} />
