@@ -38,6 +38,7 @@
     "journal_title": "Farm Journal",
     "journal_subtitle": "Chronicles of our daily labor, community events, and seasonal transitions.",
     "read_more": "Read Full Entry",
+    "read_less": "Collapse Entry",
     "no_stories": "No stories shared just yet.",
     "showing": "Showing",
     "items": "Items",
