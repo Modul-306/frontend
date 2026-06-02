@@ -23,6 +23,8 @@
     "basket": "Ihr Warenkorb",
     "empty_basket": "Ihr Warenkorb ist derzeit leer.",
     "total": "Gesamt",
+    "subtotal": "Zwischensumme",
+    "loyalty_discount": "Treuerabatt",
     "checkout": "Kauf abschliessen",
     "secure_payment": "Sichere Transaktionen über das CattleHof Network",
     "order_success": "Bestellung erfolgreich aufgegeben!",
