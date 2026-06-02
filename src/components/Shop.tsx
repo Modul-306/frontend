@@ -17,12 +17,13 @@ interface ShopProps {
 
 export default function Shop({ tenant }: ShopProps) {
     const { user } = useAuth();
-    const { t, locale } = useLanguage();
+    const { t } = useLanguage();
     const { notify } = useNotify();
     const [products, setProducts] = useState<Product[]>([]);
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
     const [basket, setBasket] = useState<BasketItem[]>([]);
+    const [expandedBlogs, setExpandedBlogs] = useState<Record<string, boolean>>({});
     const [isBasketOpen, setIsBasketOpen] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -67,7 +68,7 @@ export default function Shop({ tenant }: ShopProps) {
                 console.error("Failed to parse basket", e);
             }
         }
-    }, [tenant?.slug, search, category]);
+    }, [tenant?.slug, search, category, user]);
 
     useEffect(() => {
         if (tenant?.slug) {
@@ -125,9 +126,9 @@ export default function Shop({ tenant }: ShopProps) {
             setOrderSuccess(true);
             setIsBasketOpen(false);
             setTimeout(() => setOrderSuccess(false), 5000);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Checkout failed", err);
-            const errMsg = err.response?.data?.error || t.shop.checkout_failed;
+            const errMsg = (err as { response?: { data?: { error?: string } } }).response?.data?.error || t.shop.checkout_failed;
             notify(errMsg, 'error');
         } finally {
             setIsCheckingOut(false);
@@ -174,7 +175,7 @@ export default function Shop({ tenant }: ShopProps) {
                         <div className="flex-1 overflow-y-auto p-8 space-y-6">
                             {basket.length === 0 ? (
                                 <div className="text-center py-20 text-farm-forest/40 italic font-serif text-xl">
-                                    "{t.shop.empty_basket}"
+                                    &ldquo;{t.shop.empty_basket}&rdquo;
                                 </div>
                             ) : (
                                 basket.map((item) => (
@@ -302,7 +303,7 @@ export default function Shop({ tenant }: ShopProps) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {products.length === 0 ? (
                             <div className="col-span-full py-32 text-center glass-panel rounded-3xl text-farm-forest/40 italic font-serif text-2xl border-dashed">
-                                "{t.shop.no_products}"
+                                &ldquo;{t.shop.no_products}&rdquo;
                             </div>
                         ) : products.map((product) => (
                             <div key={product.id} className="premium-card group flex flex-col h-full bg-white relative">
@@ -365,39 +366,72 @@ export default function Shop({ tenant }: ShopProps) {
                             <div className="text-center text-farm-forest/30 italic font-serif text-xl bg-white p-16 rounded-3xl border border-farm-bark/50">
                                 {t.shop.no_stories}
                             </div>
-                        ) : blogs.map((blog) => (
-                            <article key={blog.id} className="group cursor-pointer">
-                                <div className="flex flex-col items-center text-center">
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-farm-gold mb-6 border-b border-farm-gold pb-2">{formatLongDate(blog.published_at)}</span>
-                                    <h3 className="text-5xl md:text-6xl mb-10 leading-[1.1] max-w-3xl font-serif group-hover:text-farm-pine transition-colors">{blog.title}</h3>
-                                    
-                                    <div className="w-full max-w-3xl glass-panel p-10 md:p-14 rounded-3xl text-left relative overflow-hidden transition-all duration-500 group-hover:shadow-xl group-hover:border-farm-pine/20">
-                                        <div className="absolute top-0 left-0 w-2 h-full bg-farm-gold/80" />
-                                        <div className="prose prose-slate prose-lg max-w-none text-farm-forest/80 font-sans leading-relaxed font-light mb-12">
-                                            <ReactMarkdown
-                                                components={{
-                                                    img: (props) => {
-                                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                                        const { node, ...rest } = props;
-                                                        return (
-                                                            <img 
-                                                                {...rest} 
-                                                                className="rounded-2xl max-w-full h-auto my-6 shadow-md border border-farm-bark/10 transition-transform hover:scale-[1.01]" 
-                                                            />
-                                                        );
-                                                    }
-                                                }}
-                                            >
-                                                {blog.content_md}
-                                            </ReactMarkdown>
-                                        </div>
-                                        <div className="flex justify-center">
-                                            <button className="premium-btn-outline !px-12">{t.shop.read_more}</button>
+                        ) : blogs.map((blog) => {
+                            const isExpanded = !!expandedBlogs[blog.id];
+                            return (
+                                <article key={blog.id} className="group">
+                                    <div className="flex flex-col items-center text-center">
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-farm-gold mb-6 border-b border-farm-gold pb-2">{formatLongDate(blog.published_at)}</span>
+                                        <h3 
+                                            onClick={() => {
+                                                if (!isExpanded) {
+                                                    setExpandedBlogs(prev => ({ ...prev, [blog.id]: true }));
+                                                }
+                                            }}
+                                            className={`text-5xl md:text-6xl mb-10 leading-[1.1] max-w-3xl font-serif group-hover:text-farm-pine transition-colors ${!isExpanded ? 'cursor-pointer' : ''}`}
+                                        >
+                                            {blog.title}
+                                        </h3>
+                                        
+                                        <div 
+                                            onClick={() => {
+                                                if (!isExpanded) {
+                                                    setExpandedBlogs(prev => ({ ...prev, [blog.id]: true }));
+                                                }
+                                            }}
+                                            className={`w-full max-w-3xl glass-panel p-10 md:p-14 rounded-3xl text-left relative overflow-hidden transition-all duration-500 group-hover:shadow-xl group-hover:border-farm-pine/20 ${!isExpanded ? 'cursor-pointer' : ''}`}
+                                        >
+                                            <div className="absolute top-0 left-0 w-2 h-full bg-farm-gold/80" />
+                                            <div className={`relative overflow-hidden transition-all duration-500 ${isExpanded ? 'max-h-none mb-12' : 'max-h-48'}`}>
+                                                <div className="prose prose-slate prose-lg max-w-none text-farm-forest/80 font-sans leading-relaxed font-light mb-12">
+                                                    <ReactMarkdown
+                                                        components={{
+                                                            img: (props) => {
+                                                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                                const { node, ...rest } = props;
+                                                                return (
+                                                                    <img 
+                                                                        {...rest} 
+                                                                        className="rounded-2xl max-w-full h-auto my-6 shadow-md border border-farm-bark/10 transition-transform hover:scale-[1.01]" 
+                                                                        alt={rest.alt || "Blog image"}
+                                                                    />
+                                                                );
+                                                            }
+                                                        }}
+                                                    >
+                                                        {blog.content_md}
+                                                    </ReactMarkdown>
+                                                </div>
+                                                {!isExpanded && (
+                                                    <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+                                                )}
+                                            </div>
+                                            <div className="flex justify-center">
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setExpandedBlogs(prev => ({ ...prev, [blog.id]: !isExpanded }));
+                                                    }}
+                                                    className="premium-btn-outline !px-12"
+                                                >
+                                                    {isExpanded ? t.shop.read_less : t.shop.read_more}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </article>
-                        ))}
+                                </article>
+                            );
+                        })}
                     </div>
                 </section>
             </div>
