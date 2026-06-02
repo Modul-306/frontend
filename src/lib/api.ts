@@ -6,15 +6,17 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
-    // Priority 1: Check if tenant slug is stored in localStorage (set by the tenant page)
-    const storedSlug = localStorage.getItem('tenant_slug');
-    if (storedSlug) {
-      config.headers['X-Tenant-Slug'] = storedSlug;
-    } else {
-      // Priority 2: Guess from path
-      const pathParts = window.location.pathname.split('/');
-      if (pathParts.length > 1 && pathParts[1] !== '' && !['admin-login', 'admin'].includes(pathParts[1])) {
-        config.headers['X-Tenant-Slug'] = pathParts[1];
+    if (!config.headers['X-Tenant-Slug']) {
+      // Priority 1: Check if tenant slug is stored in localStorage (set by the tenant page)
+      const storedSlug = localStorage.getItem('tenant_slug');
+      if (storedSlug) {
+        config.headers['X-Tenant-Slug'] = storedSlug;
+      } else {
+        // Priority 2: Guess from path
+        const pathParts = window.location.pathname.split('/');
+        if (pathParts.length > 1 && pathParts[1] !== '' && !['admin-login', 'admin'].includes(pathParts[1])) {
+          config.headers['X-Tenant-Slug'] = pathParts[1];
+        }
       }
     }
 

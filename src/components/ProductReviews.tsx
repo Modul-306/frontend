@@ -18,9 +18,10 @@ interface Review {
 
 interface Props {
     productId: string;
+    tenantSlug?: string;
 }
 
-export default function ProductReviews({ productId }: Props) {
+export default function ProductReviews({ productId, tenantSlug }: Props) {
     const { user } = useAuth();
     const { t } = useLanguage();
     const { notify } = useNotify();
@@ -32,16 +33,17 @@ export default function ProductReviews({ productId }: Props) {
 
     useEffect(() => {
         fetchReviews();
-    }, [productId]);
+    }, [productId, tenantSlug]);
 
     const fetchReviews = async () => {
         try {
+            const headers = tenantSlug ? { 'X-Tenant-Slug': tenantSlug } : {};
             const [reviewsRes, statsRes] = await Promise.all([
-                api.get(`products/${productId}/reviews`).catch(err => {
+                api.get(`products/${productId}/reviews`, { headers }).catch(err => {
                     console.error('Failed to fetch reviews list', err);
                     return { data: [] };
                 }),
-                api.get(`products/${productId}/reviews/stats`).catch(err => {
+                api.get(`products/${productId}/reviews/stats`, { headers }).catch(err => {
                     console.error('Failed to fetch reviews stats', err);
                     return { data: { avg_rating: 0, review_count: 0 } };
                 })
@@ -61,7 +63,8 @@ export default function ProductReviews({ productId }: Props) {
         }
         setLoading(true);
         try {
-            await api.post(`products/${productId}/reviews`, { rating, comment });
+            const headers = tenantSlug ? { 'X-Tenant-Slug': tenantSlug } : {};
+            await api.post(`products/${productId}/reviews`, { rating, comment }, { headers });
             notify(t.reviews.success, 'success');
             setComment('');
             fetchReviews();

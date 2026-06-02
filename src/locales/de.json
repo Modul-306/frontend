@@ -157,7 +157,13 @@
     "invoice_title": "CattleHof Netzwerk - Rechnung",
     "customer": "Kunde",
     "qty": "Menge",
-    "grand_total": "Gesamtsumme"
+    "grand_total": "Gesamtsumme",
+    "purchased_products": "Kürzlich gekaufte Produkte",
+    "no_purchased_products": "Sie haben noch keine Produkte gekauft.",
+    "review_product": "Produkt bewerten",
+    "select_product_to_review": "Wählen Sie ein Produkt zum Bewerten",
+    "back_to_list": "Zurück zur Liste",
+    "producer": "Produzent"
   },
   "reviews": {
     "title": "Gemeinschaftsbewertungen",
