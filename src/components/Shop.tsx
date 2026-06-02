@@ -374,7 +374,22 @@ export default function Shop({ tenant }: ShopProps) {
                                     <div className="w-full max-w-3xl glass-panel p-10 md:p-14 rounded-3xl text-left relative overflow-hidden transition-all duration-500 group-hover:shadow-xl group-hover:border-farm-pine/20">
                                         <div className="absolute top-0 left-0 w-2 h-full bg-farm-gold/80" />
                                         <div className="prose prose-slate prose-lg max-w-none text-farm-forest/80 font-sans leading-relaxed font-light mb-12">
-                                            <ReactMarkdown>{blog.content_md}</ReactMarkdown>
+                                            <ReactMarkdown
+                                                components={{
+                                                    img: (props) => {
+                                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                        const { node, ...rest } = props;
+                                                        return (
+                                                            <img 
+                                                                {...rest} 
+                                                                className="rounded-2xl max-w-full h-auto my-6 shadow-md border border-farm-bark/10 transition-transform hover:scale-[1.01]" 
+                                                            />
+                                                        );
+                                                    }
+                                                }}
+                                            >
+                                                {blog.content_md}
+                                            </ReactMarkdown>
                                         </div>
                                         <div className="flex justify-center">
                                             <button className="premium-btn-outline !px-12">{t.shop.read_more}</button>
