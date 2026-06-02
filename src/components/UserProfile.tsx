@@ -9,9 +9,11 @@ import { formatCurrency, formatLongDate } from '@/lib/utils';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ShoppingBag, Star, MessageSquare, Download, User as UserIcon, MapPin, Settings, CheckCircle, Mail } from 'lucide-react';
+import ProductReviews from './ProductReviews';
 
 interface Order {
     id: string;
+    tenant_id: string;
     total_amount: string;
     status: string;
     created_at: string;
@@ -32,6 +34,12 @@ export default function UserProfile() {
     const [street, setStreet] = useState('');
     const [zipCode, setZipCode] = useState('');
     const [city, setCity] = useState('');
+
+    // Purchased products review browser states
+    const [showBrowseModal, setShowBrowseModal] = useState(false);
+    const [loadingProducts, setLoadingProducts] = useState(false);
+    const [purchasedProducts, setPurchasedProducts] = useState<{ id: string; name: string; tenantSlug: string; tenantName: string }[]>([]);
+    const [reviewingProduct, setReviewingProduct] = useState<{ id: string; name: string; tenantSlug: string } | null>(null);
 
     useEffect(() => {
         if (user) {
@@ -129,6 +137,60 @@ export default function UserProfile() {
             doc.save(`invoice_${order.id.slice(0, 8)}.pdf`);
         } catch (err) {
             console.error('Failed to download invoice', err);
+        }
+    };
+
+    const handleLoadPurchasedProducts = async () => {
+        setLoadingProducts(true);
+        setShowBrowseModal(true);
+        try {
+            // 1. Fetch all tenants so we can map tenant_id to slug and name
+            const tenantsRes = await api.get('tenants');
+            const tenantsList = tenantsRes.data || [];
+            const tenantMap = new Map<string, { name: string; slug: string }>();
+            tenantsList.forEach((t: any) => {
+                tenantMap.set(t.id, { name: t.name, slug: t.slug });
+            });
+
+            // 2. Filter completed orders
+            const completedOrders = orders.filter(o => o.status === 'completed');
+            
+            if (completedOrders.length === 0) {
+                setPurchasedProducts([]);
+                setLoadingProducts(false);
+                return;
+            }
+
+            // 3. Fetch order items for all completed orders in parallel
+            const itemsPromises = completedOrders.map(o => api.get(`orders/${o.id}`));
+            const responses = await Promise.all(itemsPromises);
+
+            // 4. Build a list of unique products with their tenant details
+            const uniqueProductsMap = new Map<string, { id: string; name: string; tenantSlug: string; tenantName: string }>();
+            
+            responses.forEach((res, index) => {
+                const items = res.data || [];
+                const order = completedOrders[index];
+                const tenantInfo = tenantMap.get(order.tenant_id) || { name: 'Unknown Farm', slug: '' };
+                
+                items.forEach((item: any) => {
+                    if (!uniqueProductsMap.has(item.product_id)) {
+                        uniqueProductsMap.set(item.product_id, {
+                            id: item.product_id,
+                            name: item.product_name,
+                            tenantSlug: tenantInfo.slug,
+                            tenantName: tenantInfo.name
+                        });
+                    }
+                });
+            });
+
+            setPurchasedProducts(Array.from(uniqueProductsMap.values()));
+        } catch (err) {
+            console.error('Failed to load purchased products for review', err);
+            notify(t.profile.update_error || 'Error loading products', 'error');
+        } finally {
+            setLoadingProducts(false);
         }
     };
 
@@ -318,10 +380,79 @@ export default function UserProfile() {
                         <p className="text-sm text-farm-forest/60 mb-6">
                             {t.profile.review_desc}
                         </p>
-                        <button onClick={() => window.location.href = '/#directory'} className="premium-btn-outline w-full !text-xs">{t.profile.browse_products}</button>
+                        <button onClick={handleLoadPurchasedProducts} className="premium-btn-outline w-full !text-xs">{t.profile.browse_products}</button>
                     </div>
                 </aside>
             </div>
+
+            {showBrowseModal && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 md:p-12 overflow-hidden animate-in fade-in duration-300">
+                    <div className="absolute inset-0 bg-farm-cream/95 backdrop-blur-md" onClick={() => { setShowBrowseModal(false); setReviewingProduct(null); }} />
+                    <div className="relative w-full max-w-4xl bg-white rounded-[3rem] shadow-2xl p-8 md:p-12 animate-in zoom-in-95 duration-500 max-h-[85vh] flex flex-col border border-farm-bark/10 overflow-hidden">
+                        <button 
+                            onClick={() => { setShowBrowseModal(false); setReviewingProduct(null); }}
+                            className="absolute top-8 right-8 text-farm-forest/40 hover:text-farm-forest z-10"
+                        >
+                            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        {reviewingProduct ? (
+                            <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                                <button 
+                                    onClick={() => setReviewingProduct(null)}
+                                    className="flex items-center gap-2 text-farm-pine font-bold uppercase text-xs hover:underline mb-6 self-start"
+                                >
+                                    ← {t.profile.back_to_list}
+                                </button>
+                                <div className="mb-4 border-b border-farm-bark/10 pb-4">
+                                    <h2 className="text-3xl font-serif text-farm-forest">{reviewingProduct.name}</h2>
+                                </div>
+                                <div className="flex-1 min-h-0 overflow-y-auto">
+                                    <ProductReviews productId={reviewingProduct.id} tenantSlug={reviewingProduct.tenantSlug} />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                                <h2 className="text-3xl font-serif text-farm-forest mb-2">{t.profile.select_product_to_review}</h2>
+                                <p className="text-sm text-farm-forest/60 mb-8">{t.profile.purchased_products}</p>
+                                
+                                <div className="flex-1 overflow-y-auto pr-2 space-y-4 min-h-0">
+                                    {loadingProducts ? (
+                                        <div className="flex justify-center py-20">
+                                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-farm-pine"></div>
+                                        </div>
+                                    ) : purchasedProducts.length > 0 ? (
+                                        purchasedProducts.map(product => (
+                                            <div key={product.id} className="bg-white/50 p-6 rounded-3xl border border-farm-bark/10 hover:border-farm-gold/20 transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                                <div>
+                                                    <h3 className="text-lg font-serif text-farm-forest font-semibold">{product.name}</h3>
+                                                    <p className="text-xs text-farm-forest/50 mt-1">
+                                                        <span className="font-bold uppercase tracking-widest text-[9px] text-farm-gold/80 mr-1">{t.profile.producer}:</span>
+                                                        {product.tenantName}
+                                                    </p>
+                                                </div>
+                                                <button 
+                                                    onClick={() => setReviewingProduct({ id: product.id, name: product.name, tenantSlug: product.tenantSlug })}
+                                                    className="premium-btn py-2.5 px-6 text-xs uppercase tracking-wider whitespace-nowrap self-stretch sm:self-auto text-center"
+                                                >
+                                                    {t.profile.review_product}
+                                                </button>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="py-16 text-center glass-panel rounded-3xl border-dashed">
+                                            <MessageSquare className="mx-auto text-farm-bark/20 mb-3" size={36} />
+                                            <p className="text-lg font-serif italic text-farm-forest/30">{t.profile.no_purchased_products}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

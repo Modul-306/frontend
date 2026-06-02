@@ -157,7 +157,13 @@
     "invoice_title": "CattleHof Network - Invoice",
     "customer": "Customer",
     "qty": "Qty",
-    "grand_total": "Grand Total"
+    "grand_total": "Grand Total",
+    "purchased_products": "Recently Purchased Products",
+    "no_purchased_products": "You haven't purchased any products yet.",
+    "review_product": "Review Product",
+    "select_product_to_review": "Select a Product to Review",
+    "back_to_list": "Back to List",
+    "producer": "Producer"
   },
   "reviews": {
     "title": "Community Reviews",
