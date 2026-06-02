@@ -11,7 +11,7 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     BarChart, Bar, Cell
 } from 'recharts';
-import { TrendingUp, Package, ShoppingCart, BookOpen, AlertCircle, Eye, EyeOff, Download } from 'lucide-react';
+import { TrendingUp, Package, ShoppingCart, BookOpen, AlertCircle, Eye, EyeOff, Download, Bold, Italic, Heading1, Heading2, Quote, Code, List, Link, Image as ImageIcon } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -38,6 +38,49 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
     const [blogTitle, setBlogTitle] = useState('');
     const [blogContent, setBlogContent] = useState('');
     const [editingBlogId, setEditingBlogId] = useState<string | null>(null);
+
+    const insertMarkdown = (prefix: string, suffix: string = '') => {
+        const textarea = document.getElementById('blog-editor-textarea') as HTMLTextAreaElement;
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+        const selected = text.substring(start, end);
+        const replacement = prefix + selected + suffix;
+
+        setBlogContent(text.substring(0, start) + replacement + text.substring(end));
+
+        // Refocus and restore selection
+        setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
+        }, 0);
+    };
+
+    const handleInsertImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const uploadRes = await api.post('upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            let imageUrl = uploadRes.data.url;
+            if (!imageUrl.startsWith('http')) {
+                imageUrl = `${window.location.origin}${imageUrl}`;
+            }
+            insertMarkdown(`![${file.name}](${imageUrl})`);
+            notify(t.admin.storefront.logo_success || 'Image uploaded!', 'success');
+        } catch {
+            notify(t.admin.storefront.logo_error || 'Error uploading image.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const [coverUrl, setCoverUrl] = useState('');
     const [description, setDescription] = useState('');
@@ -586,7 +629,33 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
                             <h2 className="text-2xl font-serif mb-6 text-farm-forest">{editingBlogId ? t.admin.journal.edit_entry : t.admin.journal.new_entry}</h2>
                             <form onSubmit={handleCreateOrUpdateBlog} className="space-y-6">
                                 <input className="premium-input" placeholder={t.admin.journal.title} value={blogTitle} onChange={e => setBlogTitle(e.target.value)} required />
-                                <textarea className="premium-input h-64" placeholder={t.admin.journal.content} value={blogContent} onChange={e => setBlogContent(e.target.value)} required />
+                                <div className="space-y-0">
+                                    <div className="flex flex-wrap items-center gap-1 bg-farm-parchment/50 border border-farm-bark/80 p-2.5 rounded-t-xl border-b-0">
+                                        <button type="button" onClick={() => insertMarkdown('**', '**')} className="p-2 hover:bg-farm-bark/30 text-farm-forest rounded-lg transition-colors" title="Bold"><Bold size={16} /></button>
+                                        <button type="button" onClick={() => insertMarkdown('*', '*')} className="p-2 hover:bg-farm-bark/30 text-farm-forest rounded-lg transition-colors" title="Italic"><Italic size={16} /></button>
+                                        <div className="w-px h-6 bg-farm-bark/60 mx-1" />
+                                        <button type="button" onClick={() => insertMarkdown('# ')} className="p-2 hover:bg-farm-bark/30 text-farm-forest rounded-lg transition-colors" title="Heading 1"><Heading1 size={16} /></button>
+                                        <button type="button" onClick={() => insertMarkdown('## ')} className="p-2 hover:bg-farm-bark/30 text-farm-forest rounded-lg transition-colors" title="Heading 2"><Heading2 size={16} /></button>
+                                        <div className="w-px h-6 bg-farm-bark/60 mx-1" />
+                                        <button type="button" onClick={() => insertMarkdown('> ')} className="p-2 hover:bg-farm-bark/30 text-farm-forest rounded-lg transition-colors" title="Blockquote"><Quote size={16} /></button>
+                                        <button type="button" onClick={() => insertMarkdown('`', '`')} className="p-2 hover:bg-farm-bark/30 text-farm-forest rounded-lg transition-colors" title="Code"><Code size={16} /></button>
+                                        <button type="button" onClick={() => insertMarkdown('- ')} className="p-2 hover:bg-farm-bark/30 text-farm-forest rounded-lg transition-colors" title="List"><List size={16} /></button>
+                                        <button type="button" onClick={() => insertMarkdown('[', '](url)')} className="p-2 hover:bg-farm-bark/30 text-farm-forest rounded-lg transition-colors" title="Link"><Link size={16} /></button>
+                                        <div className="w-px h-6 bg-farm-bark/60 mx-1" />
+                                        <label className="p-2 hover:bg-farm-bark/30 text-farm-forest rounded-lg transition-colors cursor-pointer" title="Upload Image">
+                                            <ImageIcon size={16} className="inline" />
+                                            <input type="file" accept="image/*" onChange={handleInsertImage} className="hidden" />
+                                        </label>
+                                    </div>
+                                    <textarea 
+                                        id="blog-editor-textarea"
+                                        className="premium-input !rounded-t-none h-64 border-t-0" 
+                                        placeholder={t.admin.journal.content} 
+                                        value={blogContent} 
+                                        onChange={e => setBlogContent(e.target.value)} 
+                                        required 
+                                    />
+                                </div>
                                 <div className="flex gap-2">
                                     <button disabled={loading} className="premium-btn flex-1">{editingBlogId ? t.common.save : t.common.confirm}</button>
                                     {editingBlogId && <button type="button" onClick={() => setEditingBlogId(null)} className="premium-btn-outline">{t.common.cancel}</button>}
