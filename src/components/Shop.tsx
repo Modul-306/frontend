@@ -33,6 +33,34 @@ export default function Shop({ tenant }: ShopProps) {
     const [viewingProductId, setViewingProductId] = useState<string | null>(null);
     const viewingProduct = products.find(p => p.id === viewingProductId);
     const [paymentMethod, setPaymentMethod] = useState<'cash' | 'online'>('cash');
+    const [shippingStreet, setShippingStreet] = useState('');
+    const [shippingZipCode, setShippingZipCode] = useState('');
+    const [shippingCity, setShippingCity] = useState('');
+    const [shippingFullName, setShippingFullName] = useState('');
+    const [isEditingAddress, setIsEditingAddress] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            const fetchProfileAddress = async () => {
+                try {
+                    const res = await api.get('auth/profile');
+                    setShippingStreet(res.data.street || '');
+                    setShippingZipCode(res.data.zip_code || '');
+                    setShippingCity(res.data.city || '');
+                    setShippingFullName(res.data.full_name || '');
+                } catch (err) {
+                    console.error('Failed to fetch profile address', err);
+                }
+            };
+            fetchProfileAddress();
+        } else {
+            setShippingStreet('');
+            setShippingZipCode('');
+            setShippingCity('');
+            setShippingFullName('');
+            setIsEditingAddress(false);
+        }
+    }, [user]);
 
     useEffect(() => {
         if (tenant) {
@@ -168,7 +196,11 @@ export default function Shop({ tenant }: ShopProps) {
 
             const res = await api.post('orders', { 
                 items,
-                payment_method: finalMethod
+                payment_method: finalMethod,
+                street: shippingStreet,
+                zip_code: shippingZipCode,
+                city: shippingCity,
+                full_name: shippingFullName
             });
 
             setBasket([]);
@@ -316,6 +348,81 @@ export default function Shop({ tenant }: ShopProps) {
                                     </div>
                                 </div>
                             )}
+                            {/* Delivery Address Override Section */}
+                            <div className="mb-6 border-t border-farm-bark/10 pt-6 animate-in fade-in duration-300">
+                                <div className="flex justify-between items-center mb-3">
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">
+                                        Delivery Address
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEditingAddress(!isEditingAddress)}
+                                        className="text-[10px] font-bold text-farm-pine hover:underline uppercase tracking-wider"
+                                    >
+                                        {isEditingAddress ? "Save / Done" : "Change Address"}
+                                    </button>
+                                </div>
+
+                                {isEditingAddress ? (
+                                    <div className="space-y-3 bg-farm-parchment/30 p-4 rounded-2xl border border-farm-bark/40">
+                                        <div>
+                                            <label className="text-[9px] font-bold uppercase tracking-widest text-farm-forest/40 block mb-1">Recipient Name</label>
+                                            <input 
+                                                type="text" 
+                                                value={shippingFullName} 
+                                                onChange={e => setShippingFullName(e.target.value)} 
+                                                placeholder="Recipient's Name" 
+                                                className="premium-input !py-2 !px-3 !text-xs !rounded-xl"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[9px] font-bold uppercase tracking-widest text-farm-forest/40 block mb-1">Street & No.</label>
+                                            <input 
+                                                type="text" 
+                                                value={shippingStreet} 
+                                                onChange={e => setShippingStreet(e.target.value)} 
+                                                placeholder="Street & house number" 
+                                                className="premium-input !py-2 !px-3 !text-xs !rounded-xl"
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <div className="col-span-1">
+                                                <label className="text-[9px] font-bold uppercase tracking-widest text-farm-forest/40 block mb-1">Zip Code</label>
+                                                <input 
+                                                    type="text" 
+                                                    value={shippingZipCode} 
+                                                    onChange={e => setShippingZipCode(e.target.value)} 
+                                                    placeholder="ZIP" 
+                                                    className="premium-input !py-2 !px-3 !text-xs !rounded-xl"
+                                                />
+                                            </div>
+                                            <div className="col-span-2">
+                                                <label className="text-[9px] font-bold uppercase tracking-widest text-farm-forest/40 block mb-1">City</label>
+                                                <input 
+                                                    type="text" 
+                                                    value={shippingCity} 
+                                                    onChange={e => setShippingCity(e.target.value)} 
+                                                    placeholder="City" 
+                                                    className="premium-input !py-2 !px-3 !text-xs !rounded-xl"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="bg-farm-parchment/20 p-4 rounded-2xl border border-farm-bark/30 text-xs space-y-1">
+                                        {shippingFullName || shippingStreet || shippingCity ? (
+                                            <>
+                                                <p className="font-bold text-farm-forest">{shippingFullName || user?.email}</p>
+                                                <p className="text-farm-forest/70">{shippingStreet}</p>
+                                                <p className="text-farm-forest/70">{shippingZipCode} {shippingCity}</p>
+                                            </>
+                                        ) : (
+                                            <p className="text-farm-forest/40 italic">No delivery address set. Click 'Change Address' to provide one.</p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
                             <button 
                                 onClick={handleCheckout}
                                 disabled={basket.length === 0 || isCheckingOut}
