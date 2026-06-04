@@ -85,6 +85,8 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
     const [coverUrl, setCoverUrl] = useState('');
     const [description, setDescription] = useState('');
     const [farmCategory, setFarmCategory] = useState('');
+    const [allowsOnlinePayment, setAllowsOnlinePayment] = useState(true);
+    const [allowsCashPayment, setAllowsCashPayment] = useState(true);
 
     // Data States
     const [products, setProducts] = useState<Product[]>([]);
@@ -114,6 +116,8 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
                     setCoverUrl(res.data.cover_url?.String || '');
                     setDescription(res.data.description?.String || '');
                     setFarmCategory(res.data.category?.String || '');
+                    setAllowsOnlinePayment(res.data.allows_online_payment ?? true);
+                    setAllowsCashPayment(res.data.allows_cash_payment ?? true);
                 });
             }
         }
@@ -239,7 +243,13 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
     const handleSaveAppearance = async () => {
         setLoading(true);
         try {
-            const res = await api.put('tenants/appearance', { cover_url: coverUrl, description, category: farmCategory });
+            const res = await api.put('tenants/appearance', { 
+                cover_url: coverUrl, 
+                description, 
+                category: farmCategory,
+                allows_online_payment: allowsOnlinePayment,
+                allows_cash_payment: allowsCashPayment
+            });
             notify(t.admin.storefront.save_success, 'success');
             if (onTenantUpdate) {
                 onTenantUpdate(res.data);
@@ -552,6 +562,35 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
                                         <div>
                                             <label className="premium-label mb-2 block">{t.admin.storefront.specialty}</label>
                                             <input className="premium-input !text-xs" value={farmCategory} onChange={e => setFarmCategory(e.target.value)} placeholder={t.admin.storefront.specialty_placeholder} />
+                                        </div>
+                                        <div className="space-y-3 my-4">
+                                            <label className="premium-label block">Payment Methods</label>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="glass-panel p-4 rounded-xl flex items-center justify-between border border-farm-forest/10 hover:border-farm-forest/30 transition-all duration-300">
+                                                    <div>
+                                                        <span className="text-xs font-serif text-farm-forest block">{t.admin.storefront.allows_online}</span>
+                                                        <span className="text-[10px] text-farm-forest/60">Payrexx (TWINT, Cards, Apple Pay)</span>
+                                                    </div>
+                                                    <input 
+                                                        type="checkbox" 
+                                                        checked={allowsOnlinePayment} 
+                                                        onChange={e => setAllowsOnlinePayment(e.target.checked)} 
+                                                        className="rounded text-farm-forest focus:ring-farm-forest h-4 w-4 cursor-pointer"
+                                                    />
+                                                </div>
+                                                <div className="glass-panel p-4 rounded-xl flex items-center justify-between border border-farm-forest/10 hover:border-farm-forest/30 transition-all duration-300">
+                                                    <div>
+                                                        <span className="text-xs font-serif text-farm-forest block">{t.admin.storefront.allows_cash}</span>
+                                                        <span className="text-[10px] text-farm-forest/60">On-site cash collection</span>
+                                                    </div>
+                                                    <input 
+                                                        type="checkbox" 
+                                                        checked={allowsCashPayment} 
+                                                        onChange={e => setAllowsCashPayment(e.target.checked)} 
+                                                        className="rounded text-farm-forest focus:ring-farm-forest h-4 w-4 cursor-pointer"
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                         <button onClick={handleSaveAppearance} disabled={loading} className="premium-btn w-full !py-2 !text-xs">{loading ? t.common.loading : t.common.save}</button>
                                     </div>

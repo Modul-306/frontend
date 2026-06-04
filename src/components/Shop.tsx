@@ -30,6 +30,20 @@ export default function Shop({ tenant }: ShopProps) {
     const [orderSuccess, setOrderSuccess] = useState(false);
     const [viewingProductId, setViewingProductId] = useState<string | null>(null);
     const viewingProduct = products.find(p => p.id === viewingProductId);
+    const [paymentMethod, setPaymentMethod] = useState<'cash' | 'online'>('cash');
+
+    useEffect(() => {
+        if (tenant) {
+            if (tenant.allows_online_payment && !tenant.allows_cash_payment) {
+                setPaymentMethod('online');
+            } else {
+                setPaymentMethod('cash');
+            }
+        }
+    }, [tenant]);
+    
+    const allowsOnline = tenant?.allows_online_payment ?? true;
+    const allowsCash = tenant?.allows_cash_payment ?? true;
     
     // Search & Filter States
     const [search, setSearch] = useState('');
@@ -145,10 +159,25 @@ export default function Shop({ tenant }: ShopProps) {
                 product_id: item.product.id,
                 quantity: item.quantity
             }));
-            await api.post('orders', { items });
+
+            let finalMethod: 'cash' | 'online' = paymentMethod;
+            if (!allowsOnline) finalMethod = 'cash';
+            if (!allowsCash) finalMethod = 'online';
+
+            const res = await api.post('orders', { 
+                items,
+                payment_method: finalMethod
+            });
+
             setBasket([]);
-            setOrderSuccess(true);
             setIsBasketOpen(false);
+
+            if (res.data.redirect_url) {
+                window.location.href = res.data.redirect_url;
+                return;
+            }
+
+            setOrderSuccess(true);
             setTimeout(() => setOrderSuccess(false), 5000);
         } catch (err: unknown) {
             console.error("Checkout failed", err);
@@ -249,6 +278,43 @@ export default function Shop({ tenant }: ShopProps) {
                                 <div className="flex justify-between items-center mb-6">
                                     <span className="font-serif text-xl">{t.shop.total}</span>
                                     <span className="font-bold text-2xl text-farm-pine">{formatCurrency(basketTotalBeforeDiscount.toFixed(2))}</span>
+                                </div>
+                            )}
+                            {allowsOnline && allowsCash && (
+                                <div className="mb-6 animate-in fade-in duration-300">
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40 block mb-2">
+                                        Payment Method
+                                    </label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setPaymentMethod('cash')}
+                                            className={`py-2 px-3 rounded-xl border flex flex-col items-center justify-center transition-all duration-300 ${
+                                                paymentMethod === 'cash'
+                                                    ? 'border-farm-forest bg-farm-forest/5 text-farm-forest shadow-sm'
+                                                    : 'border-farm-bark/10 text-farm-forest/60 hover:border-farm-bark/30'
+                                            }`}
+                                        >
+                                            <svg className="w-4 h-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            <span className="text-[10px] font-serif font-bold">Cash</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setPaymentMethod('online')}
+                                            className={`py-2 px-3 rounded-xl border flex flex-col items-center justify-center transition-all duration-300 ${
+                                                paymentMethod === 'online'
+                                                    ? 'border-farm-forest bg-farm-forest/5 text-farm-forest shadow-sm'
+                                                    : 'border-farm-bark/10 text-farm-forest/60 hover:border-farm-bark/30'
+                                            }`}
+                                        >
+                                            <svg className="w-4 h-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                            </svg>
+                                            <span className="text-[10px] font-serif font-bold">Online (Payrexx)</span>
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                             <button 
