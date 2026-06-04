@@ -269,7 +269,8 @@ export default function RootPage() {
                             </div>
                             <div className="flex flex-col gap-4">
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-farm-gold">{t.home.legal}</span>
-                                <a href="#" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">{t.home.privacy_policy}</a>
+                                <Link href="/privacy" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">{t.home.privacy_policy}</Link>
+                                <Link href="/impressum" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">{t.home.impressum}</Link>
                                 <a href="#" className="text-sm text-farm-cream/60 hover:text-farm-cream transition-colors">{t.home.terms_of_service}</a>
                             </div>
                         </div>
