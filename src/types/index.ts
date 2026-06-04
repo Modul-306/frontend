@@ -13,6 +13,8 @@ export interface Tenant {
     created_at: string | NullTime;
     owner_id?: NullUUID;
     category?: NullString;
+    allows_online_payment?: boolean;
+    allows_cash_payment?: boolean;
 }
 
 export type NullUUID = string | null;

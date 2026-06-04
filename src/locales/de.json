@@ -68,7 +68,9 @@
       "logo_error": "Fehler beim Aktualisieren des Logos.",
       "specialty": "Hof-Spezialität / Kategorie",
       "specialty_placeholder": "z.B. Milchprodukte, Gemüse, Honig",
-      "restricted": "Die Konfiguration der Ladenfront ist für Administratoren reserviert."
+      "restricted": "Die Konfiguration der Ladenfront ist für Administratoren reserviert.",
+      "allows_online": "Online-Zahlung aktivieren (Payrexx)",
+      "allows_cash": "Barzahlung aktivieren"
     },
     "inventory": {
       "add_new": "Neuen Artikel hinzufügen",
