@@ -569,7 +569,7 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
                                                 <label className="premium-label block mb-1">Payment Methods</label>
                                                 <span className="text-[10px] text-farm-forest/40 block">Configure how customers can pay for their orders at your farm.</span>
                                             </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 gap-4">
                                                 <div 
                                                     className={`glass-panel p-5 rounded-2xl flex items-center justify-between border-2 transition-all duration-300 cursor-pointer select-none ${
                                                         allowsOnlinePayment ? 'border-farm-pine bg-farm-pine/5 shadow-md shadow-farm-pine/5' : 'border-farm-bark/60 opacity-70 hover:opacity-100 hover:border-farm-bark'
@@ -755,22 +755,68 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
                         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                             <div className="xl:col-span-2 space-y-4">
                                 <h2 className="text-2xl font-serif mb-6 text-farm-forest">{t.admin.orders.title}</h2>
-                                {orders.map(o => (
-                                    <div key={o.id} onClick={() => fetchOrderDetails(o.id)} className={`cursor-pointer p-6 rounded-3xl border transition-all ${viewingOrderId === o.id ? 'bg-farm-forest text-farm-cream border-farm-forest shadow-xl scale-[1.02]' : 'bg-white border-farm-bark/20 hover:border-farm-pine'}`}>
-                                        <div className="flex justify-between items-center">
-                                            <div>
-                                                <p className={`text-[10px] font-bold uppercase tracking-widest ${viewingOrderId === o.id ? 'text-farm-gold' : 'text-farm-forest/40'}`}>{t.admin.orders.order_id}: {o.id.slice(0, 8)}</p>
-                                                <p className="font-serif text-lg">{formatLongDate(o.created_at)}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="font-bold">{formatCurrency(o.total_amount)}</p>
-                                                <span className={`text-[10px] px-2 py-1 rounded-full uppercase font-bold ${o.status === 'completed' ? 'bg-green-100 text-green-700' : o.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                                    {o.status}
-                                                </span>
+                                {orders.map(o => {
+                                    const isSelected = viewingOrderId === o.id;
+                                    const customerName = o.full_name?.Valid ? o.full_name.String : (o.email ? o.email.split('@')[0] : 'Guest');
+                                    const createdDate = typeof o.created_at === 'object' && o.created_at.Valid 
+                                        ? o.created_at.Time 
+                                        : (typeof o.created_at === 'string' ? o.created_at : '');
+
+                                    return (
+                                        <div 
+                                            key={o.id} 
+                                            onClick={() => fetchOrderDetails(o.id)} 
+                                            className={`cursor-pointer p-6 rounded-3xl border transition-all duration-300 hover:shadow-md ${
+                                                isSelected 
+                                                    ? 'bg-gradient-to-br from-farm-forest to-farm-pine text-farm-cream border-farm-forest shadow-xl scale-[1.01]' 
+                                                    : 'bg-white border-farm-bark/20 hover:border-farm-pine hover:scale-[1.005]'
+                                            }`}
+                                        >
+                                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className={`text-[10px] font-bold uppercase tracking-widest ${isSelected ? 'text-farm-gold' : 'text-farm-forest/40'}`}>
+                                                            {t.admin.orders.order_id}: #{o.id.slice(0, 8)}
+                                                        </span>
+                                                        <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase border ${
+                                                            o.payment_status === 'paid' 
+                                                                ? (isSelected ? 'bg-white/20 text-white border-white/20' : 'bg-green-50 text-green-700 border-green-200')
+                                                                : (isSelected ? 'bg-red-500/20 text-red-200 border-red-500/20' : 'bg-red-50 text-red-700 border-red-200')
+                                                        }`}>
+                                                            {o.payment_status}
+                                                        </span>
+                                                    </div>
+                                                    <p className={`text-base font-medium ${isSelected ? 'text-white' : 'text-farm-forest'}`}>
+                                                        {customerName}
+                                                    </p>
+                                                    <p className={`text-xs ${isSelected ? 'text-farm-cream/60' : 'text-farm-forest/50'}`}>
+                                                        {formatLongDate(createdDate)}
+                                                    </p>
+                                                </div>
+
+                                                <div className="flex sm:flex-col items-end justify-between sm:justify-center w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 border-farm-bark/10">
+                                                    <div className="text-left sm:text-right space-y-0.5">
+                                                        <p className={`text-[10px] uppercase font-bold tracking-wider ${isSelected ? 'text-farm-cream/60' : 'text-farm-forest/40'}`}>
+                                                            {o.payment_method === 'online' ? 'Online Pay' : 'Cash on delivery'}
+                                                        </p>
+                                                        <p className={`text-lg font-black ${isSelected ? 'text-farm-gold' : 'text-farm-pine'}`}>
+                                                            {formatCurrency(o.total_amount)}
+                                                        </p>
+                                                    </div>
+                                                    <span className={`mt-2 text-[9px] px-2.5 py-1 rounded-full uppercase font-bold border tracking-wider ${
+                                                        o.status === 'completed' 
+                                                            ? (isSelected ? 'bg-white/20 text-white border-white/30' : 'bg-green-100 text-green-800 border-green-200') 
+                                                            : o.status === 'cancelled' 
+                                                                ? (isSelected ? 'bg-red-500/20 text-red-200 border-red-500/30' : 'bg-red-100 text-red-800 border-red-200') 
+                                                                : (isSelected ? 'bg-yellow-500/20 text-yellow-200 border-yellow-500/30' : 'bg-yellow-100 text-yellow-800 border-yellow-200')
+                                                    }`}>
+                                                        {o.status.replace('_', ' ')}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                             
                             <div className="xl:col-span-1">

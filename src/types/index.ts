@@ -51,6 +51,8 @@ export interface Order {
     status: 'pending' | 'completed' | 'cancelled';
     total_amount: string; // From backend it's a string decimal
     created_at: string | NullTime;
+    payment_method: 'cash' | 'online';
+    payment_status: 'paid' | 'unpaid';
     full_name?: NullString;
     email?: string;
     street?: NullString;
