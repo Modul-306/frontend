@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import NextLink from 'next/link';
 import api from '@/lib/api';
 import { Product, Blog, Order, OrderItem, Tenant } from '@/types';
 import { formatLongDate, formatCurrency } from '@/lib/utils';
@@ -225,7 +226,7 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
     const fetchOrderDetails = async (orderId: string) => {
         try {
             const res = await api.get(`orders/${orderId}`);
-            setSelectedOrderItems(res.data || []);
+            setSelectedOrderItems(res.data.items || []);
             setViewingOrderId(orderId);
         } catch (err) { console.error(err); }
     };
@@ -750,7 +751,12 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
                             <div className="xl:col-span-1">
                                 {viewingOrderId ? (
                                     <div className="glass-panel p-8 rounded-3xl sticky top-24">
-                                        <h3 className="font-serif text-xl mb-6 border-b pb-4">{t.admin.orders.details}</h3>
+                                        <div className="flex justify-between items-center mb-6 border-b pb-4">
+                                            <h3 className="font-serif text-xl">{t.admin.orders.details}</h3>
+                                            <NextLink href={`/orders/${viewingOrderId}`} className="text-xs font-bold text-farm-pine hover:underline uppercase tracking-wider">
+                                                Full View →
+                                            </NextLink>
+                                        </div>
                                         <div className="mb-8 space-y-2">
                                             <p className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">{t.profile.customer}</p>
                                             <p className="text-sm font-bold">{orders.find(o => o.id === viewingOrderId)?.full_name?.String || orders.find(o => o.id === viewingOrderId)?.email}</p>
