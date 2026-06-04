@@ -10,6 +10,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useNotify } from '@/context/NotificationContext';
 import UserAuthModal from './UserAuthModal';
 import ProductReviews from './ProductReviews';
+import { useRouter } from 'next/navigation';
 
 interface ShopProps {
     tenant: Tenant | null;
@@ -19,6 +20,7 @@ export default function Shop({ tenant }: ShopProps) {
     const { user } = useAuth();
     const { t } = useLanguage();
     const { notify } = useNotify();
+    const router = useRouter();
     const [products, setProducts] = useState<Product[]>([]);
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
@@ -171,14 +173,7 @@ export default function Shop({ tenant }: ShopProps) {
 
             setBasket([]);
             setIsBasketOpen(false);
-
-            if (res.data.redirect_url) {
-                window.location.href = res.data.redirect_url;
-                return;
-            }
-
-            setOrderSuccess(true);
-            setTimeout(() => setOrderSuccess(false), 5000);
+            router.push(`/orders/${res.data.order.id}`);
         } catch (err: unknown) {
             console.error("Checkout failed", err);
             const errMsg = (err as { response?: { data?: { error?: string } } }).response?.data?.error || t.shop.checkout_failed;

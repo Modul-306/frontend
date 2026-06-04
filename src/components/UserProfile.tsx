@@ -8,8 +8,9 @@ import { useNotify } from '@/context/NotificationContext';
 import { formatCurrency, formatLongDate } from '@/lib/utils';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { ShoppingBag, Star, MessageSquare, Download, User as UserIcon, MapPin, Settings, CheckCircle, Mail, Info } from 'lucide-react';
+import { ShoppingBag, Star, MessageSquare, Download, User as UserIcon, MapPin, Settings, CheckCircle, Mail, Info, Eye } from 'lucide-react';
 import ProductReviews from './ProductReviews';
+import { useRouter } from 'next/navigation';
 
 interface Order {
     id: string;
@@ -23,6 +24,7 @@ export default function UserProfile() {
     const { user } = useAuth();
     const { t } = useLanguage();
     const { notify } = useNotify();
+    const router = useRouter();
     
     const [orders, setOrders] = useState<Order[]>([]);
     const [loyalty, setLoyalty] = useState<{tier: string, discount_percent: string} | null>(null);
@@ -103,7 +105,7 @@ export default function UserProfile() {
     const handleDownloadInvoice = async (order: Order) => {
         try {
             const res = await api.get(`orders/${order.id}`);
-            const items = res.data || [];
+            const items = res.data.items || [];
             
             const doc = new jsPDF();
             doc.setFontSize(22);
@@ -325,6 +327,13 @@ export default function UserProfile() {
                                                         {order.status}
                                                     </span>
                                                 </div>
+                                                <button 
+                                                    onClick={() => router.push(`/orders/${order.id}`)}
+                                                    className="p-3 bg-farm-bark/10 text-farm-forest/40 hover:text-farm-pine hover:bg-farm-pine/10 rounded-2xl transition-all"
+                                                    title="View Details"
+                                                >
+                                                    <Eye size={20} />
+                                                </button>
                                                 <button 
                                                     onClick={() => handleDownloadInvoice(order)}
                                                     className="p-3 bg-farm-bark/10 text-farm-forest/40 hover:text-farm-pine hover:bg-farm-pine/10 rounded-2xl transition-all"
