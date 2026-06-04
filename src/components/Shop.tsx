@@ -173,7 +173,11 @@ export default function Shop({ tenant }: ShopProps) {
 
             setBasket([]);
             setIsBasketOpen(false);
-            router.push(`/orders/${res.data.order.id}`);
+            if (res.data.redirect_url) {
+                window.location.href = res.data.redirect_url;
+            } else {
+                router.push(`/orders/${res.data.order.id}`);
+            }
         } catch (err: unknown) {
             console.error("Checkout failed", err);
             const errMsg = (err as { response?: { data?: { error?: string } } }).response?.data?.error || t.shop.checkout_failed;
