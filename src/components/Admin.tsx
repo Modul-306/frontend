@@ -564,32 +564,57 @@ export default function Admin({ isOwner = false, onTenantUpdate }: { isOwner?: b
                                             <label className="premium-label mb-2 block">{t.admin.storefront.specialty}</label>
                                             <input className="premium-input !text-xs" value={farmCategory} onChange={e => setFarmCategory(e.target.value)} placeholder={t.admin.storefront.specialty_placeholder} />
                                         </div>
-                                        <div className="space-y-3 my-4">
-                                            <label className="premium-label block">Payment Methods</label>
+                                        <div className="space-y-4 my-6">
+                                            <div>
+                                                <label className="premium-label block mb-1">Payment Methods</label>
+                                                <span className="text-[10px] text-farm-forest/40 block">Configure how customers can pay for their orders at your farm.</span>
+                                            </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div className="glass-panel p-4 rounded-xl flex items-center justify-between border border-farm-forest/10 hover:border-farm-forest/30 transition-all duration-300">
-                                                    <div>
-                                                        <span className="text-xs font-serif text-farm-forest block">{t.admin.storefront.allows_online}</span>
-                                                        <span className="text-[10px] text-farm-forest/60">Payrexx (TWINT, Cards, Apple Pay)</span>
+                                                <div 
+                                                    className={`glass-panel p-5 rounded-2xl flex items-center justify-between border-2 transition-all duration-300 cursor-pointer select-none ${
+                                                        allowsOnlinePayment ? 'border-farm-pine bg-farm-pine/5 shadow-md shadow-farm-pine/5' : 'border-farm-bark/60 opacity-70 hover:opacity-100 hover:border-farm-bark'
+                                                    }`}
+                                                    onClick={() => setAllowsOnlinePayment(!allowsOnlinePayment)}
+                                                >
+                                                    <div className="space-y-1">
+                                                        <span className="text-sm font-serif font-bold text-farm-forest block">{t.admin.storefront.allows_online}</span>
+                                                        <span className="text-xs text-farm-forest/60 block">Payrexx (TWINT, Cards, Apple Pay)</span>
                                                     </div>
-                                                    <input 
-                                                        type="checkbox" 
-                                                        checked={allowsOnlinePayment} 
-                                                        onChange={e => setAllowsOnlinePayment(e.target.checked)} 
-                                                        className="rounded text-farm-forest focus:ring-farm-forest h-4 w-4 cursor-pointer"
-                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none ${
+                                                            allowsOnlinePayment ? 'bg-farm-pine' : 'bg-farm-bark'
+                                                        }`}
+                                                    >
+                                                        <span
+                                                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-300 ease-in-out ${
+                                                                allowsOnlinePayment ? 'translate-x-5' : 'translate-x-0'
+                                                            }`}
+                                                        />
+                                                    </button>
                                                 </div>
-                                                <div className="glass-panel p-4 rounded-xl flex items-center justify-between border border-farm-forest/10 hover:border-farm-forest/30 transition-all duration-300">
-                                                    <div>
-                                                        <span className="text-xs font-serif text-farm-forest block">{t.admin.storefront.allows_cash}</span>
-                                                        <span className="text-[10px] text-farm-forest/60">On-site cash collection</span>
+                                                <div 
+                                                    className={`glass-panel p-5 rounded-2xl flex items-center justify-between border-2 transition-all duration-300 cursor-pointer select-none ${
+                                                        allowsCashPayment ? 'border-farm-pine bg-farm-pine/5 shadow-md shadow-farm-pine/5' : 'border-farm-bark/60 opacity-70 hover:opacity-100 hover:border-farm-bark'
+                                                    }`}
+                                                    onClick={() => setAllowsCashPayment(!allowsCashPayment)}
+                                                >
+                                                    <div className="space-y-1">
+                                                        <span className="text-sm font-serif font-bold text-farm-forest block">{t.admin.storefront.allows_cash}</span>
+                                                        <span className="text-xs text-farm-forest/60 block">On-site cash collection</span>
                                                     </div>
-                                                    <input 
-                                                        type="checkbox" 
-                                                        checked={allowsCashPayment} 
-                                                        onChange={e => setAllowsCashPayment(e.target.checked)} 
-                                                        className="rounded text-farm-forest focus:ring-farm-forest h-4 w-4 cursor-pointer"
-                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none ${
+                                                            allowsCashPayment ? 'bg-farm-pine' : 'bg-farm-bark'
+                                                        }`}
+                                                    >
+                                                        <span
+                                                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-300 ease-in-out ${
+                                                                allowsCashPayment ? 'translate-x-5' : 'translate-x-0'
+                                                            }`}
+                                                        />
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
