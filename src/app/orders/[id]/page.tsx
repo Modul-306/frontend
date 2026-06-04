@@ -19,6 +19,10 @@ interface OrderMetadata {
 	created_at: { Time: string; Valid: boolean } | string;
 	payment_method: string;
 	payment_status: string;
+	shipping_street?: { String: string; Valid: boolean };
+	shipping_zip_code?: { String: string; Valid: boolean };
+	shipping_city?: { String: string; Valid: boolean };
+	shipping_full_name?: { String: string; Valid: boolean };
 }
 
 interface OrderItemRow {
@@ -190,32 +194,136 @@ export default function OrderDetailsPage() {
 			</nav>
 
 			<div className="container mx-auto px-4 max-w-4xl mt-12 animate-in fade-in duration-500">
-				{/* Top Panel */}
-				<div className="glass-panel p-8 rounded-3xl border-farm-gold/20 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-					<div>
-						<span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40">Order Summary</span>
-						<h1 className="text-3xl font-serif text-farm-forest mt-1">ID: #{order.id.slice(0, 8)}</h1>
-						<p className="text-xs text-farm-forest/60 mt-1">{formatLongDate(dateVal)}</p>
-					</div>
+				{/* Celebratory Hero Header */}
+				<div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-farm-forest via-farm-pine to-farm-forest p-8 md:p-12 mb-8 text-farm-cream shadow-2xl border-none">
+					{/* Decorative circles */}
+					<div className="absolute -right-10 -top-10 w-40 h-40 bg-farm-gold/10 rounded-full blur-2xl pointer-events-none" />
+					<div className="absolute -left-20 -bottom-20 w-60 h-60 bg-farm-pine/20 rounded-full blur-3xl pointer-events-none" />
+					
+					<div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+						<div className="space-y-4">
+							<div className="flex items-center gap-3">
+								<span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+									order.payment_status === 'paid' 
+										? 'bg-farm-gold text-farm-forest shadow-md' 
+										: 'bg-white/10 text-white border border-white/20'
+								}`}>
+									{order.payment_status === 'paid' ? '✨ PAID & CONFIRMED' : '💳 PENDING PAYMENT'}
+								</span>
+								<span className="text-[10px] font-mono tracking-widest text-farm-cream/60">
+									#{order.id.slice(0, 8)}
+								</span>
+							</div>
 
-					<div className="flex flex-wrap gap-3">
-						<button 
-							onClick={handleDownloadInvoice}
-							className="premium-btn-outline text-xs !py-2 flex items-center gap-2"
-						>
-							<Download size={14} />
-							Invoice PDF
-						</button>
-						{order.status === 'pending_payment' && order.payment_status !== 'paid' && (
+							<h1 style={{ color: '#FCFAF6' }} className="text-4xl md:text-5xl font-serif font-bold leading-tight !text-farm-cream">
+								{order.payment_status === 'paid' ? (
+									<>Thank you for <br />your purchase!</>
+								) : (
+									<>Complete your <br />farm order payment</>
+								)}
+							</h1>
+
+							<p className="text-sm text-farm-cream/70 font-sans max-w-md font-light leading-relaxed">
+								{order.payment_status === 'paid' ? (
+									"Your payment was processed successfully. The farm has received your order and is currently preparing your fresh local goods."
+								) : (
+									"Your order is recorded, but we are awaiting payment confirmation. Please click the button to pay securely via Payrexx."
+								)}
+							</p>
+
+							<p className="text-xs text-farm-cream/50">
+								Placed on {formatLongDate(dateVal)}
+							</p>
+						</div>
+
+						<div className="flex flex-col sm:flex-row md:flex-col gap-3 w-full md:w-auto">
 							<button 
-								onClick={handlePayNow}
-								disabled={paying}
-								className="premium-btn text-xs !py-2 flex items-center gap-2 shadow-lg"
+								onClick={handleDownloadInvoice}
+								className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-farm-cream font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-full transition-all duration-300 flex items-center justify-center gap-2 shadow-lg backdrop-blur-sm"
 							>
-								<CreditCard size={14} />
-								{paying ? 'Connecting to Payrexx...' : 'Pay Now'}
+								<Download size={14} />
+								Invoice PDF
 							</button>
-						)}
+							{order.status === 'pending_payment' && order.payment_status !== 'paid' && (
+								<button 
+									onClick={handlePayNow}
+									disabled={paying}
+									className="w-full bg-farm-gold hover:bg-farm-honey text-farm-forest font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-full transition-all duration-300 flex items-center justify-center gap-2 shadow-xl hover:scale-105 active:scale-95"
+								>
+									<CreditCard size={14} />
+									{paying ? 'Connecting...' : 'Pay Now'}
+								</button>
+							)}
+						</div>
+					</div>
+				</div>
+
+				{/* Progress Timeline */}
+				<div className="glass-panel p-8 rounded-3xl mb-8">
+					<div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-8 relative">
+						{/* Background connecting line */}
+						<div className="hidden md:block absolute top-6 left-1/12 right-1/12 h-0.5 bg-farm-bark/10 -z-10" />
+
+						{/* Step 1: Placed */}
+						<div className="flex flex-col items-center text-center space-y-2 flex-1 relative z-10">
+							<div className="w-12 h-12 rounded-full bg-farm-pine text-farm-cream flex items-center justify-center shadow-lg font-bold border-4 border-white">
+								✓
+							</div>
+							<div>
+								<p className="font-serif font-bold text-sm text-farm-forest">Order Placed</p>
+								<p className="text-[10px] text-farm-forest/50">Your order has been recorded</p>
+							</div>
+						</div>
+
+						{/* Step 2: Payment */}
+						<div className="flex flex-col items-center text-center space-y-2 flex-1 relative z-10">
+							{order.payment_status === 'paid' ? (
+								<div className="w-12 h-12 rounded-full bg-farm-pine text-farm-cream flex items-center justify-center shadow-lg font-bold border-4 border-white">
+									✓
+								</div>
+							) : order.status === 'cancelled' ? (
+								<div className="w-12 h-12 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg font-bold border-4 border-white">
+									✕
+								</div>
+							) : (
+								<div className="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg font-bold border-4 border-white animate-pulse">
+									💳
+								</div>
+							)}
+							<div>
+								<p className="font-serif font-bold text-sm text-farm-forest">Payment</p>
+								<p className="text-[10px] text-farm-forest/50">
+									{order.payment_status === 'paid' ? 'Paid & Confirmed' : order.status === 'cancelled' ? 'Payment Cancelled' : 'Awaiting Payment'}
+								</p>
+							</div>
+						</div>
+
+						{/* Step 3: Fulfillment */}
+						<div className="flex flex-col items-center text-center space-y-2 flex-1 relative z-10">
+							{order.status === 'completed' ? (
+								<div className="w-12 h-12 rounded-full bg-farm-pine text-farm-cream flex items-center justify-center shadow-lg font-bold border-4 border-white">
+									✓
+								</div>
+							) : order.status === 'cancelled' ? (
+								<div className="w-12 h-12 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg font-bold border-4 border-white">
+									✕
+								</div>
+							) : order.payment_status === 'paid' ? (
+								<div className="w-12 h-12 rounded-full bg-farm-gold text-farm-forest flex items-center justify-center shadow-lg font-bold border-4 border-white animate-pulse">
+									📦
+								</div>
+							) : (
+								<div className="w-12 h-12 rounded-full bg-farm-bark/10 text-farm-forest/30 flex items-center justify-center shadow-lg font-bold border-4 border-white">
+									3
+								</div>
+							)}
+							<div>
+								<p className="font-serif font-bold text-sm text-farm-forest">Ready for Pick Up</p>
+								<p className="text-[10px] text-farm-forest/50">
+									{order.status === 'completed' ? 'Picked up / Completed' : order.status === 'cancelled' ? 'Order Cancelled' : 'Preparing at Farm'}
+								</p>
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -287,6 +395,27 @@ export default function OrderDetailsPage() {
 									<span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40 block mb-1">Payment Method</span>
 									<p className="font-medium text-farm-forest">
 										{order.payment_method === 'online' ? 'Online (Payrexx)' : 'Cash'}
+									</p>
+								</div>
+							</div>
+						</div>
+
+						{/* Delivery Address */}
+						<div className="glass-panel p-8 rounded-3xl">
+							<h3 className="text-xl font-serif mb-6 text-farm-forest border-b pb-4">Delivery Address</h3>
+							<div className="space-y-4 text-xs text-farm-forest">
+								<div>
+									<span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40 block mb-1">Recipient Name</span>
+									<p className="font-bold text-sm text-farm-forest">{order.shipping_full_name?.Valid ? order.shipping_full_name.String : 'Guest'}</p>
+								</div>
+								<div>
+									<span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40 block mb-1">Street</span>
+									<p className="font-medium text-farm-forest/70">{order.shipping_street?.Valid ? order.shipping_street.String : 'N/A'}</p>
+								</div>
+								<div>
+									<span className="text-[10px] font-bold uppercase tracking-widest text-farm-forest/40 block mb-1">City / ZIP</span>
+									<p className="font-medium text-farm-forest/70">
+										{order.shipping_zip_code?.Valid ? order.shipping_zip_code.String : ''} {order.shipping_city?.Valid ? order.shipping_city.String : ''}
 									</p>
 								</div>
 							</div>
